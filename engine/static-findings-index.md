@@ -1,7 +1,7 @@
 # Binary Analysis
 
 Status: living index of the static and byte-level findings
-Last updated: 2026-10-22 (decompilation linked)
+Last updated: 2026-11-02 (historical debugger runbook availability clarified)
 Summary: front door to the static and byte-level findings about the Steam `BEA.exe`: specimen baseline, dated
 analyses, per-system contracts and per-function notes. Makes no claim of its own — every claim below belongs to the
 document it links.
@@ -103,5 +103,7 @@ tools or navigation.
 These notes are not decompiler source and do not authorize copying proprietary
 code into the rebuild.
 
-For controlled debugger work, use the CDB runbook (archived research record, not published).
-Full databases, backups, raw logs, and captures stay outside Git.
+The historical controlled debugger work used a CDB runbook kept as an archived
+research record, not published. It is unavailable to contributors and is not a
+prerequisite for documentation corrections. Full databases, backups, raw logs,
+and captures stay outside Git.

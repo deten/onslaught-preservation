@@ -1,22 +1,26 @@
 # Reference Source Analysis
 
 Status: active — folder index
-Last updated: 2026-10-22 (research-campaign records removed)
-Summary: how the notes on Stuart's pinned source are organised, and what the reference submodules are used for.
+Last updated: 2026-11-02 (external source references and current rebuild provenance clarified)
+Summary: how the notes on Stuart's pinned external source are organised and where to find the current rebuild's
+implementation and licence boundary.
 
-The pinned [`references/Onslaught`](https://github.com/stuart73/Onslaught) and
-[`references/AYAResourceExtractor`](https://github.com/stuart73/AYAResourceExtractor)
-submodules are actively used reference evidence. Their current build, format,
-test, provenance, and license posture is recorded in the
-reference-submodule audit (archived research record, not published).
+These notes use Stuart Gillam's published
+[Onslaught source at `c3d8ac4`](https://github.com/dlprentice/Onslaught/tree/c3d8ac464259942b83fa8aa7f867c856e77b734d) and
+[AYAResourceExtractor at `53b10b0`](https://github.com/dlprentice/AYAResourceExtractor/tree/53b10b083b59cfd7e72849c15bec8b608eaf8a23)
+as external reference evidence. The labels `references/Onslaught` and
+`references/AYAResourceExtractor` are historical citation paths; this repository
+contains neither submodule. A finding that names an earlier commit describes
+that dated source snapshot. The earlier reference-submodule audit is an archived
+research record, not published.
 
 Stuart Gillam's source represents an internal PC development lineage. The Steam
 retail executable and save layout differ. Source names and architecture are
 useful hypotheses; they are not proof of retail identity or behavior.
 
 [`stuart-source-synthesis.md`](stuart-source-synthesis.md) is the dated narrative
-synthesis of that exact pinned source corpus. The source files themselves remain
-the line-level authority.
+synthesis of the source snapshot named in its header. The source files themselves
+remain the line-level authority for that source lineage.
 
 ## System maps
 
@@ -34,5 +38,5 @@ or semantic-correctness claims. Current retail relationships belong in the
 smallest owning binary-analysis note rather than a generated crosswalk mirror.
 
 The GPL rebuild is RE-informed original code, not a mechanical translation of
-these references. Follow `rebuild/PROVENANCE.md` in Onslaught-Career-Editor
-for its license and implementation boundary.
+these references. Follow [onslaught-godot's provenance record](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/PROVENANCE.md)
+for its current license and implementation boundary.

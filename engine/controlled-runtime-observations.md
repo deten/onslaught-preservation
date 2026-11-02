@@ -1,8 +1,11 @@
 # Controlled copied-runtime observations — 2026-07-26
 
-Date: 2026-07-26. Four questions that static reading could not settle, settled by
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
-reading a running copy under CDB. Each had blocked for hours or days on a
+Status: historical — controlled copied-runtime observations
+Date: 2026-07-26
+Last updated: 2026-11-02 (historical probe tooling availability clarified)
+Summary: four questions that static reading could not settle, settled by reading a running copy under CDB.
+
+Each had blocked for hours or days on a
 decompiler limitation, an unresolvable indirect call, or a constant whose units
 are simply not present in the image.
 
@@ -28,23 +31,25 @@ Raw debugger logs are untracked by project rule and live under
 
 ## The technique, because it generalises
 
-Two shapes, both reusable, both now committed as tools.
+These observations used two reusable probe patterns. The script names below
+identify historical tooling in the original research checkout; the scripts and
+private driving script are not included in this documentation-only repository.
 
-**Breakpoint window** — `tools/cdb_worldmatrix_probe.ps1`. Arm the expensive
+**Breakpoint window** — `tools/cdb_worldmatrix_probe.ps1` armed the expensive
 breakpoint on entry to a wrapper that has exactly one caller in the image, and
-disarm it on that wrapper's return address. Everything outside the window runs
-untrapped. For the cockpit that is: arm at `0x0053bb50`, break at `0x00551043`,
-disarm at `0x0053ec6f` — and the game still runs at ~77 fps, which is what makes
-a scripted playthrough to Level 100 survivable.
+disarmed it on that wrapper's return address. Everything outside the window ran
+untrapped. For the cockpit it armed at `0x0053bb50`, broke at `0x00551043`, and
+disarmed at `0x0053ec6f`; the game still ran at ~77 fps, making a scripted
+playthrough to Level 100 survivable.
 
-**Hit-scheduled** — `tools/cdb_lightstate_probe.ps1`. For a site that fires once
-per frame, no window is needed; schedule on the nth hit.
+**Hit-scheduled** — `tools/cdb_lightstate_probe.ps1` scheduled a read on the nth
+hit of a site that fired once per frame, without a breakpoint window.
 
-`tools/cdb_meshmode_probe.ps1` is a third instance of the same pattern.
+`tools/cdb_meshmode_probe.ps1` was a third instance of the same pattern.
 
-The game is driven to Level 100 by scripted input. `Capture-Retail.ps1` kills the
-target in a `finally` block and cannot be reused for an attached session, so
-`<maintainer evidence>/cockpit-worldmatrix-2026-07-26/Drive-RunningRetail.ps1` exists. The
+The game was driven to Level 100 by scripted input. `Capture-Retail.ps1` killed the
+target in a `finally` block and could not be reused for an attached session, so
+`<maintainer evidence>/cockpit-worldmatrix-2026-07-26/Drive-RunningRetail.ps1` was used. The
 one trap that blocked five earlier attempts is an idle timeout on the
 click-to-start page, documented in `<maintainer evidence>/STARTUP-FLOW-FINDINGS-2026-07-25.md`.
 

@@ -1,7 +1,7 @@
 # Retail Specimen Baseline
 
 Status: active specimen record
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-02 (historical manifest generator availability clarified)
 Summary: which retail executable and corpus files probes trust, their hashes, and the state of the installed copy.
 Evidence: MEASURED — SHA-256 of the named files, measured on the dates given.
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -12,6 +12,8 @@ Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.origina
 ## Purpose
 
 This file pins the exact files that future runtime probes should trust first.
+The workspace and installed-copy states below are dated observations, not a
+setup manifest for a public clone of this repository.
 
 It exists to solve two problems:
 
@@ -20,15 +22,14 @@ It exists to solve two problems:
 
 ## Canonical Manifest
 
-The current machine-generated manifest is:
+The historical machine-generated manifest was:
 
 - `retail-specimen-manifest-2026-03-14.json` (archived research record, not published)
 
-Regenerate it with:
-
-```sh
-python tools/hash_retail_specimens.py
-```
+Its generator was named `tools/hash_retail_specimens.py` in the original research
+checkout. Neither the manifest nor the generator is included in this
+documentation-only repository; this is a historical tool citation, not a command
+contributors can run here.
 
 ## Baseline Targets
 

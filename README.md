@@ -41,7 +41,7 @@ and no decompiler output.
   (SHA-256 `74154bfa…`; see the [retail specimen baseline](platforms/pc/retail-specimen-baseline.md)).
 - Function names such as `CCareer__Save` are the names of the matching decompilation,
   [onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), which is the naming authority. Its per-function notes are not
-  published; a document that cites one says "(in the decompilation notes, not yet published)", and the decompiled
+  published; a document that cites one says "(in the decompilation notes, not yet published)", and the reconstructed
   source itself is in onslaught-decomp.
 - `references/Onslaught/<file>` cites Stuart's published source at the pinned commit
   [`c3d8ac4`](https://github.com/dlprentice/Onslaught/tree/c3d8ac464259942b83fa8aa7f867c856e77b734d) of the
