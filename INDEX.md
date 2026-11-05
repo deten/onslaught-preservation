@@ -1,7 +1,7 @@
 # Index
 
 Status: active — the front door to this repository's findings
-Last updated: 2026-10-22 (patch notes marked historical; related projects linked)
+Last updated: 2026-11-05 (the Companion's move into Onslaught CE is named and the rename dropped; the removed per-function notes are described accurately; earlier: patch notes marked historical; related projects linked)
 Summary: where each kind of finding about *Battle Engine Aquila* lives in this repository, the evidence rules
 every claim meets, and the patch analyses, per-subsystem contracts and machine-readable tables.
 
@@ -103,7 +103,8 @@ the analysed specimen, not runtime behaviour, exact layouts or source-body ident
 Per-function contracts sit beside their subsystem: [Battle Engine](mechanics/battleengine/contracts/README.md),
 [world](engine/world/contracts/README.md), [unit AI](mechanics/ai/README.md), [career](mechanics/career/README.md)
 and [save functions](saves/by-function/README.md). Function-level notes that were mostly records of the research
-process have moved to the decompilation notes; [DECOMP-BOUND.md](DECOMP-BOUND.md) lists them.
+process were removed from this repository; their subject belongs to the decompilation's function notes, which are not published,
+and [DECOMP-BOUND.md](DECOMP-BOUND.md) lists them.
 
 Machine-readable tables:
 
@@ -126,6 +127,8 @@ Machine-readable tables:
 - [Save/options boundary](saves/public-save-options.md)
 - [Assets and modding boundary](formats/public-assets-and-modding.md)
 
-The companion app for careers, saves, settings and lore is [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) (to be renamed
-onslaught-companion); it does not patch executables. To play the game, see [onslaught-ce](https://github.com/dlprentice/onslaught-ce); the
+The Toolkit and Companion app (careers, saves and backups, settings, lore, content exploration and the catalogue, the editors,
+installation management) is [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor); every Companion
+capability is moving into native Onslaught CE, and the separate Companion stays supported until each replacement is verified. It
+does not patch executables. To play the game, see [onslaught-ce](https://github.com/dlprentice/onslaught-ce); the
 rebuild is [onslaught-godot](https://github.com/dlprentice/onslaught-godot).

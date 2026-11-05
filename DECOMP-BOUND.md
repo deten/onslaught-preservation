@@ -1,7 +1,7 @@
-# Moved to the decompilation notes
+# Per-function notes removed from this repository
 
 Status: active — list of removed documents
-Last updated: 2026-10-22 (decompilation linked)
+Last updated: 2026-11-05 (retitled: the notes were removed, not moved to a readable place; earlier: 2026-10-22, decompilation linked)
 Summary: per-function notes that were removed from this repository because they were mostly records of the
 research process (per-function packets, digests, grades, coverage tables and promotion verdicts) rather than
 findings about the game. Their subject matter belongs to the function notes of the byte-matching decompilation
