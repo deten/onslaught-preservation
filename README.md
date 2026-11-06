@@ -1,7 +1,7 @@
 # Onslaught preservation
 
 Status: active — the repository's front page
-Last updated: 2026-10-29 (the rebuild's measured comparison scope is linked to its current record; earlier: onslaught-godot described as its own README describes it; earlier: related projects linked; Onslaught-Career-Editor citations pinned to one commit)
+Last updated: 2026-11-06 (contribution routing, evidence labels, how to check a specimen and the second and third Toolkit pins stated; earlier: the rebuild's measured comparison scope is linked to its current record; earlier: onslaught-godot described as its own README describes it; earlier: related projects linked; Onslaught-Career-Editor citations pinned to one commit)
 Summary: what this repository documents about *Battle Engine Aquila*, where to start in each section, how to read a
 finding, the licence, related projects and how to contribute.
 
@@ -10,15 +10,20 @@ options, gameplay mechanics, levels and mission scripts, engine systems, and the
 findings are measured from the retail game, from Stuart Gillam's published GPL source and from controlled runtime
 evidence.
 
-It is Markdown and tables only. It contains no game executables, no game data or converted copies of game data,
-and no decompiler output.
+It is Markdown, TSV and JSON tables, plus one small check script ([`tools/check_docs.py`](tools/check_docs.py)). It contains no game executables, no copies of the game's data files and no
+decompiler output. Short quoted strings appear where a finding needs them, for example in the comparison tables under
+[`platforms/demo/`](platforms/demo/README.md). A patch document may also give the few original and patched bytes of its
+patch site, as [CONTRIBUTING.md](CONTRIBUTING.md) allows.
 
 ## Start here
 
 - [`INDEX.md`](INDEX.md) is the front door: what each store covers and the evidence rules every claim has to meet.
 - [`QUICK-REFERENCE.md`](QUICK-REFERENCE.md) collects the lookup tables (save structures, tags, MSL commands,
   command-line options, source layout).
-- [`DECOMP-BOUND.md`](DECOMP-BOUND.md) lists the function-level notes that moved to the decompilation notes.
+- [`DECOMP-BOUND.md`](DECOMP-BOUND.md) lists the per-function notes that were removed from this repository; their subject
+  matter belongs to the decompilation's function notes, which are not yet published.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) says [where each kind of work belongs](CONTRIBUTING.md#where-to-contribute) across the
+  project's public repositories, and what to check before a pull request.
 
 | Section | What it covers | Start with |
 | --- | --- | --- |
@@ -33,19 +38,33 @@ and no decompiler output.
 ## How to read a finding
 
 - Each document opens with `Status:`, `Last updated:` (or `Date:`) and `Summary:` lines. Older documents that predate
-  the convention have no header yet; their dates are in the text.
+  the convention have no header yet; their dates are in the text. Some documents carry a
+  `Verdict:` in place of the `Summary:`.
+- A finding's `Evidence:` line starts with one of four labels. `MEASURED`: read from the shipped game, by a controlled
+  runtime capture, a byte comparison, a table read out of shipped data, or a test that asserts a recovered law.
+  `SOURCE`: backed by the pinned Onslaught source, with file and line; it shows shape, ownership and intent, and does not
+  by itself show that the Steam build agrees. `INFERRED`: reasoned from something else. `UNKNOWN`: not settled, and the
+  line says what would settle it. A document that mixes labels is graded by its weakest load-bearing claim.
+- A *per-function contract* (for example under `saves/by-function/` or `mechanics/battleengine/contracts/`) is a
+  bounded, static description published here. The decompilation's *per-function notes* are a different set and are not
+  published.
 - Every behaviour claim cites its evidence: a controlled runtime capture, a byte comparison against a named retail
   file, a focused test, or a pinned source file and line. Static evidence establishes identities and structures; only
   controlled runtime evidence establishes causality and values. Unknowns are written as open questions.
 - Retail addresses refer to the specimen named in the document, normally the pristine Steam `BEA.exe`
-  (SHA-256 `74154bfa…`; see the [retail specimen baseline](platforms/pc/retail-specimen-baseline.md)).
+  (SHA-256 `74154bfa…`; see the [retail specimen baseline](platforms/pc/retail-specimen-baseline.md)). To check your own
+  copy, run `sha256sum BEA.exe`; a copy that does not match the specimen's hash is a different file, and a measurement
+  made on it needs its own specimen line. `BEA.exe.original.backup`, the name some documents give the specimen, is the
+  maintainer's untouched copy; you do not need a file of that name.
 - Function names such as `CCareer__Save` are the names of the matching decompilation,
   [onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), which is the naming authority. Its per-function notes are not
   published; a document that cites one says "(in the decompilation notes, not yet published)", and the reconstructed
   source itself is in onslaught-decomp.
-- `references/Onslaught/<file>` cites Stuart's published source at the pinned commit
+- This repository has no `references/` folder. `references/Onslaught/<file>` cites Stuart's published source at the pinned commit
   [`c3d8ac4`](https://github.com/dlprentice/Onslaught/tree/c3d8ac464259942b83fa8aa7f867c856e77b734d) of the
-  public reference fork of [stuart73/Onslaught](https://github.com/stuart73/Onslaught).
+  public reference fork of [stuart73/Onslaught](https://github.com/stuart73/Onslaught); for example,
+  `references/Onslaught/Career.cpp` is
+  [`Career.cpp` at that commit](https://github.com/dlprentice/Onslaught/blob/c3d8ac464259942b83fa8aa7f867c856e77b734d/Career.cpp).
   `references/AYAResourceExtractor/<file>` cites his
   [AYAResourceExtractor](https://github.com/stuart73/AYAResourceExtractor) at the pinned commit
   [`53b10b0`](https://github.com/dlprentice/AYAResourceExtractor/tree/53b10b083b59cfd7e72849c15bec8b608eaf8a23).
@@ -57,6 +76,8 @@ and no decompiler output.
   was written. The rebuild (`rebuild/…`) has since moved to [onslaught-godot](https://github.com/dlprentice/onslaught-godot). The retired
   AppCore editor and its patch catalogue (`OnslaughtCareerEditor.AppCore/…`, `patches/…`) are cited at
   [`4ac3c9ae`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/4ac3c9ae32d97c1293858c49bf9cc485eb814f28), the last commit that has them.
+  A document that cites a tool added later, such as the animation census in `formats/lvlr-archive.md`, names its own
+  commit, for example [`843c86e`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/843c86e06810c8fce953226ccebd41bf2cf74473).
 - "(archived research record, not published)" marks a citation of the project's private research history: process
   records that are kept but not published.
 
@@ -87,13 +108,15 @@ Credits are in [`history/attribution.md`](history/attribution.md).
   not yet a playable release. Its simulation is compared Present by Present with selected recorded runs of Onslaught CE
   and the original game; its [parity record](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/PARITY.md)
   describes the measured routes and their limits.
-- [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor): the companion app for careers, saves, settings and backups, with the game's
-  lore and lore book (to be renamed onslaught-companion).
+- [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) (also called the Toolkit): Onslaught
+  Companion, the app for careers, saves, settings and backups, with the game's lore and lore book, and the project's
+  goal and plan (to be renamed onslaught-companion).
 - [stuart73/Onslaught](https://github.com/stuart73/Onslaught): Stuart Gillam's published Onslaught source, which
   many findings here cite.
 
 ## Contributing
 
-Corrections and new findings are welcome. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) first: contributions come in
-under the same licence, every claim needs evidence, and game files, decompiler output and disassembly listings with
-raw bytes are never accepted.
+Corrections and new findings are welcome. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) first: it says
+[where each kind of work belongs](CONTRIBUTING.md#where-to-contribute), contributions come in under the same licence,
+every claim needs evidence, and game files, decompiler output and disassembly listings with raw bytes are never
+accepted. Security problems and leaked private material go through [`SECURITY.md`](SECURITY.md).

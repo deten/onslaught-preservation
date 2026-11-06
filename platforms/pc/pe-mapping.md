@@ -7,9 +7,9 @@ raw range. `.data` VirtualSize is far larger than SizeOfRawData, so most
 runtime globals (including `g_bGodModeEnabled`, the mapping table, and
 the script objective / goodie arrays) are BSS and are not file-patchable.
 Evidence: MEASURED — PE section table and VA-to-file map re-read from the
-named specimen on 2026-08-22; hash matched. `t_5129ab1b` added the
+named specimen on 2026-08-22; hash matched. A later pass added the
 impostor / debris / mesh-LOD CVar dwords as file-backed `.data` (not BSS;
-not rewritten by SetQualityLevel). `t_aacb4492` added the six
+not rewritten by SetQualityLevel). Another added the six
 `g_dash_*` dests (file-backed `.data`; not rewritten by
 ResetConfiguration) and `cg_meshsurfacelodbias` `0x00631EA0`.
 Specimen: `<maintainer evidence>/pristine-verification-2026-07-26/pristine-target/BEA.exe`
@@ -35,11 +35,11 @@ file bytes. A naive `VA − 0x400000` landing past `0x00261000` hits
 
 ## Consequence for the first-cut census
 
-`t_7b48b14a` rowed `g_bGodModeEnabled` `0x00662AB4` as a file-born TRUE
+The first-cut census rowed `g_bGodModeEnabled` `0x00662AB4` as a file-born TRUE
 patch. That VA maps into `.data` BSS (`delta 0x40AB4` ≥ raw `0x3F000`).
 The zeros previously read at file `0x262AB4` are `.rsrc` bytes, not the
 flag. File-patching them would corrupt resources and would not set god
-mode. Successor `t_14fcbbed` retracts that TSV row.
+mode. A later pass retracts that TSV row.
 
 Same BSS class (not file-patchable):
 
@@ -73,12 +73,12 @@ Same BSS class (not file-patchable):
 | `0x009C7558` | `SetQualityLevel` lod-table dest | 6 |
 | `0x00809598` | occupancy bitplane scratch | — |
 
-`t_17fa180d` added the last five after the IScript / SendButtonAction
-pin. `t_120c3e1b` added the GetPlayer / MessageBox / GameTime /
+A later pass added the last five after the IScript / SendButtonAction
+pin. Another added the GetPlayer / MessageBox / GameTime /
 GetWaterHeight / HighlightHud / GetGoodieState-view VAs.
-`t_94b70425` added `Rand`/`GetFloatRand` `0x008A9D9C`, `GetMapHeight` `0x006FADC8`,
+Another added `Rand`/`GetFloatRand` `0x008A9D9C`, `GetMapHeight` `0x006FADC8`,
 the `GetNumUnits` tables `0x008551C0` / `0x00855228`, lookup
-`this` `0x00855090`, and event-manager `this` `0x00672FC8`. `t_94ad2658`
+`this` `0x00855090`, and event-manager `this` `0x00672FC8`. A final pass
 added CRTTree 45-override flag `0x00662F10`, quality-table dest
 `0x009C7558`, and occupancy scratch `0x00809598`. Same rule: never
 promote those VAs to a file row; patch the `.text` store or the

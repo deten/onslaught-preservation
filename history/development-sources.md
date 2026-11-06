@@ -105,16 +105,16 @@ technology descriptions. The in-universe Forseti/Muspell technology pages are
 lore unless independently corroborated as real engine documentation.
 
 Analysis status: inventoried by the archive collector; technical/asset joins
-remain open. Do not restart the converged Wayback harvest without a new seed.
+remain open. The Wayback harvest has converged; another pass needs a new seed.
 
 ### E3 2002 press kit
 
 Root:
 `<maintainer archive>\Lore\05_Press_Kits_and_Media\gamenatione32002`
 
-Priority inputs: `NEW.ISO` and `NEW Disc2.iso`. Expected value: earlier or
-higher-quality screenshots/renders, logos, fact sheets, press copy, video,
-filenames, and metadata. These images remain read-only; filesystem manifests
+The kit's disc images stay in the maintainer's archive and are not published or
+requested here. Expected value: earlier or higher-quality screenshots/renders,
+logos, fact sheets, press copy, video, filenames, and metadata. They remain read-only; filesystem manifests
 and BEA-specific comparisons are the next bounded step.
 
 ### Manuals and credits

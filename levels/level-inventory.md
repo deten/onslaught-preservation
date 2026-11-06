@@ -155,6 +155,6 @@ level loads: the frontend takes its choices from this collected copy, and the le
   script object code (the `CMissionScriptObjectCode` stream) and compare its event names and constants with the
   folder's source. 901's race-time thresholds are a good first probe.
 - What were 856 and 858 meant to be? They play (2026-08 traces) but no menu lists them. Cheapest falsifier: a
-  capture of `-level 856` on the Linux harness, once David has released the desktop, compared with 850's opening.
+  capture of `-level 856` on the Linux harness, compared with 850's opening (not yet made).
 - Does anything read the world type in the frontend's copy? Search the unmatched frontend functions for
   `SBEConfigLevel` offset `+0x10` loads.

@@ -1,7 +1,7 @@
 # Index
 
 Status: active — the front door to this repository's findings
-Last updated: 2026-10-22 (patch notes marked historical; related projects linked)
+Last updated: 2026-11-06 (the no-game-data sentence states the short quoted strings; earlier: patch notes marked historical; related projects linked)
 Summary: where each kind of finding about *Battle Engine Aquila* lives in this repository, the evidence rules
 every claim meets, and the patch analyses, per-subsystem contracts and machine-readable tables.
 
@@ -20,8 +20,8 @@ counts and names of their own time; read them as history.
   Steam executable is implemented or of complete format support.
 - A controlled runtime observation establishes only the measured behaviour on the measured specimen.
 - Agreement with a rebuild does not re-prove retail behaviour.
-- This repository holds no executables, game data, converted game data, saves, debugger logs or decompiler output.
-  Retail inputs stay with whoever owns the game.
+- This repository holds no executables, copies of the game's data files, saves, debugger logs or decompiler output;
+  short quoted strings appear only where a finding needs them. Retail inputs stay with whoever owns the game.
 
 ## Start here
 

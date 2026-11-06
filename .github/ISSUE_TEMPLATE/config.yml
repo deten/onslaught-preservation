@@ -1,0 +1,20 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ask a question or share an idea
+    url: https://github.com/dlprentice/onslaught-ce/discussions
+    about: Questions and ideas go to Discussions on onslaught-ce, the project's one Discussions page.
+  - name: Report leaked private material or other sensitive content
+    url: https://github.com/dlprentice/onslaught-preservation/security/advisories/new
+    about: Report these privately through this form, not as a public issue (see SECURITY.md).
+  - name: Problem playing Onslaught CE
+    url: https://github.com/dlprentice/onslaught-ce/issues
+    about: Bugs in the native Linux and Windows port, its launcher and updates belong in Onslaught CE's issues.
+  - name: Decompilation or function-matching work
+    url: https://github.com/dlprentice/onslaught-decomp/issues
+    about: Functions, tools and matching notes belong in onslaught-decomp.
+  - name: Godot rebuild
+    url: https://github.com/dlprentice/onslaught-godot/issues
+    about: Rebuild bugs and parity differences belong in onslaught-godot.
+  - name: Companion app, lore, and the project's goals and plan
+    url: https://github.com/dlprentice/Onslaught-Career-Editor/issues
+    about: The Companion, its tools and lore belong in Onslaught-Career-Editor.

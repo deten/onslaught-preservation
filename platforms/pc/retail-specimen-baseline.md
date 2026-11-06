@@ -167,9 +167,9 @@ so it is reversible whenever the user wants it done.
 
 ## Operational Rule
 
-Before any serious runtime-validation wave:
+Before relying on a specimen for a new measurement or runtime check:
 
-1. regenerate or re-check the specimen manifest,
-2. note whether `installed_live_bea_exe` matches `clean_repo_bea_exe`,
-3. record the exact specimen keys used by the probe session,
-4. write resulting notes/logs under ignored `<maintainer evidence>/` with a date- and task-scoped filename.
+1. re-check the file's SHA-256 against the hashes recorded above,
+2. note whether the installed copy matches the pristine specimen,
+3. name the exact specimen (file and SHA-256) in the finding's `Specimen:` line,
+4. keep raw logs and bulky output out of this repository, and say in the finding when a receipt is not public.

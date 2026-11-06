@@ -642,5 +642,5 @@ the same way (`LevelScript.msl:185`), and it stays inactive.
 | --- | --- |
 | Whether the turret, lock, crosshair and seek laws above hold at runtime as composed | An original-code composition of `0x004fa8d0`'s turret section, `HandleLocks`, `CalcUnitOverCrossHair` and `CRound::Move` over a supplied world |
 | Exact first-flush order of all AI, 4003 and Actor draws in Level 100 | Extend the World 110 construction order to all base rows and the level-world rows |
-| How often stray turret rounds hit the player | A copied-retail observation once David releases the desktop |
+| How often stray turret rounds hit the player | A copied-retail observation (not yet made) |
 | Whether retail aborts on a given player trajectory | Not reproducible without a retail run of the same inputs |

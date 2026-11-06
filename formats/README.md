@@ -13,8 +13,7 @@ The header declares schema `onslaught.asset-mirror-index.v1`, generated
 
 ## Scope and safety boundary
 
-This is Part B of Kanban `t_97657338`; [../platforms/pc/game-binaries.md](../platforms/pc/game-binaries.md) is
-Part A. `<maintainer evidence>\bea-asset-mirror`, the installed game, and the pristine safe copy
+[../platforms/pc/game-binaries.md](../platforms/pc/game-binaries.md) is the companion document for the executables. `<maintainer evidence>\bea-asset-mirror`, the installed game, and the pristine safe copy
 were read only. No binary was executed and no asset, decoded image, audio,
 video, or extracted payload is tracked here.
 

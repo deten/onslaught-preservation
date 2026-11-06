@@ -17,7 +17,7 @@ unconfirmed proposals/search seeds.
 
 The primary source is:
 
-Retained PowerPoint (private lab copy: `<maintainer evidence>/inputs/retail-archive/Lore/09_Wayback_Websites/full_domains/www.losttoys.com/GDC/20030412092159_GDC_GDCE02_20-_20Cross_20Platform_20Console_20Development.ppt`).
+Retained PowerPoint (private copy: `<maintainer evidence>/…`; file name `20030412092159_GDC_GDCE02_20-_20Cross_20Platform_20Console_20Development.ppt`, identified by the SHA-256 below).
 
 | Property | Value |
 | --- | --- |

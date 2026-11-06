@@ -8,6 +8,13 @@ path = ["**"]
 SPDX-FileCopyrightText = "David Prentice and Onslaught preservation contributors"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
+# The documentation check script is code, not documentation.
+[[annotations]]
+path = "tools/**"
+precedence = "override"
+SPDX-FileCopyrightText = "David Prentice and Onslaught preservation contributors"
+SPDX-License-Identifier = "GPL-3.0-only"
+
 # engine/source/ quotes and documents Stuart Gillam's published Onslaught source
 # (github.com/stuart73/Onslaught, GPL version 3 only): the quoted source stays
 # under its GPL-3.0-only licence and credit, alongside CC BY-SA 4.0 for this
