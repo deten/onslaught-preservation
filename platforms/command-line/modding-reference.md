@@ -42,11 +42,11 @@ The table below is April 2025 community testing, kept as reported. Linked rows f
 | `-getversion` | Display version info |
 | `-landscape0/1/2` | Landscape quality levels |
 | `-level` | Jump directly to level (dev use); the retail parser accepts it ([cli-parameters.md](cli-parameters.md)) |
-| `-showdebugtrace` | No effect: stored, never read ([cli-parameters.md](cli-parameters.md)) |
+| `-showdebugtrace` | No effect found: stored; no reader found in a bounded search ([cli-parameters.md](cli-parameters.md)) |
 | `-soundbuffers` | Sound buffer configuration |
 | `-testeur` | Guard for `-forcewindowed` (see the [parser contract](CLIParams__ParseCommandLine.md#windowed-guard-and-logger-boundaries)) |
 | `-timeout` | Inactivity timeout, only with `-e3` or `-playabledemo` ([cli-parameters.md](cli-parameters.md)) |
-| `-traceconsole` | No effect: stored, never read ([cli-parameters.md](cli-parameters.md)) |
+| `-traceconsole` | No effect found: stored; no reader found in a bounded search ([cli-parameters.md](cli-parameters.md)) |
 
 Stuart noted: "These must of been used to help development. The --level one was important, because when you're coding and testing a particular level, you just want the game to start straight into the action and not keep going through the menus. I suspect many of these options won't work on the released version."
 
