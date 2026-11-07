@@ -1,11 +1,11 @@
 # Development source index
 
 Status: active, prioritized source/provenance index
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
+Last updated: 2026-11-06 (private archive named `<maintainer evidence>`, local folder layout dropped, zero-normalized count added; earlier: links updated for the onslaught-preservation layout)
 Summary: first-party and technical-development evidence for Battle Engine
 Aquila, separated from later reporting, inferred binary behavior, and fictional
-in-universe lore. Original archive material remains read-only under
-`<maintainer archive>`; only bounded findings and hashes are promoted here.
+in-universe lore. Original archive material remains read-only in the maintainer's private store,
+`<maintainer evidence>/` (not public); only bounded findings and hashes are promoted here.
 
 ## Evidence classes
 
@@ -23,8 +23,7 @@ in-universe lore. Original archive material remains read-only under
 
 ### Lost Toys GDC deck
 
-Path:
-`<maintainer archive>\Lore\09_Wayback_Websites\full_domains\losttoys.com\GDC\20030412092159_GDC_GDCE02_20-_20Cross_20Platform_20Console_20Development.ppt`
+Location: a private copy in `<maintainer evidence>/`, identified by the SHA-256 below.
 
 | Property | Value |
 | --- | --- |
@@ -43,7 +42,7 @@ concerns, console preview/profiling tools, certification scheduling, and the
 importance of a maintained PC build. See
 [`../engine/README.md`](../engine/README.md).
 
-The shown code is edited presentation pseudocode. Exact identifiers are only
+The deck's code slides are edited presentation pseudocode. Exact identifiers are only
 promoted after a binary/data/source-path join.
 
 ## Priority 2 — measured builds and data
@@ -61,8 +60,7 @@ still carry provenance, but the three disc payloads are not separate builds.
 
 ### PC demo
 
-Path:
-`<maintainer archive>\battleengine - 2003 PC DEMO.zip`
+Location: a private copy in `<maintainer evidence>/`, identified by the hashes below.
 
 | Artifact | Bytes | SHA-256 |
 | --- | ---: | --- |
@@ -71,8 +69,7 @@ Path:
 | Inner `All.gip` | 75,388,730 | `90b16dc8df5669bb1ed2dbd09b450c30864047c9a536ecc31bfc6aa55cb66975` |
 
 This is a distinct build and a strong independent refuter for retail function
-work. Its strict virtual class surface pairs all 2,127 retail virtual targets;
-see [`../platforms/demo/demo-vs-retail.md`](../platforms/demo/demo-vs-retail.md).
+work. Its strict virtual class surface pairs all 2,127 retail virtual targets, and 2,123 of those pairs show zero normalized instruction differences once their encoded immediate and displacement fields are zeroed; see [`../engine/README.md`](../engine/README.md) and [`../platforms/demo/demo-vs-retail.md`](../platforms/demo/demo-vs-retail.md).
 
 ### Xbox, PlayStation 2, and demo discs
 
@@ -96,8 +93,7 @@ known regional AYA byte differences.
 
 ### Official Lost Toys / BEA website archive
 
-Root:
-`<maintainer archive>\Lore\09_Wayback_Websites\full_domains\losttoys.com\battleengine`
+Root: the captures of the official site, kept privately in `<maintainer evidence>/`.
 
 Expected value: original screenshots/thumbnails, SWF material, PC support
 files, public mission/character/vehicle terminology, and contemporary public
@@ -105,12 +101,11 @@ technology descriptions. The in-universe Forseti/Muspell technology pages are
 lore unless independently corroborated as real engine documentation.
 
 Analysis status: inventoried by the archive collector; technical/asset joins
-remain open. The Wayback harvest has converged; another pass needs a new seed.
+remain open. The Wayback harvest is complete: repeated passes stopped finding new material, so another pass needs a new seed.
 
 ### E3 2002 press kit
 
-Root:
-`<maintainer archive>\Lore\05_Press_Kits_and_Media\gamenatione32002`
+Root: the E3 2002 press kit, kept privately in `<maintainer evidence>/`.
 
 The kit's disc images stay in the maintainer's archive and are not published or
 requested here. Expected value: earlier or higher-quality screenshots/renders,
@@ -119,7 +114,7 @@ and BEA-specific comparisons are the next bounded step.
 
 ### Manuals and credits
 
-Root: `<maintainer archive>\Lore\04_Manuals_and_Docs`
+Root: the manuals and documents, kept privately in `<maintainer evidence>/`.
 
 Use for credits/roles, release/legal data, controls, mission/vehicle/weapon and
 character terminology, and regional feature differences. Manual prose proves
@@ -130,15 +125,14 @@ misread by direct page inspection: the printed name is **Kensor**.
 
 ### Official and press visual material
 
-Roots include `Lore\06_Videos_Trailers`, `Lore\07_Box_Art_Covers`, the official
-Wayback trees, and `Lore\11_Misc_Collections\BattleEngineAquila-LivBs\IMGs`.
+Roots include the videos and trailers, box art, the official Wayback captures, and an image collection, all kept privately in `<maintainer evidence>/`.
 Use dated frames to identify altered HUDs, levels, vehicles, lighting, and cut
 features, then join them to a named build or publication date before making a
 development-sequence claim.
 
 ## Priority 4 — source/reference material
 
-The pinned Stuart Gillam source under `references/Onslaught/` is a high-value
+The Stuart Gillam source under [`references/Onslaught/`](https://github.com/dlprentice/Onslaught/tree/c3d8ac464259942b83fa8aa7f867c856e77b734d), pinned at commit `c3d8ac4` (see the [README](../README.md#how-to-read-a-finding)), is a high-value
 architecture and intent reference. It is not assumed to be the retail PC,
 Xbox, or PS2 source tree. Every consequential behavior is checked against
 retail bytes, data, or runtime evidence; cross-build demo agreement now supplies
@@ -146,12 +140,11 @@ an additional refuter for virtual functions.
 
 ## Transformation and publication boundary
 
-- Original archive files remain unchanged under `<maintainer archive>`.
+- Original archive files remain unchanged in `<maintainer evidence>/`.
 - Extractions, normalized comparisons, transcripts, and raw manifests stay in
   ignored analysis workspaces unless their size/licensing permits a bounded
   derived fact to be promoted.
 - Every promoted claim names the input path and hash when known.
 - Copyrighted executables, disc images, extracted assets, and long presentation
   transcripts are not tracked or redistributed.
-- Passwords for protected archives remain only in their local owner and are
-  never copied into prompts, logs, reports, or Git.
+- Passwords for protected archives stay with their local owner and are not written into any repository or log.
