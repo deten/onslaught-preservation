@@ -179,7 +179,7 @@ all 40 routines has a row; no row is unclassified.
    work accounts for all 1,361 PC envelopes and 1,725 zlib members. The observed
    364 full 1 MiB members support a writer chunking policy, not the comment's
    causal claim that BEA could only handle 1 MiB
-   ([`aya-container.md`](aya-container.md):30-62).
+   ([`aya-container.md`](aya-container.md):30-65).
 2. **CMSH root, tags, hierarchy, reference, rigid geometry, and six TEXR IDs are
    already stronger.** The current parser frames all 367 measured streams,
    emits 366, and byte-round-trips all 367 while retaining opaque bytes
@@ -187,11 +187,11 @@ all 40 routines has a row; no row is unclassified.
 3. **Skinning has advanced beyond the extractor.** The three stride-48 words are
    matrix-palette slots (`BONE index * 3`), not unnamed “bone weighting”; the
    combination/weight and bind rule remain open
-   ([`cmsh-animation-usage.md`](cmsh-animation-usage.md):136-148; [palette contract](cmsh-matrix-palette-skinning.md)).
+   ([`cmsh-animation-usage.md`](cmsh-animation-usage.md):127-139; [palette contract](cmsh-matrix-palette-skinning.md)).
 4. **CPOS/CORI are no longer generic unknowns.** They are bounded derived
    model-space caches indexed by virtual frame. Exact bitwise regeneration is
    not claimed.
-5. **Three extractor claims are contradicted.** The i32 `piece_count` at `CMVB+264` ([cmsh-fields.md](cmsh-fields.md):341, 0 to 12 installed) is a
+5. **Three extractor claims are contradicted.** The i32 `piece_count` at `CMVB+264` ([cmsh-fields.md](cmsh-fields.md):340, 0 to 12 installed) is a
    material group count, not the independent CMSH root texture count. The
    README's DXT2-only storage statement also overgeneralizes: the measured
    800-file shelf has 212 DXT1 and 588 DXT2 DDS files. The September 30 retail
