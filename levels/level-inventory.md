@@ -1,13 +1,15 @@
 # Level inventory: the 95 MissionScripts folders
 
-Status: active reference
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
+Status: active — level inventory
+Last updated: 2026-11-06 (undefined terms defined or flagged; tool and decompilation citations name their public sources; 500 branch and 010 notes corrected)
 Summary: which of the 95 numbered `data/MissionScripts` folders are playable levels, how the retail game reaches
 each one, and what the 29 folders that cannot load contain.
 Evidence: MEASURED — the pristine specimen's `data/` tree: the folder listing, `data/resources/*_res_PC.aya`,
 `data/WorldHeaders.dat` (all 97 records parsed, 4,783 of 4,783 bytes) and `data/language/english.dat`
-(`tools/language_dat_decode.py` with `text/text.stf`). The code paths cite
-the private decompilation's functions that match retail byte for byte, named with their
+(`tools/language_dat_decode.py` in Onslaught-Career-Editor at commit
+[`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50), with `text/text.stf`). The code paths cite
+the decompilation's functions ([onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), the public export;
+its per-function notes are not published) that match retail byte for byte, named with their
 addresses; the multiplayer lock test is read from retail's disassembly (0051d28c..0051d2d6) because its function
 does not match yet. RUNTIME — the 2026-08-15 native coverage census
 (`<maintainer evidence>/native-corpus-coverage-20260815-v1/native-coverage.tsv`) records script natives executed in
@@ -24,7 +26,7 @@ Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`
   `data/WorldHeaders.dat`, and each one's scripts ran in the 2026-08 level-opening traces: the 43 campaign levels,
   201 for the playable demo, 17 two-player levels (850–866) and 5 race levels (901–905).
 - **The other 29 cannot load.** Without an archive there is no world data: the world loader's only other source is
-  `data\worlds\world%03d.wrd` (`CWorld::Load` 0050b520; both path strings are in the executable), and the retail
+  `data\worlds\world%03d.wrd` (`CWorld::Load` 0050b520; the archive pattern `data\Resources\%03d_res_<TARGET>.aya` and this one are both in the executable, see the [LVLR archive](../formats/lvlr-archive.md)), and the retail
   install has no `data\worlds`. 19 folders are empty shells. The other 10 hold scripts: six early prototypes (003,
   004, 010, 020, 021, 022), an unfinished level (530), a flagship-duel test (888), and two copies of the hidden
   co-op script (956, 958).
@@ -34,7 +36,8 @@ Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`
   (00538ec0). Nothing in the executable compiles scripts: its only script-related strings are the runtime VM's own
   `__FILE__` names (`MissionScript\AsmInstruction.cpp`, `IScript.cpp`, `ScriptObjectCode.cpp`, `Symtab.cpp` and
   so on) and class names. It has no `data\MissionScripts` path and no language keyword (`end_vars`, `do_once`) in
-  ASCII or UTF-16. So the `.msl` and `English.txt` files are shipped source, and `text/text.stf` is the generated
+  ASCII or UTF-16. So the `.msl` files and `English.txt` (the English mission text a level folder typically holds, see
+[level folder contents](../formats/game-folder-analysis.md#level-directory-contents)) are shipped source, and `text/text.stf` is the generated
   text-id header that the C++ source and the scripts `#include`.
 - **Two playable levels are on no menu:** 856 and 858, co-op levels that only `-level` reaches.
 
@@ -57,9 +60,12 @@ Only the campaign levels and 201 have names and briefings (`CFrontEndText::GetLe
 
 English names from `english.dat` (`FETX_LEVEL_NAME_*`). The graph's links, grades and base-world bitmaps are in the
 [career graph](../saves/career-graph.md). The career opens a level's "(Evo)" version when the level before it is
-won with every secondary objective complete ([career links](../saves/career-links.md)). 500 branches instead to
-two different missions, 511 and 512, by save slot (62 for the submarine, 61 for the rocket). 7.41 ends the
-campaign. 7.42 (Evo) leads on to 8.00, which the career reaches from nowhere else.
+won with every secondary objective complete ([career links](../saves/career-links.md)); this repository does not define
+"(Evo)" (see [open questions](#open-questions)). 500 branches instead to two different missions, 511 and 512, by career
+slot: 62 (`SLOT_500_SUB`, the submarine) and 61 (`SLOT_500_ROCKET`, the rocket). The same table gives slot 62 as the way
+to 511 and slot 61 as the way to 512 (links 46 and 47); which of 511 and 512 holds the submarine is an open question
+(see [open questions](#open-questions)). 741 ends the campaign. 742 (Evo) leads on to 800, which the career reaches
+from nowhere else.
 
 | Episode | Levels |
 | --- | --- |
@@ -91,7 +97,7 @@ The grid has three rows, one per mode, and six columns (`CFEPMultiplayer::Init` 
 
 - Columns 4–6 open once world 800 or 741 is complete (retail 0051d2a7..0051d2d6 asks the career for node 800, then
   node 741).
-- `-e3` closes one cell, 859, the third Co-Op column (0051d28c..0051d2a2). The E3 build also quits on inactivity
+- `-e3` closes one cell, 859, the third Co-Op column (0051d28c..0051d2a2). The E3 show build ([command-line parameters](../platforms/command-line/cli-parameters.md)) also quits on inactivity
   (`CController::InactivityMeansQuitGame` 0042d810) and asks for a `vectorlosttoyssplash.tga` splash
   (`CSystem::Init` 004efb10), which the retail install does not ship.
 - **856 and 858 are on no grid cell.** Both have archives and world-header records of the co-operative type, and
@@ -125,7 +131,7 @@ None of these has a `NNN_res_PC.aya`. "Header" means a record in `WorldHeaders.d
 | 520 | yes | a `text.stf` holding only the text converter's banner comment |
 | 003 | yes | a base defence: three zones west, east and south of the base warn when Muspell ground forces enter, with counters for Forseti and Muspell buildings and turrets. Its English text is in `english.dat` |
 | 004 | yes | tank traps and a vital building and emplacement |
-| 010 | yes | a target range with close, medium and long-range targets; declares its variables in an `attributes … end_attributes` block, which no other level script uses (the rest use `vars … end_vars`) |
+| 010 | yes | a target range with close, medium and long-range targets; declares its variables in an `attributes … end_attributes` block, the same block 020 uses |
 | 020 | yes | destroy the Muspell advance base and motorised units, and keep four ambulances alive; objectives printed to the console. The same `attributes` block as 010 |
 | 021 | yes | destroy three hangars; losing the control tower loses the level |
 | 022 | no | a HUD walkthrough using the object scripts of 100 Training Level (airborne drones, target tanks, four target zones); it reads as an earlier cut of that level |
@@ -153,8 +159,20 @@ level loads: the frontend takes its choices from this collected copy, and the le
 
 - Do the shipped `.msl` sources match the compiled scripts in the archives? Cheapest falsifier: decode one archive's
   script object code (the `CMissionScriptObjectCode` stream) and compare its event names and constants with the
-  folder's source. 901's race-time thresholds are a good first probe.
+  folder's source. No decoder for that stream is published yet: a search of the Toolkit's
+[`tools/`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50/tools)
+at commit `51129bab` for its name found none (the tools that read `.msl` files read the shipped text). 901's race-time
+thresholds are a good first probe.
 - What were 856 and 858 meant to be? They play (2026-08 traces) but no menu lists them. Cheapest falsifier: a
-  capture of `-level 856` on the Linux harness, compared with 850's opening (not yet made).
+  capture of `-level 856` from your own copy of the game, compared with 850's opening (not yet made). No capture setup is
+  named in this repository for it yet; the 2026-08 traces came from the retired Windows setup named in the header.
 - Does anything read the world type in the frontend's copy? Search the unmatched frontend functions for
   `SBEConfigLevel` offset `+0x10` loads.
+- Which of 511 and 512 holds the submarine? [Career links](../saves/career-links.md) opens 511 from slot 62 and 512 from
+  slot 61 (links 46 and 47), but the submarine section of [MSL scripting](scripting/msl-scripting.md) puts the submarine
+  in 512. Cheapest falsifier: in the shipped `.msl` text of folders 511 and 512, find where the submarine's `Dive` and
+  `Surface` commands sit and which slot calls (61 or 62) each folder makes.
+- What does the "(Evo)" label mean? Nothing in this repository defines it. [Game folder analysis](../formats/game-folder-analysis.md)
+  groups 800 and 850–866 as "Bonus/Evo levels" and 700–742 as end-game missions. Cheapest falsifier: the names and
+  briefings of 742 and 800 in `english.dat`, read with
+  [`tools/language_dat_decode.py`](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/tools/language_dat_decode.py).

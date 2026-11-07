@@ -1,17 +1,20 @@
 # World 110 construction order, transition and first frames
 
 Status: active static contract for the rebuild's World 110
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (runtime measurement disclosed, derived times separated, citation paths and links added)
 Summary: how a Level 100 win leads to World 110, the order in which World 110's
 construction consumes the shared gameplay stream and queues events, what the first
 flush delivers and draws, and when the player gains control.
-Evidence: MEASURED static reads of the pristine specimen, the pinned GPL source, and
-the shipped World 110 world files, mission scripts and their compiled bytecode, meshes and
-`default physics.dat`.
+Evidence: MEASURED static reads of the pristine specimen, the pinned GPL source
+(`references/Onslaught`, commit `c3d8ac4`), and the shipped World 110 world files, mission
+scripts and their compiled bytecode, meshes and `default physics.dat`.
 Two read-only research passes traced the level-world rows. A second review re-read every
 address, class, event, draw and profile value given here, and re-ran the squad
 formation model. The squad target choices are a static calculation from positions and
-scores. There is no runtime capture.
+scores. The one runtime measurement used here is the 6.0 s Level 100 pan duration,
+which two controlled Steam runs measured ([source synthesis, intro-pan row](../engine/source/stuart-source-synthesis.md#proven-or-bounded-deltas)).
+The source note does not name their receipt, and none is in this repository.
+There is no other runtime capture.
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`;
 interpreted `110_RLWD` JSON SHA-256 prefix `495511efc7a8d412`; `110_BSWD` is
@@ -29,14 +32,14 @@ Start in the [player-start contract](world-110-player-start-admission.md).
 ## From a Level 100 win to World 110
 
 - **The win.** `LevelWon()` (`IScript::LevelWon` `0x005381e0`) calls
-  `CGame::DeclareLevelWon` (`0x0046f2f0`, `game.cpp:2384-2411`). Past game state 3
+  `CGame::DeclareLevelWon` (`0x0046f2f0`, `references/Onslaught/game.cpp:2384-2411`). Past game state 3
   (playing) it does nothing. Otherwise it:
   - stops controller vibration;
   - sets state 5 (won);
   - sets the end count `+0x48` to 5.0 (0 for levels 741 and 742);
   - pauses (`0x0046fb00`).
 - **The end count.** Each `CGame::Update` in state 5 takes 0.05 from the count while
-  it is not negative (`0x0046ec5a-0x0046ecd3`, `game.cpp:1997-2005`). The quit code
+  it is not negative (`0x0046ec5a-0x0046ecd3`, `references/Onslaught/game.cpp:1997-2005`). The quit code
   `+0x34` becomes 1 (to front end) once the count is below 0, about 100 updates after
   the win. Retail adds a hold that the GPL source lacks: when the count reaches 0.05
   or less, it is held at 0.05 while `0x0089be58` is nonzero, or on levels 851-899
@@ -55,7 +58,7 @@ Start in the [player-start contract](world-110-player-start-admission.md).
 - **The map.** The level-select page offers a world when `0x00461a50` passes: with
   the unlock-all cheat, for world 100, or when any incoming link of its node has
   state 1. The player starts World 110 there; it does not start by itself.
-- **The new run.** `RunLevel` runs `InitRestartLoop` again (`game.cpp:292-410`):
+- **The new run.** `RunLevel` runs `InitRestartLoop` again (`references/Onslaught/game.cpp:292-410`):
   - it resets the event manager (`CEventManager::Init`, called at `0x0046c587`);
   - it queues FINISHED_PRE_RUN 2001 at now + 3.0 (`0x0046c5f0`), before any world
     is loaded;
@@ -68,7 +71,8 @@ player are rebuilt.
 
 ## Load order
 
-The loader is Level 100's.
+The loader is Level 100's; [RLWD and BSWD](level100-construction-order.md#terms-and-event-numbers)
+are defined in the Level 100 note.
 1. World 110's 13 scripts load first, in file order (`LoadScriptEvents` at
    `0x0050bbde`).
 2. The base pass loads the shared base world:
@@ -101,7 +105,8 @@ The loader is Level 100's.
 - "AI" is the AI constructor's events: 2003 at −1 when the unit has a script, then
   3000 at now. No World 110 unit row has a target, so none takes the 3001 path.
 
-All events are priority 0 unless stated.
+All events are priority 0 unless stated. Event numbers are defined in the
+[Level 100 note](level100-construction-order.md#terms-and-event-numbers).
 
 | Rows | Class | Construction sequence | Draws |
 | --- | --- | --- | ---: |
@@ -131,6 +136,8 @@ All events are priority 0 unless stated.
   result would drop the row. Light Gun Tank and AV-14B are both behaviour 3 →
   selector 2 → `CNormalSquad` with `CGroundVehicle` members.
 - **Scripts.** A type-28 row leaves squad `+0x84` at 0, unlike a type-8 squad row.
+  Level 100's squad rows are described as setting the flag, and their row type is left
+  open in the [Level 100 note](level100-construction-order.md#level-world-units).
   - So `CSquad::Init` clears the member template's script and name (`0x004e6049-0x004e6076`),
     and members get no 2001 or 2003.
   - The squad keeps its own script: row 19's `Scout` is bound by the squad's
@@ -223,7 +230,7 @@ In `default physics.dat` the three sweep and target-draw flags are set only on:
 - Arachnadrone (`CUnitIgnoreThreats`).
 
 World 110 uses none of them. So its AI target searches never draw, and the AI
-constructor's four sweep draws never run.
+constructor's four sweep draws never run ([the constructor rule](level100-construction-order.md#level-world-units)).
 
 | Profile | Turret turn rate `+0xbc` | Hover `+0x10c` | Fire control |
 | --- | ---: | ---: | --- |
@@ -266,7 +273,8 @@ From the shipped `.msl` sources:
   whose 2001 lands in frame 2.
 - `Weather` sets the snow density to 1.
 - `Lander` (rows 8 and 20) sets AI state 4 (`AI_ONF`) and follows "Lander Path 1"
-  (`FollowWaypointWait`, which suspends it). Row 8 flies 10 → 11 → 15 and row 20
+  (`FollowWaypointWait`, which suspends it); after the path returns, it sets AI state 0
+  (`AI_ON`). Row 8 flies 10 → 11 → 15 and row 20
   21 → 22 → 24 ([waypoint paths](../mechanics/waypoint-paths.md#world-110-paths)).
 - `Lander2` (row 12) sets AI state 4, then calls `Land()`, then sets AI state 0
   (`AI_ON`), then pauses.
@@ -278,8 +286,8 @@ From the shipped `.msl` sources:
 
 None of these natives reaches the shared generator through direct calls
 (reachability from each handler against the census). Activate, Deactivate and Land
-reach it through their virtual targets `0x004fd6a0`, `0x004fd700` and
-`0x00447f50`/`0x00447a40`, which also reach no generator call.
+reach their handlers through virtual targets `0x004fd6a0`, `0x004fd700` and
+`0x00447f50`/`0x00447a40`, and those targets reach no generator call.
 
 ### What the first deliveries draw
 
@@ -299,7 +307,7 @@ The level rows' deliveries:
 | Unit 4003 (the Battle Engine, landers, turret children, tanks, fighters) | one, then 4003 at now + 3.0 + (r mod 65536)/65536 |
 | Tank fire control 4001, when its delay put it in bucket 0 | one, then 4001 at now + (r mod 65536) × 0.1/65536 |
 | Turret child MOVE (`CComponent` Move `0x00428110`) | one (`0x004284a1`); on its normal path it draws once per Move, and it moves every frame |
-| Battle Engine, landing-craft, tank and fighter MOVEs | none. The dropship guide update draws only in landing states 3 and 5 (Level 100 table) |
+| Battle Engine, landing-craft, tank and fighter MOVEs | none. The dropship guide update draws only in landing states 3 and 5 ([Level 100 table](level100-construction-order.md#what-each-first-delivery-draws)) |
 | Fighter guide 2000 and 2001 | one each, then requeue at now + 0.5 + (r mod 65536) × 2⁻¹⁷ |
 | Lander AI 3000, rows 8 and 20 (AI state 4) | two. The dispatcher (`0x004ff330`) calls `CDropshipAI::Update` (`0x004487e0`: draw `0x0044880f`), then polls (draw `0x004ff371`), then queues 3003 at now + 2.0 + (r mod 65536) × 2⁻¹⁵ |
 | Lander AI 3000, row 12 (landing state 2) | one. Slot 9 (`0x00448580`) does nothing in state 2, then draws (`0x00448763`) and queues 3000 at now + 1.0 + (r mod 65536) × 2⁻¹⁶ |
@@ -345,8 +353,11 @@ The level rows' deliveries:
   one shared draw (`0x00538237`) and returns r mod n. Case 0 plays `HEALTH_LOW_1O`, case 1
   `HEALTH_LOW_2O` and case 2 `HEALTH_LOW_3O`, each followed by `_110_RESEARCH_HIT`.
   - The `.msl` source has no `break`, but the shipped bytecode does not fall through.
-    `level110-VitalBuilding.mso.bin` is materialized from `110_res_PC.aya`, SHA-256
-    `712bac0b6b8177fcbafc3ceaf4d0768375e22cce465513125f06f712ca23dea5`.
+    `level110-VitalBuilding.mso.bin`, a maintainer-held derived file that is not in this
+    repository, is materialized from `110_res_PC.aya`, SHA-256
+    `712bac0b6b8177fcbafc3ceaf4d0768375e22cce465513125f06f712ca23dea5`. Here "materialized"
+    means generated locally from that retail input by the rebuild's asset materializer
+    (`rebuild/tools/materialize_retail_assets.py` in onslaught-godot) and kept out of Git.
   - Instructions 26-61 test each case with push, push, compare (`0x0f`), remove-top
     (`0x0e`) and jump-if-not-equal (`0x12`). They end each body with a jump (`0x14`) to
     instruction 60, at instructions 36, 47 and 58.
@@ -355,7 +366,7 @@ The level rows' deliveries:
   - Opcode `0x12`'s executor `0x0052e990` (vtable `0x005e4c20`, getter `0x0052db60`) jumps
     only when bit 0 of `+0x218` is clear.
   - The `0x0d` executors at the case labels are `ret 0xc` (`0x00453ac0`).
-  - The rebuild found this and pins it in `World110ScriptNativeTests`.
+  - The rebuild found this and pins it in [`World110ScriptNativeTests`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Core.Tests/World110ScriptNativeTests.cs).
 
 ## Player start
 
@@ -373,12 +384,13 @@ The level rows' deliveries:
   - The player's own camera handoff 4000, at pan − 0.05, lands in bucket 98.
 - **Frame 99.** The camera hands over to the first-person view.
 - **Frame 100.** The FINISHED_PANNING handler (`0x00470024`, an inlined
-  `StartPlayingState`; the standalone copy is `0x0046fec0`, `game.cpp:3025-3031`) sets
+  `StartPlayingState`; the standalone copy is `0x0046fec0`, `references/Onslaught/game.cpp:3025-3031`) sets
   game state 3 and posts "game playing".
 - **Level 100 check.** The same arithmetic gives frame 180 (time 9.0) for its 6.0
-  pan. That matches the measured change from panning to playing at 9.0 and the
-  camera handoff at 8.95
-  (pan measurement; in the decompilation notes, not yet published).
+  pan. The 9.0 s is derived from 3.0 + 6.0. The 6.0 s pan is the measured value
+  ([source synthesis, intro-pan row](../engine/source/stuart-source-synthesis.md#proven-or-bounded-deltas)).
+  The 8.95 s camera handoff is expected from the same arithmetic, not measured here,
+  unless a receipt shows it.
 - **Control.** The `Scout` script answers "game playing" with "Enemy Engaged".
   `LevelScript`'s handler then waits two seconds and activates the Airfield and the
   player. No weapon or flight mode is restricted.

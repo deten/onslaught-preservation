@@ -1,8 +1,9 @@
-Status: active quick reference
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
-Source: user-owned retail MissionScript corpus and current tracked RE contracts.
-Summary: MSL command and mission scripting verb lookup.
 # MSL Command Reference
+
+Status: active — quick reference for MSL commands
+Last updated: 2026-11-06 (AI_ONF added to SetAIState; header moved above the title; Source names the maintainer-held corpus)
+Source: the authored MissionScript corpus (maintainer-held, not published) and current tracked RE contracts.
+Summary: MSL command and mission scripting verb lookup.
 
 This file is a syntax and verb lookup over the authored MissionScript corpus.
 Current static owners are the
@@ -60,7 +61,7 @@ thing.EnableFlightMode();
 thing.DisableFlightMode();
 health = thing.GetHealth();
 thing.SetHealth(value);
-SetAIState(AI_OFF/AI_ON/AI_NORMAL/AI_DEFENSIVE);
+SetAIState(AI_OFF/AI_ON/AI_NORMAL/AI_DEFENSIVE/AI_ONF);  // AI_ONF is 4, see AI States in msl-scripting.md
 ```
 
 ## Spawning

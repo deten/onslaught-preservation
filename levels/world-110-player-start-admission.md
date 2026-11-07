@@ -2,9 +2,10 @@
 
 Status: accepted authored-data and bounded static construction contracts; the separate rebuild
 owners this page describes were retired on 2026-09-26 (see "Rebuild pointers")
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (retired owners marked as retired; the test claim corrected; P7 named; Core defined; commit references replaced by descriptions; pinned-source citations name `references/Onslaught/`; the God term is linked; the Z direction is stated numerically; the energy default is stated; earlier: research-campaign records and decompiler-style code removed)
+Summary: The one exact authored player-1 start in World 110 and its bounded static admission, post-load assignment order and terrain clamp, as the retired rebuild stage handled them; static evidence only, with no retail process opened.
 Verdict: world 110 contains one exact authored type-15 start for player 1. Until
-2026-09-26, Core admitted its serialized pre-initialization fields, the complete ordered-match
+2026-09-26, [Core](../INDEX.md#terms) admitted its serialized pre-initialization fields, the complete ordered-match
 selection law, the released no-match fallback plan, and the exact
 terrain-height prefix of `CStart::Init`. Separate deterministic owners carried
 valid-object `CPlayer::AssignBattleEngine` order and invoked it once for every
@@ -25,7 +26,7 @@ SHA-256 `4e041c758b9d41ba18311b1fadeacb95fc31af51320861480b97033bc24e3c2b`.
 
 ## Rebuild pointers (2026-09-26)
 
-The rebuild types this page names were retired on 2026-09-26, together with their tests:
+The rebuild types this page names were retired on 2026-09-26:
 - the `RetailWorld110*` owners;
 - `RetailWorldInitialObjectSeedAdmission` and `RetailWorldActorDefinitionAdmission`;
 - `RetailWorldPlayerStartAdmission` (with `RetailWorldPlayerStartResolution`);
@@ -33,11 +34,10 @@ The rebuild types this page names were retired on 2026-09-26, together with thei
 - `RetailUnitConstructionAttachments` and `RetailBuildingSegments`.
 
 That separate World 110 stage never ran in the product. `Simulation` now builds World 110 from
-the materialized static world in the retail load order. That work is `c44977d3`; Level 100's
-base world is carried over in `df392cb4`. See the
-[World 110 construction order](world-110-construction-order.md).
+the materialized static world in the retail load order. Level 100's base-world carry-over is part of
+that build. See the [World 110 construction order](world-110-construction-order.md).
 
-The retired code is last present at `df392cb4`. The retail evidence on this page is unchanged:
+The retired code is no longer in the rebuild; its code is kept in Git history. The retail evidence on this page is unchanged:
 offsets, hashes, orders and values. Where the page says what Core does, it describes the
 retired code.
 
@@ -79,7 +79,7 @@ common fields not projected individually by Core.
 Pinned `references/Onslaught/InitThing.h:112-130` names the common
 `CInitThing` position, Euler-orientation, script/name, target, allegiance, and
 active fields. Its version-greater-than-45 loader at lines 318-356 fixes their
-serialized order for this version-50 world. `InitThing.h:791-830` then names
+serialized order for this version-50 world. `references/Onslaught/InitThing.h:791-830` then names
 the derived `CStartInitThing` tail and loads `mPlaneMode` followed by
 `mPlayerNumber`; its constructor defaults are plane mode false and player 1.
 
@@ -113,22 +113,21 @@ pristine body at `0x0046d040` agree on this order for each player:
 The byte discriminator is the unconditional list advance at
 `0x0046d0e7` after the match arm's assignment at `0x0046d0dc`; the loop returns
 to `0x0046d0c6` while another node exists. The found flag is tested only after
-the list is exhausted at `0x0046d102`. The earlier statement that retail
-stopped at the first match was false.
+the list is exhausted at `0x0046d102`. Retail does not stop at the first match.
 
 ## Reconstruction admission
 
 `RetailWorldPlayerStartAdmission` (retired) accepted only world 110, the exact archive identity, and the exact ordered start
 record above. Object identity, type, length, record digest, all six raw float
 words, plane mode, player number, count, and null shape fail closed.
-Commit `4e3d472c` gives the real materializer the matching fail-closed
+The real materializer has the matching fail-closed
 actor-header/census/tree-boundary and exact-start parser, so a supported retail
 materialization verifies the same row before writing generated assets.
-`RetailWorld110LevelActors.AuthoredPlayerStarts` keeps this row separate from
+`RetailWorld110LevelActors.AuthoredPlayerStarts` kept this row separate from
 the 49 definition-bearing identities because a start is placement/lifecycle
 input, not a Battle Engine definition.
 
-The accepted projection is immutable and deterministic. Resolution now walks
+Retired owner: the accepted projection is immutable and deterministic. Resolution now walks
 the stored start rows completely, retains every match in order through
 `MatchingAuthoredStarts`, and exposes the final matching row through
 `AuthoredStart` and the effective projected fields. World 110's admitted data
@@ -140,7 +139,7 @@ world-110 mission instrument.
 
 ## Bounded post-load list resolution
 
-Commit `7491346f` carries only the deterministic selection part of
+The owner carries only the deterministic selection part of
 `CGame::PostLoadProcess`. The selected pristine byte range is
 `[0x0046d0a9,0x0046d10a)`, 97 bytes, SHA-256
 `6a3af1eb13df39a7fd5eeb2996f8ef26c09ad7b2f23988d8b0f4c93e9e35cb22`.
@@ -162,11 +161,11 @@ sequence owner below consumes only caller-supplied identities.
 The pristine function is `[0x004d3080, 0x004d30c5)`, 69 bytes, SHA-256
 `17f1f2e24aa271c93f1a223b7ad871f34487e91d4e1e640c37056cb112593a10`.
 For valid objects it first rebinds the player's Battle Engine reader, then the
-engine's player reader. If the complete player God dword is nonzero, it calls
-the source-correlated vulnerability policy with raw `0`, then infinite energy
+engine's player reader. If the complete player [God](../mechanics/cheats/god-mode.md) dword is nonzero, it calls
+the source-correlated vulnerability policy (`references/Onslaught/Player.cpp:261-264`) with raw `0`, then infinite energy
 with raw `1`. There is no non-God reset arm.
 
-`RetailPlayerBattleEngineAssignment` (`rebuild/OnslaughtRebuild.Core/RetailPlayerBattleEngineAssignment.cs` in Onslaught-Career-Editor)
+`RetailPlayerBattleEngineAssignment` (`rebuild/OnslaughtRebuild.Core/RetailPlayerBattleEngineAssignment.cs` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot))
 composes those two calls over `RetailActiveReaderGraph` and returns a deeply
 immutable outer call transcript. Empty generic-reader action lists do not erase
 same-target function-call boundaries. Rebinding player P from engine A to B
@@ -186,8 +185,7 @@ state.
 No World-110 construction owner currently supplies a real engine identity, its
 player-reader cell, or the player's engine-reader cell. The assignment contract
 therefore closes one reusable function boundary without closing
-`CStart::SpawnBattleEngine`, `GetPlayerObject`, live post-load integration, or
-P7.
+`CStart::SpawnBattleEngine`, `GetPlayerObject`, live post-load integration, or the paused World 110 generalization item of the earlier rebuild queue (called P7 in the Toolkit's PROGRAM.md).
 
 ## Ordered authored-start assignment composition
 
@@ -227,17 +225,16 @@ shipped World-110 start list contains duplicate player-1 rows.
 the full pristine body but admits only the 37-byte half-open prefix
 `[0x004eae27, 0x004eae4c)`, SHA-256
 `f4efe7633c1f4ea75ca937ec0479eb1c72cd273812c15c31100991cd0844fe6a`.
-Retail samples the heightfield once, compares that result strictly below
-serialized Z, and only on that arm samples again and stores the second result.
+Retail samples the heightfield once and compares that result with serialized Z; only when it is numerically smaller (higher, down-positive) does retail sample again and store the second result.
 The contract stops before the next-call setup at `0x004eae4c` and
 `CComplexThing__Init` at `0x004eae4f`.
 
-`RetailWorldPlayerStartHeightClamp` composes that prefix with an already
+Retired owner: `RetailWorldPlayerStartHeightClamp` composes that prefix with an already
 admitted resolution and only `Level100Terrain.World110`. For the exact authored
 row, XY converts to 24.8 fixed `(67,776, 66,256)`. The pinned world-110 HFLD
 returns `-10,485` units on both calls; scale bits `0x3a7003c0` produce final Z
-bits `0xc1199926` (`-9.599889755249023`). This is strictly below authored
-negative zero, so the second result is retained. The immutable result preserves
+bits `0xc1199926` (`-9.599889755249023`). This is numerically smaller than the authored
+negative zero (higher, down-positive), so the second result is retained. The immutable result preserves
 the serialized Z and authored orientation separately from that final value.
 
 The released fallback position is also bounded through the same prefix. This
@@ -247,21 +244,20 @@ owner is introduced.
 
 ## Measured mutation receipts
 
-The independent row gate was exercised against canonical commit `4e3d472c` in
+The independent row gate was exercised against the committed parser in
 a disposable worktree. The controlled production mutation changed only
 `RetailWorld110LevelActors.PlayerStartPlayerNumber` from `1` to `2`.
-`RetailWorldPlayerStartAdmissionTests.Admit_ExactWorld110StartPreservesRawBitsAndDeterministicIdentity`
+The focused admission test (retired with its stage on 2026-09-26; see Rebuild pointers)
 then failed with Expected 1 / Actual 2. After restoring the production owner,
 the same exact filtered test passed; the receipt also binds the restored owner
 and test SHA-256 values.
 
-The receipt's logical machine-local path is
+The receipt's logical path is
 `<maintainer evidence>/rebuild-world110-player-start-mutation-kill-20260830/RECEIPT.md`,
 SHA-256
 `900f22187dea14262846d968a229e7a324ec1a292302c3214ddf656ec7e56b3d`.
-On this workstation it resides in canonical-checkout `<maintainer evidence>/`. It is
-ignored machine evidence, not content carried by a fresh clone or child
-worktree. This mutation proves the
+It is private evidence held by the maintainer and is not carried by a clone.
+This mutation proves the
 exact player-number assertion is live; it does not prove runtime construction.
 
 The bounded clamp has a separate controlled production mutation at
@@ -308,9 +304,7 @@ ordering, not runtime object construction or virtual policy effects.
 
 ## Deliberate limits
 
-The older admission, clamp and assignment helpers keep their original bounded
-contracts. The detached construction owner below adds owned storage; neither
-lane completes:
+The older admission, clamp and assignment helpers kept their original bounded contracts. The detached construction owner below added owned storage; neither lane completed:
 
 - Start's `CComplexThing::Init`/`CThing::Init` resource instantiation and world
   publication, including a proven class-15 resource-descriptor result;
@@ -338,7 +332,6 @@ constructor and relevant vtable targets. This is static evidence only; no
 retail process or desktop session was opened.
 
 The checked instruction addresses come from the maintainer's instruction exports.
-An earlier reading of these Start globals as “player-object globals” was wrong.
 
 | Function | Half-open pristine range | Bytes | Raw SHA-256 |
 | --- | --- | ---: | --- |
@@ -366,7 +359,7 @@ embedded engine initializer, then selects configuration ID `0x008a9bb8` for
 effective player 1 or `0x008a9bbc` otherwise. These globals are
 `CGame +0x11c/+0x120/+0x124`, corresponding to frontend settings in pinned
 `references/Onslaught/game.h:63-73`. `CGame::CGame` at `0x0046c210` and
-`game.cpp:216-224` initialize them to zero. That proves fresh-game defaults;
+`references/Onslaught/game.cpp:216-224` initialize them to zero. That proves fresh-game defaults;
 it does not prove the values after a frontend selection.
 
 The engine initializer's configuration word is embedded `+0x3c0`, hence
@@ -397,7 +390,7 @@ PostLoadProcess directly reads Start `+0x7c` at `0x0046d0d3`; the source's
 stores its number, sets both view modes to 1, zeros seven stats and five kill
 counts, and copies a complete God dword. The player-1 read at `0x004d27f3`
 is runtime `0x00662ab4`, corresponding to the admitted career-container word
-at `0x2496`; pinned `Player.cpp:24-34,247-265` supplies the source bridge.
+at `0x2496`; pinned `references/Onslaught/Player.cpp:24-34,247-265` supplies the source bridge.
 This does not execute the later God-policy virtuals or `CPlayer::Init`'s
 camera/host-time work.
 
@@ -410,7 +403,7 @@ non-base world and Skip for the base world. The byte-checked body is
 `[0x0050d4c0,0x0050d577)`, 183 bytes, SHA-256
 `a6518553f1f15ae04dff03db169812950b44704417dd7190c3dee3dec454eb16`.
 
-The existing hash-gated `tools/battle_engine_config_decode.py` owns the
+The existing hash-gated `tools/battle_engine_config_decode.py` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot) owns the
 1,514-byte shipped configuration data, SHA-256
 `58722b12a04cae97ad2163acb2cc2c1699f95a0688318bd8a86696714d94454a`.
 The source loader and byte-checked retail loader at
@@ -418,7 +411,7 @@ The source loader and byte-checked retail loader at
 the 1,939-byte body hash is
 `77e45d9fe461d98d44ad33d9bf3242e557b9fe42bf33cae8b761b35ee63d0742`.
 The genuine Aquila record has life bits `0x41a00000` and energy bits
-`0x41000000`. The existing Core configuration lookup owns the name-table
+`0x41000000`. As floats these are 20.0 (life) and 8.0 (energy), so the record sets energy to 8.0; the default is 2.5 ([battleengine-config-values.md](../mechanics/battleengine/battleengine-config-values.md)). The existing Core configuration lookup owns the name-table
 index clamp, case-sensitive search and fallback; no second selection law was
 introduced for World110.
 
@@ -450,8 +443,7 @@ Review of the **complete** 2,858-byte engine Init and pinned
 
 Source-only defaults or top-level RNG counts do not discharge those nested
 dependencies. Start's own base Init also calls resource-chain instantiation
-for OID 15; its concrete descriptor result remains unadmitted. Consequently
-the new constructor does not claim completed native Init, full call ordering,
+for OID 15; its concrete descriptor result remains unadmitted. Consequently the retired constructor did not claim completed native Init, full call ordering,
 post-load readiness or final engine position.
 
 ## Script control of the player in World 110
@@ -462,7 +454,7 @@ flush.
 - **Frame 60.** The pre-run ends, and FINISHED_PRE_RUN starts a 2.0 s pan (the
   level world's pan length).
 - **Frame 100.** The FINISHED_PANNING handler (`0x00470024`, an inlined
-  `CGame::StartPlayingState`; standalone copy `0x0046fec0`, `game.cpp:3025-3031`)
+  `CGame::StartPlayingState`; standalone copy `0x0046fec0`, `references/Onslaught/game.cpp:3025-3031`)
   sets game state 3 and posts the script event "game playing"
   ([timing](world-110-construction-order.md#player-start)).
 - **Control.** The `Scout` script (on RLWD row 19's squad) answers with
@@ -493,7 +485,7 @@ the shipped data, with no restamped Level100 fixture or invented player row.
 
 Focused checks lived in `RetailWorld110PlayerConstructionTests.cs` (retired)
 and `World110InitialActorMaterializationTests` in
-`rebuild/tools/materialize_retail_assets_tests.py` in Onslaught-Career-Editor.
+`rebuild/tools/materialize_retail_assets_tests.py` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot).
 They distinguish all three reader cells, preserve raw God/settings words,
 verify actual World110 configuration selection and stores, and assert that
 post-load readers remain unassigned. They are deterministic construction

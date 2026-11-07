@@ -1,12 +1,22 @@
 # DataType.cpp - Function Mappings
 
 Status: active static function map
-Last updated: 2026-10-22 (decompiler-style signatures and research-campaign records removed)
+Last updated: 2026-11-06 (Interface column reduced to function names, with parameter lists and calling conventions removed; Evidence, Specimen and Terms added; earlier: 2026-10-22 decompiler-style signatures and research-campaign records removed)
 Summary: the mission-script datatype classes (int, float, bool, string, position, thing pointer): factory,
 vtables, operator slots, layouts and the GETTOP reassign rule.
+Evidence: MEASURED — static reads of the pristine specimen's vtables, slot targets, debug strings and the factory's type-id mapping. Exact source identity, runtime MissionScript behaviour, layouts beyond the observed fields and rebuild parity are not established, as each section states.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Source file: `MissionScript/DataType.cpp`. Debug source path strings: `DataType.cpp` at `0x0064cc80`,
 > `DataType.h` at `0x0064c628`.
+
+## Terms
+
+- **GETTOP**: opcode 21 in the [opcode schema](missionscript-vm-datatype-opcode-schema.v1.json). The table below lists the slot its reassign path calls; the schema records its runtime effect as open.
+- **POP**: opcode 6 in the same schema. The note below the GETTOP table says it deletes and replaces the value.
+- **`symbol+8`**: the pointer at byte offset 8 of a script symbol, to the symbol's datatype object. The GETTOP note treats it as null before the first write.
+- **Virtual slot `+0xNN`**: the entry at byte offset `0xNN` of an object's vtable, called through the object's vtable pointer. `+0x14` is the sixth vtable dword.
+- **HIGH**: the confidence label on the GETTOP table's Body column. It marks a body that was independently re-read from the specimen on 2026-08-18 (the re-read is noted under the GETTOP heading). It grades that static reading, not runtime behaviour, which stays open.
 
 ## GETTOP assign slots — 2026-08-18
 
@@ -46,7 +56,7 @@ withdrawn label can tell it was corrected and not lost.
 
 ## Overview
 
-DataType.cpp implements the **mission script data type system** - a polymorphic class hierarchy for representing different data types (int, float, bool, string, position, thing pointer) used by the mission scripting engine.
+Debug strings in the retail binary name `DataType.cpp`. The classes below form the **mission script data type system**, a polymorphic class hierarchy for representing different data types (int, float, bool, string, position, thing pointer) used by the mission scripting engine.
 
 The retained `missionscript-vm-datatype-opcode-schema.v1.json` accounts for the
 six serialized datatype ids `1..6` (int, float, string, bool, thing pointer, and
@@ -58,59 +68,59 @@ behavior and exact layouts remain separate proof.
 The `CStringDataType` and `CThingPtrDataType` tails, the shared `CDataType` scalar-deleting destructor wrapper and the
 `CPositionDataType` arithmetic slots. This is static retail-binary evidence only; exact source identity, runtime MissionScript behavior, concrete layouts beyond observed fields, trailing CPosition dword semantics, and rebuild parity remain unproven.
 
-| Address | Interface | Evidence |
+| Address | Function | Evidence |
 | --- | --- | --- |
-| `0x0052f2c0` | `CStringDataType__Clone`: member with the receiver in ECX; no stack arguments; returns a pointer | Allocates an 8-byte CString object, installs vtable `0x005e4e4c`, allocates/copies a heap string from `this+0x04`, and null-terminates the clone buffer. |
-| `0x0052f360` | `CStringDataType__Equals`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Reads rhs through datatype vtable slot `+0x38` and compares the returned string against `this+0x04`. |
-| `0x0052f430` | `CThingPtrDataType__Print`: member with the receiver in ECX; takes `rhs` (pointer); returns nothing | Table name is Print. Body is assign: reads the thing from rhs through slot `+0x40` and passes it to `CGenericActiveReader__SetReader` for the reader at `this+4`. Independently re-read 2026-08-18. |
-| `0x0052f470` | `CThingPtrDataType__Clone`: member with the receiver in ECX; no stack arguments; returns a pointer | Allocates an 8-byte thing-pointer datatype, copies `this+0x04`, registers the clone field with `CSPtrSet__AddToHead` when needed, and installs vtable `0x005e4df8`. |
-| `0x0052f550` | `CThingPtrDataType__ScalarDeletingDestructor`: member with the receiver in ECX; takes `flags` (byte); returns a pointer | Calls `CThingPtrDataType__Destructor` and frees `this` when `flags&1` is set. |
-| `0x0052f570` | `CThingPtrDataType__Destructor`: member with the receiver in ECX; no stack arguments; returns nothing | Removes `this+0x04` from the pointed object's `CSPtrSet` when present and restores base vtable pointer `0x005e4b4c`. |
-| `0x0052f670` | `CDataType__ScalarDeletingDestructor`: member with the receiver in ECX; takes `flags` (byte); returns a pointer | Shared CDataType scalar-deleting destructor wrapper reused by CInt/CFloat/CBool/CPosition vtable heads; calls `CDataType__Destructor` and frees `this` when `flags&1` is set. |
-| `0x0052f690` | `CStringDataType__InitFromString`: member with the receiver in ECX; takes `source_text` (string); returns a pointer | Installs CString vtable `0x005e4e4c`, allocates/copies `source_text`, null-terminates it, and returns `this`. |
-| `0x0052f720` | `CStringDataType__ScalarDeletingDestructor`: member with the receiver in ECX; takes `flags` (byte); returns a pointer | Calls `CStringDataType__Destructor` and frees `this` when `flags&1` is set. |
-| `0x0052f740` | `CStringDataType__Destructor`: member with the receiver in ECX; no stack arguments; returns nothing | Frees the string buffer at `this+0x04` and restores base vtable pointer `0x005e4b4c`. |
-| `0x0052f790` | `CStringDataType__ReadFromBuffer`: member with the receiver in ECX; takes `bytecode_reader` (pointer); returns a pointer | Reads a 4-byte length from the bytecode buffer, allocates `length+1`, reads string bytes, and appends a null terminator. |
-| `0x0052f8a0` | `CPositionDataType__SubtractPosition`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Reads rhs through datatype vtable slot `+0x44`, allocates a 0x14-byte CPosition object, installs vtable `0x005e4da4`, and stores observed x/y/z differences. |
-| `0x0052f920` | `CPositionDataType__ScaleByFloat`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Reads rhs float through datatype vtable slot `+0x34`, allocates a 0x14-byte CPosition object, installs vtable `0x005e4da4`, and stores observed x/y/z scaled values. |
+| `0x0052f2c0` | `CStringDataType__Clone` | Allocates an 8-byte CString object, installs vtable `0x005e4e4c`, allocates/copies a heap string from `this+0x04`, and null-terminates the clone buffer. |
+| `0x0052f360` | `CStringDataType__Equals` | Reads rhs through datatype vtable slot `+0x38` and compares the returned string against `this+0x04`. |
+| `0x0052f430` | `CThingPtrDataType__Print` | Table name is Print. Body is assign: reads the thing from rhs through slot `+0x40` and passes it to `CGenericActiveReader__SetReader` for the reader at `this+4`. Independently re-read 2026-08-18. |
+| `0x0052f470` | `CThingPtrDataType__Clone` | Allocates an 8-byte thing-pointer datatype, copies `this+0x04`, registers the clone field with `CSPtrSet__AddToHead` when needed, and installs vtable `0x005e4df8`. |
+| `0x0052f550` | `CThingPtrDataType__ScalarDeletingDestructor` | Calls `CThingPtrDataType__Destructor` and frees `this` when `flags&1` is set. |
+| `0x0052f570` | `CThingPtrDataType__Destructor` | Removes `this+0x04` from the pointed object's `CSPtrSet` when present and restores base vtable pointer `0x005e4b4c`. |
+| `0x0052f670` | `CDataType__ScalarDeletingDestructor` | Shared CDataType scalar-deleting destructor wrapper reused by CInt/CFloat/CBool/CPosition vtable heads; calls `CDataType__Destructor` and frees `this` when `flags&1` is set. |
+| `0x0052f690` | `CStringDataType__InitFromString` | Installs CString vtable `0x005e4e4c`, allocates/copies `source_text`, null-terminates it, and returns `this`. |
+| `0x0052f720` | `CStringDataType__ScalarDeletingDestructor` | Calls `CStringDataType__Destructor` and frees `this` when `flags&1` is set. |
+| `0x0052f740` | `CStringDataType__Destructor` | Frees the string buffer at `this+0x04` and restores base vtable pointer `0x005e4b4c`. |
+| `0x0052f790` | `CStringDataType__ReadFromBuffer` | Reads a 4-byte length from the bytecode buffer, allocates `length+1`, reads string bytes, and appends a null terminator. |
+| `0x0052f8a0` | `CPositionDataType__SubtractPosition` | Reads rhs through datatype vtable slot `+0x44`, allocates a 0x14-byte CPosition object, installs vtable `0x005e4da4`, and stores observed x/y/z differences. |
+| `0x0052f920` | `CPositionDataType__ScaleByFloat` | Reads rhs float through datatype vtable slot `+0x34`, allocates a 0x14-byte CPosition object, installs vtable `0x005e4da4`, and stores observed x/y/z scaled values. |
 
 ## Factory and float slots
 
 `CDataType__CreateFromType` and the adjacent `CFloatDataType` arithmetic, comparison and assignment slots. This is static retail-binary evidence only; exact source identity, runtime MissionScript behavior, concrete layouts beyond observed fields, exact type enum names, and rebuild parity remain unproven.
 
-| Address | Interface | Evidence |
+| Address | Function | Evidence |
 | --- | --- | --- |
-| `0x0052ec60` | `CDataType__CreateFromType`: `__cdecl`; takes `type_id` (int), `bytecode_reader` (pointer); returns a pointer | Factory called from `CScriptObjectCode__ReadSymbolTable`; switches serialized `type_id` 1..6, installs observed datatype vtables, and reads initial payload bytes from `bytecode_reader`. Type 2 installs `CFloatDataType` vtable `0x005e4ea4`; type 4 installs the observed `CBoolDataType` vtable region `0x005e4d50`. |
-| `0x0052ef50` | `CFloatDataType__Add`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Float add slot at data pointer `0x005e4ea8`; reads rhs through datatype vtable slot `+0x34`, allocates an 8-byte `CFloatDataType`, installs vtable `0x005e4ea4`, and stores the sum. |
-| `0x0052efc0` | `CFloatDataType__Subtract`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Float subtract slot at data pointer `0x005e4eac`; reads rhs through slot `+0x34`, allocates an 8-byte `CFloatDataType`, and stores `this+0x04 - rhs`. |
-| `0x0052f030` | `CFloatDataType__Multiply`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Float multiply slot at data pointer `0x005e4eb0`; reads rhs through slot `+0x34`, allocates an 8-byte `CFloatDataType`, and stores the product. |
-| `0x0052f0a0` | `CFloatDataType__Divide`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Float divide slot at data pointer `0x005e4eb4`; reads rhs through slot `+0x34`, allocates an 8-byte `CFloatDataType`, and stores `this+0x04 / rhs`. |
-| `0x0052f110` | `CFloatDataType__Equals`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Float equality slot at data pointer `0x005e4ebc`; reads rhs through slot `+0x34` and compares against `this+0x04`. |
-| `0x0052f140` | `CFloatDataType__NotEquals`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Float inequality slot at data pointer `0x005e4ec0`; reads rhs through slot `+0x34` and compares against `this+0x04`. |
-| `0x0052f170` | `CFloatDataType__Assign`: member with the receiver in ECX; takes `rhs` (pointer); returns nothing | Float assignment slot at data pointer `0x005e4eb8`; reads rhs through slot `+0x34` and stores the returned float at `this+0x04`. |
-| `0x0052f190` | `CFloatDataType__LessThan`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Float less-than slot at data pointer `0x005e4ec4`; returns whether `this+0x04 < rhs`. |
-| `0x0052f1c0` | `CFloatDataType__GreaterThan`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Float greater-than slot at data pointer `0x005e4ec8`; returns whether `this+0x04 > rhs`. |
-| `0x0052f1f0` | `CFloatDataType__LessOrEqual`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Float less-or-equal slot at data pointer `0x005e4ecc`; returns whether `this+0x04 <= rhs`. |
-| `0x0052f220` | `CFloatDataType__GreaterOrEqual`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Float greater-or-equal slot at data pointer `0x005e4ed0`; returns whether `this+0x04 >= rhs`. |
+| `0x0052ec60` | `CDataType__CreateFromType` | Factory called from `CScriptObjectCode__ReadSymbolTable`; switches serialized `type_id` 1..6, installs observed datatype vtables, and reads initial payload bytes from `bytecode_reader`. Type 2 installs `CFloatDataType` vtable `0x005e4ea4`; type 4 installs the observed `CBoolDataType` vtable region `0x005e4d50`. |
+| `0x0052ef50` | `CFloatDataType__Add` | Float add slot at data pointer `0x005e4ea8`; reads rhs through datatype vtable slot `+0x34`, allocates an 8-byte `CFloatDataType`, installs vtable `0x005e4ea4`, and stores the sum. |
+| `0x0052efc0` | `CFloatDataType__Subtract` | Float subtract slot at data pointer `0x005e4eac`; reads rhs through slot `+0x34`, allocates an 8-byte `CFloatDataType`, and stores `this+0x04 - rhs`. |
+| `0x0052f030` | `CFloatDataType__Multiply` | Float multiply slot at data pointer `0x005e4eb0`; reads rhs through slot `+0x34`, allocates an 8-byte `CFloatDataType`, and stores the product. |
+| `0x0052f0a0` | `CFloatDataType__Divide` | Float divide slot at data pointer `0x005e4eb4`; reads rhs through slot `+0x34`, allocates an 8-byte `CFloatDataType`, and stores `this+0x04 / rhs`. |
+| `0x0052f110` | `CFloatDataType__Equals` | Float equality slot at data pointer `0x005e4ebc`; reads rhs through slot `+0x34` and compares against `this+0x04`. |
+| `0x0052f140` | `CFloatDataType__NotEquals` | Float inequality slot at data pointer `0x005e4ec0`; reads rhs through slot `+0x34` and compares against `this+0x04`. |
+| `0x0052f170` | `CFloatDataType__Assign` | Float assignment slot at data pointer `0x005e4eb8`; reads rhs through slot `+0x34` and stores the returned float at `this+0x04`. |
+| `0x0052f190` | `CFloatDataType__LessThan` | Float less-than slot at data pointer `0x005e4ec4`; returns whether `this+0x04 < rhs`. |
+| `0x0052f1c0` | `CFloatDataType__GreaterThan` | Float greater-than slot at data pointer `0x005e4ec8`; returns whether `this+0x04 > rhs`. |
+| `0x0052f1f0` | `CFloatDataType__LessOrEqual` | Float less-or-equal slot at data pointer `0x005e4ecc`; returns whether `this+0x04 <= rhs`. |
+| `0x0052f220` | `CFloatDataType__GreaterOrEqual` | Float greater-or-equal slot at data pointer `0x005e4ed0`; returns whether `this+0x04 >= rhs`. |
 
 ## Int slots
 
 The `CIntDataType` arithmetic and comparison head and the base destructor. This is retail-binary evidence only; exact source identity, runtime MissionScript behavior, concrete layouts beyond observed fields, and rebuild parity remain unproven.
 
-| Address | Interface | Evidence |
+| Address | Function | Evidence |
 | --- | --- | --- |
-| `0x0052d0a0` | `CIntDataType__Add`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Reads `rhs` through vtable slot `+0x30`, allocates an 8-byte CInt object, and stores the sum. |
-| `0x0052d110` | `CIntDataType__Subtract`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Reads `rhs` through slot `+0x30`, allocates an 8-byte CInt object, and stores the difference. |
-| `0x0052d180` | `CIntDataType__Multiply`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Reads `rhs` through slot `+0x30`, allocates an 8-byte CInt object, and stores the product. |
-| `0x0052d1f0` | `CIntDataType__Divide`: member with the receiver in ECX; takes `rhs` (pointer); returns a pointer | Reads `rhs` through slot `+0x30`, allocates an 8-byte CInt object, and stores the integer quotient. |
-| `0x0052d260` | `CIntDataType__Equals`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Returns `this+0x04 == rhs_value`. |
-| `0x0052d280` | `CIntDataType__NotEquals`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Returns `this+0x04 != rhs_value`. |
-| `0x0052d2a0` | `CIntDataType__Assign`: member with the receiver in ECX; takes `rhs` (pointer); returns nothing | Stores the integer value returned by `rhs` at `this+0x04`. |
-| `0x0052d2c0` | `CIntDataType__LessThan`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Returns `this+0x04 < rhs_value`. |
-| `0x0052d2e0` | `CIntDataType__GreaterThan`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Returns `this+0x04 > rhs_value`. |
-| `0x0052d300` | `CIntDataType__LessOrEqual`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Returns `this+0x04 <= rhs_value`. |
-| `0x0052d320` | `CIntDataType__GreaterOrEqual`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Returns `this+0x04 >= rhs_value`. |
-| `0x0052d390` | `CDataType__Destructor`: member with the receiver in ECX; no stack arguments; returns nothing | Base destructor that restores the base CDataType vtable pointer. |
+| `0x0052d0a0` | `CIntDataType__Add` | Reads `rhs` through vtable slot `+0x30`, allocates an 8-byte CInt object, and stores the sum. |
+| `0x0052d110` | `CIntDataType__Subtract` | Reads `rhs` through slot `+0x30`, allocates an 8-byte CInt object, and stores the difference. |
+| `0x0052d180` | `CIntDataType__Multiply` | Reads `rhs` through slot `+0x30`, allocates an 8-byte CInt object, and stores the product. |
+| `0x0052d1f0` | `CIntDataType__Divide` | Reads `rhs` through slot `+0x30`, allocates an 8-byte CInt object, and stores the integer quotient. |
+| `0x0052d260` | `CIntDataType__Equals` | Returns `this+0x04 == rhs_value`. |
+| `0x0052d280` | `CIntDataType__NotEquals` | Returns `this+0x04 != rhs_value`. |
+| `0x0052d2a0` | `CIntDataType__Assign` | Stores the integer value returned by `rhs` at `this+0x04`. |
+| `0x0052d2c0` | `CIntDataType__LessThan` | Returns `this+0x04 < rhs_value`. |
+| `0x0052d2e0` | `CIntDataType__GreaterThan` | Returns `this+0x04 > rhs_value`. |
+| `0x0052d300` | `CIntDataType__LessOrEqual` | Returns `this+0x04 <= rhs_value`. |
+| `0x0052d320` | `CIntDataType__GreaterOrEqual` | Returns `this+0x04 >= rhs_value`. |
+| `0x0052d390` | `CDataType__Destructor` | Base destructor that restores the base CDataType vtable pointer. |
 
 ## Boolean datatype slots
 
@@ -120,11 +130,11 @@ type 2 and the observed `CBoolDataType` vtable region for type 4. Exact source
 identity, concrete layouts, runtime MissionScript behavior, and rebuild parity
 remain unproven.
 
-| Address | Interface | Evidence |
+| Address | Function | Evidence |
 | --- | --- | --- |
-| `0x0052e420` | `CBoolDataType__Equals`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Bool equality slot at data pointer `0x005e4d68`; `RET 0x4`, rhs read through datatype vtable slot `+0x3c`, compare against the byte at `this+0x04`. |
-| `0x0052e440` | `CBoolDataType__NotEquals`: member with the receiver in ECX; takes `rhs` (pointer); returns a bool | Bool inequality slot at data pointer `0x005e4d6c`; `RET 0x4`, rhs read through datatype vtable slot `+0x3c`, compare against the byte at `this+0x04`. |
-| `0x0052e460` | `CBoolDataType__Assign`: member with the receiver in ECX; takes `rhs` (pointer); returns nothing | Bool assignment slot at data pointer `0x005e4d64`; `RET 0x4`, rhs read through datatype vtable slot `+0x3c`, store returned byte at `this+0x04`. |
+| `0x0052e420` | `CBoolDataType__Equals` | Bool equality slot at data pointer `0x005e4d68`; `RET 0x4`, rhs read through datatype vtable slot `+0x3c`, compare against the byte at `this+0x04`. |
+| `0x0052e440` | `CBoolDataType__NotEquals` | Bool inequality slot at data pointer `0x005e4d6c`; `RET 0x4`, rhs read through datatype vtable slot `+0x3c`, compare against the byte at `this+0x04`. |
+| `0x0052e460` | `CBoolDataType__Assign` | Bool assignment slot at data pointer `0x005e4d64`; `RET 0x4`, rhs read through datatype vtable slot `+0x3c`, store returned byte at `this+0x04`. |
 
 ## Class Hierarchy (from RTTI)
 
@@ -159,7 +169,7 @@ CDataType                    (base class)
 | CPositionDataType | 0x005e4da4 | CDataType__ScalarDeletingDestructor |
 | CDataType (base) | 0x005e4b4c | (abstract base) |
 
-## Functions (38 total)
+## Functions (37 in this section)
 
 ### Factory Functions
 
@@ -220,7 +230,6 @@ CDataType                    (base class)
 |---------|------|---------|
 | 0x0052f2c0 | CStringDataType__Clone | Creates copy of string data type |
 | 0x0052f360 | CStringDataType__Equals | String comparison (strcmp) |
-| 0x0052f430 | CThingPtrDataType__Print | Assign / rebind the thing slot at `this+4` via SetReader (Print is the table label) |
 | 0x0052f690 | CStringDataType__InitFromString | Initialize from C string |
 | 0x0052f720 | CStringDataType__ScalarDeletingDestructor | Scalar deleting destructor |
 | 0x0052f740 | CStringDataType__Destructor | Frees string buffer |
@@ -237,9 +246,12 @@ CDataType                    (base class)
 
 | Address | Name | Purpose |
 |---------|------|---------|
+| 0x0052f430 | CThingPtrDataType__Print | Assign / rebind the thing slot at `this+4` via SetReader (Print is the table label) |
 | 0x0052f470 | CThingPtrDataType__Clone | Creates copy with reference counting |
 | 0x0052f550 | CThingPtrDataType__ScalarDeletingDestructor | Scalar deleting destructor |
 | 0x0052f570 | CThingPtrDataType__Destructor | Releases thing reference |
+
+The Print row's superseded label, `CStringDataType__Print`, is recorded in the [Name corrections](#name-corrections--2026-07-28) table above.
 
 ## Layouts
 

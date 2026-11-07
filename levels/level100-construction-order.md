@@ -1,7 +1,7 @@
 # Level 100 construction order: shared draws and queued events
 
-Status: active static contract for the rebuild's Level 100 start
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Status: active static contract for the Level 100 start of the Godot C# rebuild ([onslaught-godot](https://github.com/dlprentice/onslaught-godot))
+Last updated: 2026-11-06 (world-data terms and event numbers defined, runtime trace and source pin stated, squad-row and allegiance notes made explicit; earlier: research-campaign records and decompiler-style code removed)
 Summary: the order in which Level 100's construction consumes the shared gameplay
 random stream and queues events, from the base-world pines to the last level-world
 row, and what each event's first delivery draws.
@@ -9,12 +9,52 @@ Evidence: MEASURED static reads of the pristine specimen and the shipped Level 1
 world files, scripts, meshes and `default physics.dat`. A read-only research pass
 traced the level-world unit rows; a second review re-checked their classes, constructors,
 queued events and draw sites at the addresses given. Laws already contracted
-elsewhere are linked, not repeated. No runtime capture.
+elsewhere are linked, not repeated. MEASURED, one bounded runtime trace: the retained
+Level 100 opening trace, read only for the manager's live event count at time 0.05
+(1,713 events; [AddEvent contract](../engine/world/contracts/CEventManager__AddEvent_AtTime__0044b370.md)).
+Its receipt is held privately by the maintainer (SHA-256
+`f3e677f7df5f5563ebb468f46ca6041756271f84dfc28ddf37b59210a4552b50`); nothing was launched
+for this document. SOURCE: `references/Onslaught/<file>:<line>` cites Stuart Gillam's
+published source at the pinned commit
+[`c3d8ac4`](https://github.com/dlprentice/Onslaught/tree/c3d8ac464259942b83fa8aa7f867c856e77b734d)
+([how to read a finding](../README.md#how-to-read-a-finding)).
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`;
 `100_BSWD` is byte-identical to `110_BSWD` (interpreted JSON SHA-256 prefix
 `5a309d4565fb58e7`); interpreted `100_RLWD` JSON SHA-256 prefix `41f33fb6d14201b0`;
-`data/default physics.dat` SHA-256 prefix `e1fb3dedbeb29b4b`.
+`data/default physics.dat` SHA-256 prefix `e1fb3dedbeb29b4b`. The runtime image of the
+trace above is SHA-256 `e1436ef7e0ad9ccbddd43aaaca952f6e84d4b1a282835cead745efcfc32fadf4`,
+pinned separately from the pristine specimen.
+
+## Terms and event numbers
+
+**World data.** RLWD is a level's own world records (`100_RLWD` here) and BSWD the base
+world's records (`100_BSWD`, the base world that Level 100 and World 110 share). The
+[WRES join](../formats/wres-instance-join.md) names both as definition-bearing record
+families. `LoadWorld(RLWD, ...)` reads the level world, and its recursive
+`LoadWorld(BSWD, base 1)` reads the base world first ([load order](#load-order)).
+
+**Event numbers.** One number means different things to different owners (2000 is a
+collision detector event, a guide event and a script wait), so the table names each
+owner. The enumerators the pinned source declares are cited from `references/Onslaught/`;
+the other owners come from the tables below.
+
+| Number | Name in this document | Owner |
+| ---: | --- | --- |
+| 1000, 1001, 1002 | influence events | the influence map (`CInfluenceMap` handler) |
+| 2000 | detector event; guide event; script wait | the collision detector; `CAirGuide`; a script waiting in `FollowWaypointWait` |
+| 2001 | INIT_SCRIPT (`references/Onslaught/thing.h:33`); FINISHED_PRE_RUN (`references/Onslaught/game.h:31`); cockpit; guide event | a thing's script; the game; the Battle Engine's cockpit; `CAirGuide` |
+| 2003 | READY_SCRIPT (`references/Onslaught/thing.h:33`) | a thing's script |
+| 3000 | MOVE (`references/Onslaught/actor.h:7`); collision readiness; AI; animation; motion controller | the Actor; the collision component; `CUnitAI`; the animation owner; the Battle Engine's motion controller |
+| 3001 | LF_MOVE (`references/Onslaught/actor.h:7`); AI event for an owner with a target | the Actor; `CUnitAI` |
+| 3002 | AI event on an init-link path | `CUnitAI` |
+| 3003 | AI re-poll | `CUnitAI` |
+| 4000 | squad event; radar-warning receiver | `CNormalSquad`; the Battle Engine's receiver |
+| 4001 | fire control; squad prune | a cannon's fire control; `CNormalSquad` |
+| 4002 | squad process | `CNormalSquad` |
+| 4003 | Unit event (`CUnit::HandleEvent`) | `CUnit` |
+| 6002 | crosshair refresh (`CALC_UNIT_OVER_CROSSHAIR`, `references/Onslaught/BattleEngine.h:20`) | the Battle Engine |
+| 6003 | auto-aim refresh (`HANDLE_AUTO_AIM`, `references/Onslaught/BattleEngine.h:20`) | the Battle Engine |
 
 ## Shared-stream consumers
 
@@ -23,15 +63,19 @@ call site's generator object was classified from the last load of `ecx` before t
 call. The gameplay stream is `GAME.mRandomStream`, the pointer at `0x008a9d9c`,
 which is `CGame+0x304` of the global `CGame` at `0x008a9a98`. `InitRestartLoop`
 creates it afresh with seed 123456 at every level start (`0x0046c7e4-0x0046c80d`,
-`game.cpp:387`).
+`references/Onslaught/game.cpp:387`).
 - 137 sites in 74 functions load it as `ds:0x008a9d9c`.
 - 3 more load it through `this+0x304`: the developer-mode win and lose buttons in
-  `CGame::ReceiveButtonAction` (`0x0046f96a`, `0x0046fa60`, `game.cpp:2677/2716`)
+  `CGame::ReceiveButtonAction` (`0x0046f96a`, `0x0046fa60`, `references/Onslaught/game.cpp:2677/2716`)
   and the spawn-point pick in `CGame::RespawnPlayer` (`0x00470267`). None runs in
   normal single-player play.
 - `CMessageBox::RenderBattleLinePulseSprites` (12 sites) uses a local generator.
 - Two `CWorld::LoadWorld` sites (`0x0050cc62`, `0x0050cc8b`) use a generator seeded
   locally at `0x0050cc3f`.
+
+The four groups above name 74, 2, 1 and 1 functions: 78 in all, one more than the 77 in
+the first sentence. Either one function sits in two groups or the total is 78; the
+[open questions](#open-questions) say how to settle it.
 
 The site list is kept at
 `<maintainer evidence>/test-runs/re-lane-20260925/rng-call-sites-20260926.tsv` (SHA-256
@@ -90,7 +134,7 @@ unless stated.
 - A request at or before now + 0.051 goes to the current ring bucket; a negative
   request is stored as now + 0.0001.
 - A later request goes to bucket floor((t − now − 0.001) × 20), or to the overflow
-  list beyond the 200-bucket ring.
+  list at bucket offset 198 or more (the ring has 200 buckets).
 - Each bucket keeps per-priority lists in insertion order.
 
 Each `Update` (`0x0044b5c0`) advances the frame (time = frame × 0.05), saves the old
@@ -144,7 +188,7 @@ Actor draw.
 
 No Level 100 unit profile sets `CUnitSweeping` (profile `+0x19c`: apply
 `0x00432e20`, default 0 at `0x0042f196`). So the AI constructor never takes its four
-extra draws here.
+extra draws here ([the rule](#level-world-units)).
 
 Row 2's AI is `CRepairPadAI`; the others use the shared `CUnitAI`
 ([owners table](level100-final-drone-wave.md#ai-owners-that-draw-shared-rng)).
@@ -201,8 +245,11 @@ neighbour scan; the scan's later-time 2000s are listed under
     constructor `0x004e6870`);
   - 0 and 3 get the 0xb4-byte squad (constructor `0x004e5da0`);
   - every other selector gets none.
-- A squad row gets a `CSquadInitThing` (type 0x1c) naming one member (`+0x3bc` = 1)
-  and sets squad `+0x84` = 1 (`0x0050ca0c-0x0050ca14`).
+- A squad row gets a `CSquadInitThing` naming one member (`+0x3bc` = 1) and sets squad
+  `+0x84` = 1 (`0x0050ca0c-0x0050ca14`). This document does not state the serialized row
+  type of Level 100's squad rows (9 and 12). [World 110](world-110-construction-order.md#type-28-squads)
+  says a serialized type-28 row leaves `+0x84` at 0, so the two notes cannot both hold for
+  type 28 until those row types are read (see the [open questions](#open-questions)).
 - Other rows are created by `0x0050df80`: selector 7 is `CBuilding` (vtable
   `0x005d8eb4`), 8 `CPlane` (`0x005e1930`) and 12 `CDropship` (`0x005e1dd8`). The
   squad's member, selector 2, is a `CGroundVehicle` (`0x005e297c`).
@@ -217,6 +264,9 @@ neighbour scan; the scan's later-time 2000s are listed under
   −1 (`0x004fe81d`);
 - a target (init `+0xa4`) gives state 0 and 3001 at now; no target gives state 1 and
   3000 at now (`0x004fe8e3`).
+- a profile with `CUnitSweeping` (profile `+0x19c`) makes the constructor take four extra
+  draws. This document cites no source line for that rule. No Level 100 profile sets the
+  flag ([base-world rows](#base-world-rows)), so no row here takes the draws.
 
 All these events are priority 0. Base-world AIs have no script, so they queue
 only their 3000.
@@ -358,7 +408,7 @@ Tanks and row 40 the Air Trainer, so two warm-ups remain:
 
 A unit's allegiance `+0x138` is its initializer's `+0xa0`, copied by `CUnit::Init`
 at `0x004f8fba`. For a world row `CInitThing::Load` (`0x0040e280`)
-reads it from the row, after the mesh number. The September 26
+reads it from the row, after the mesh number. The 2026-09-26
 [initializer recheck](../engine/world/world-initializer-copy-load.md) separates versioned reads,
 selective copies and fields left unchanged. `onsldef.msl` names 0 friendly,
 1 enemy and 2 neutral.
@@ -374,9 +424,13 @@ selective copies and fields left unchanged. `onsldef.msl` names 0 friendly,
   its leader's `+0x138` (`0x004e714a`).
 - `SpawnThing` (`0x00536cd0`) gives the new unit the allegiance of the script's
   owner (`[script+0x10]`) when that owner is a unit (`+0x34` bit `0x10`), and 2
-  otherwise (`0x00536f69-0x00536f97`). Level 100's spawners run on the Tank
-  Factory (`TankFactory`) and the Airfield (`Hangar`), both 0, so their tanks,
-  trucks and drones start friendly until their own scripts call `SetAllegiance`.
+  otherwise (`0x00536f69-0x00536f97`). The bit is set by `CUnit`'s `SetThingType` on
+  every unit ([World 110 native guard](world-110-construction-order.md#script-inits)).
+  The Tank Factory (base row 1) and the Airfield (base row 23) are `CBuilding` rows
+  whose construction queues the Unit event 4003, which `CUnit::HandleEvent` handles,
+  so both are units and pass the test ([drone-wave table](level100-final-drone-wave.md#ai-owners-that-draw-shared-rng)).
+  Level 100's spawners run on them, and both are allegiance 0, so their tanks, trucks
+  and drones start friendly until their own scripts call `SetAllegiance`.
 - `CUnit::Init` lists a unit that is not in a squad in `0x008550c0` for
   allegiance 1 or 6 and in `0x008550b0` for 0 or 6 (`0x004f9182-0x004f91b2`);
   `CNormalSquad::Init` does the same for the squad by `+0x7c`
@@ -452,7 +506,8 @@ In the first flush:
   move-to (slot 61, `0x00403a90`, which sets the guide's goal). It then suspends the
   script with a script 2000 at −1, delivered in frame 2. The U-17 flies 22 → 23 → 44
   and the Air Trainer 42 → 43 ([waypoint paths](../mechanics/waypoint-paths.md)).
-- The four `TargetZone` scripts deactivate their zones.
+- The four `TargetZone` scripts deactivate their zones. The script on row 19, the fifth
+  zone, is not named here (see the [open questions](#open-questions)).
 - `StaticTarget` has an empty `init()`, and no script defines the `ready()` event
   that 2003 calls.
 
@@ -507,7 +562,7 @@ guide below.
 ## Pre-run, pan and the first rendered frame
 
 - **Pre-run.** `RestartLoopRunLevel` calls `CGame::Update` while the game state is 1
-  (`0x0046e040-0x0046e05d`, `game.cpp:2063-2071`). It skips the loop only when
+  (`0x0046e040-0x0046e05d`, `references/Onslaught/game.cpp:2063-2071`). It skips the loop only when
   `0x00662dd4` (resource building) is set.
   - Each pass is a whole update: the frame counter, `AdvanceTime` (`0x0046eb5d`),
     each controller's `Flush`, the event flush (`0x0046ebce`) and
@@ -523,7 +578,7 @@ guide below.
 - **After the pre-run.** These run before any frame is rendered, and none reaches a
   shared-stream draw:
   - every unit in `0x008550d0` starts its looping noise (`0x004f99b0`, the GPL
-    source's `StartPlayingInitNoise`, `game.cpp:1414-1420`);
+    source's `StartPlayingInitNoise`, `references/Onslaught/game.cpp:1414-1420`);
   - the level music starts when `0x00662dcc` is set (`0x0046e0ba`);
   - the loading screen is switched off (`0x0046e0c7`).
   Then `MainLoop` starts. Each pass runs `Update` (`0x0046efd7`) before `Render`, so
@@ -538,7 +593,7 @@ guide below.
     once idle for five updates (`+0x50` = 0 and `+0xcc` ≥ 5, `0x004988c9`). Neither
     path reaches a shared draw. What the pose feeds besides rendering is not traced.
   - `CBattleEngine::Move` zeroes the controller's animation blend `+0x2c` from state 3
-    on (`0x004084a6`, `BattleEngine.cpp:1343`). The blend starts at 0
+    on (`0x004084a6`, `references/Onslaught/BattleEngine.cpp:1343`). The blend starts at 0
     (`0x0049849e`). `CBattleEngine::Init` sets it to 1.0 only on levels 221, 222,
     231, 232, 331, 332, 523 and 524 (`0x00405458-0x00405493`), so Level 100 and
     World 110 are unaffected.
@@ -549,7 +604,7 @@ guide below.
   - the reconnect check and the guide counter `0x00854d90`, which is written only
     and never read (`0x0046ea7c`);
   - mouse look and rotation input, which run only in state 3;
-  - player buttons, ignored in states 1 and below (`Player.cpp:286-287`);
+  - player buttons, ignored in states 1 and below (`references/Onslaught/Player.cpp:286-287`);
   - non-repeating sounds, dropped in state 1 (`0x004e0b57`);
   - vibration and pause.
 
@@ -557,11 +612,20 @@ guide below.
 
 ## Open questions
 
+A copied runtime in the falsifiers below is a copy of the game's executable, not the
+pristine specimen, run under a debugger or instrumentation ([controlled copied-runtime
+observations](../engine/controlled-runtime-observations.md)). Each row names the cheapest
+check that would settle it.
+
 | Question | Cheapest falsifier |
 | --- | --- |
 | Whether both influence 1000 chains persist, and the receiver's 0.03 delay (read from its initializer, not traced end to end) | Count hits on `0x0048bf0f` per second, and log the receiver's first 4000, in a copied runtime |
 | Whether this static order matches retail end to end, from the first pine draw through frame 2 | Log the return address of every `Random__NextLCGAbs` call on `0x008a9d9c` from level load through frame 2 in a copied runtime |
 | What the response `0x004264a0` does in the first flush for the two overlapping pairs, including its virtual callees | Trace the response's virtual calls for `CBuilding`/`CGroundVehicle` and `CSphereTrigger`/`CBattleEngine` pairs, or read lane 1 in the draw log |
-| Which pairs the Battle Engine's and the units' first scans find, and their 2000 times | Recompute the scans with the Level 100 heightfield in Core, or log `0x00480ed0` arguments during load |
+| Which pairs the Battle Engine's and the units' first scans find, and their 2000 times | Recompute the scans with the Level 100 heightfield in the earlier [OnslaughtRebuild.Core](https://github.com/dlprentice/onslaught-godot/tree/main/rebuild/OnslaughtRebuild.Core), or log `0x00480ed0` arguments during load |
 | Whether the member position update (slot 20 at `0x004e6199`) or `AddMember`'s formation placement (`0x004e8730`) rescans collision | Static read of `CGroundVehicle` slot 20 and `0x004e8730` |
 | Whether a native run by the frame-1 inits reaches the shared generator: `PrimaryObjectiveFailed`, `DisableFlightMode`, `DisableWeapon`, `Deactivate`, `PlayCharMessageWait`, `SetAIState` | Direct-call reachability from each native's handler, or the draw log above |
+| The serialized row type of Level 100's squad rows 9 and 12, and so whether the `+0x84` = 1 branch applies to them | Read the type word of level-world rows 9 and 12 in the interpreted `100_RLWD` JSON (a static read) |
+| Whether 77 or 78 functions call `Random__NextLCGAbs` (the four groups above name 78 entries) | Count the distinct function names in the site list's function column |
+| The script on row 19, the fifth zone, and what it does with its zone | Read row 19's script name from the interpreted `100_RLWD` JSON, and that script's `init()` |
+| The source line for the four sweep draws of a `CUnitSweeping` profile in the AI constructor | Read the constructor's sweep branch in the pristine specimen and cite it by function and address |
