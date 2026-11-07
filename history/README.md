@@ -1,7 +1,7 @@
 # History and attribution
 
 Status: active — folder index
-Last updated: 2026-10-22 (method history added)
+Last updated: 2026-11-06 (the community Discord history replaces the March 2026 extract; earlier: 2026-10-22 (method history added))
 Summary: attribution, development sources, community resources and lore errata.
 
 ## Overview
@@ -15,7 +15,7 @@ This folder holds the history around the game and this documentation rather than
 | [attribution.md](attribution.md) | Public-safe attribution, contributor history, and preservation context |
 | [community-resources.md](community-resources.md) | Speedrun resources, emulators, similar games |
 | [development-sources.md](development-sources.md) | First-party development sources and what each is good for |
-| [discord-archive-extract-2026-03.md](discord-archive-extract-2026-03.md) | Findings extracted from the community Discord archive (March 2026) |
+| [community-history.md](community-history.md) | Dated history of the community Discord, 2021 to 2026 (replaces the March 2026 extract) |
 | [lore-errata.md](lore-errata.md) | Corrections to published lore |
 
 ## How the findings were made
