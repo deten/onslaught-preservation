@@ -68,13 +68,14 @@ Two further byte facts fix the interpretation:
 
 ## Corrections to existing RE documents
 
-- [`aya-tags.md`](aya-tags.md) (lines 153,161) calls `CPOS` /
-  `CORI` "Animation position/orientation keyframes". That is misleading: they
+- Before this update, [`aya-tags.md`](aya-tags.md) called `CPOS` /
+  `CORI` "Animation position/orientation keyframes". That was misleading: they
   are not keyframes and are not an authoring source. They are a per-virtual-frame
-  composed cache.
-- [`aya-asset-format.md`](aya-asset-format.md) (lines 113-115) calls them
-  "Unknown (skipped)". Skipping is correct; "unknown" is now resolved.
-- The same file describes `VHFM` as "Vertex frame data". It is the
+  composed cache, and `aya-tags.md` now says so.
+- Before this update, [`aya-asset-format.md`](aya-asset-format.md) called them
+  "Unknown (skipped)". Skipping is correct; "unknown" is now resolved, and that file
+  now gives the same identity.
+- That file still describes `VHFM` as "Vertex frame data". It is the
   virtual-frame → hierarchy-frame map: one byte per virtual frame, valued in
   `[0, hFrames)`, per part.
 

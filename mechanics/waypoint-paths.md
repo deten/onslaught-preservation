@@ -103,12 +103,12 @@ heights are that run's output; this page has not re-sampled them.
 
 - **Target chains:** 3→4; 6→7; 10→11→15; 21→22→24; 26→29; 27→30→33; 28→31→32. The
   others end the chain.
-- **Landing craft.** The craft at rows 8 and 20 (script `Lander`; see [construction order](../levels/world-110-construction-order.md) lines 268-272) fly Lander Path 1 from their authored positions:
+- **Landing craft.** The craft at rows 8 and 20 (script `Lander`; see [construction order](../levels/world-110-construction-order.md) lines 275-278) fly Lander Path 1 from their authored positions:
   - row 8 at (215, 422, −20) starts at row 10 (squared distance 725, against 7,782.5 for
     row 11) and flies 10 → 11 → 15;
   - row 20 at (170, 505, −25) starts at row 21 (706, against 12,942 for row 10) and flies
     21 → 22 → 24.
-  Row 23 is on the list but neither craft reaches it. Row 12 (`Lander2`) does not follow this path: it calls `Land()`, which lands the craft where it is. The positions of rows 8 and 20 are in the [seeds document](../levels/world-110-initial-constructor-seeds.md), lines 855 and 858. The squared distances 725 and 7,782.5 for row 8 are stated in [onslaught-godot's World110 test](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Client.Tests/World110StaticWorldManifestTests.cs#L88), which cites this page; the values 706 and 12,942 for row 20 are in none of the three onslaught-godot test files and cannot be recomputed here, because the other node positions are not published in this repository.
+  Row 23 is on the list but neither craft reaches it. Row 12 (`Lander2`) does not follow this path: it calls `Land()`, which lands the craft where it is. The positions of rows 8 and 20 are in the [seeds document](../levels/world-110-initial-constructor-seeds.md), lines 844 and 847. The squared distances 725 and 7,782.5 for row 8 are stated in [onslaught-godot's World110 test](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Client.Tests/World110StaticWorldManifestTests.cs#L88), which cites this page; the values 706 and 12,942 for row 20 are in none of the three onslaught-godot test files and cannot be recomputed here, because the other node positions are not published in this repository.
 - **Fighters.** Fighter Path 1 holds three separate chains. A fighter scripted to follow
   it (`MuspellFighter`, `MuspellFighter1`; no World 110 row carries either script)
   takes the chain of its nearest node.

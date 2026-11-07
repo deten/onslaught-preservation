@@ -90,7 +90,7 @@ and marks the superseded parts.
 
 | Note | What it holds | Contract state |
 | --- | --- | --- |
-| [aya-asset-format.md](aya-asset-format.md) | Overview of the AYA format from the AYAResourceExtractor analysis: compression, tag catalog, vertex and texture layouts | Older overview without a status header; the outer envelope is in [aya-container.md](aya-container.md) |
+| [aya-asset-format.md](aya-asset-format.md) | Overview of the AYA format from the AYAResourceExtractor analysis: compression, tag catalog, vertex and texture layouts | Active overview of the AYA format; partly superseded for record layouts, which [cmsh-fields.md](cmsh-fields.md) and [cmsh-mesh.md](cmsh-mesh.md) own; the outer envelope is in [aya-container.md](aya-container.md) |
 | [aya-resource-chunks.md](aya-resource-chunks.md) | Chunk IDs and the top-level chunk lookup for `.aya` resource files | Active quick reference, migrated from archived skill notes |
 | [aya-resource-extractor-contract.tsv](aya-resource-extractor-contract.tsv) | One row per AYAResourceExtractor claim (92 rows), each classified against current evidence | Machine-readable owner of the source audit's claim table |
 | [aya-resource-extractor-source-audit.md](aya-resource-extractor-source-audit.md) | Audit of the AYAResourceExtractor source and its removed release, with historical comparisons | Active audit; behavior equivalence is not established |
