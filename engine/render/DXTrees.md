@@ -1,11 +1,11 @@
 # DXTrees.cpp - Function Mappings
 
 Status: active static function map
-Last updated: 2026-10-22 (reconstructed code and research-campaign records removed)
+Last updated: 2026-11-06 (names follow the decompilation; close-pass mip bias marked unverified; earlier: reconstructed code and research-campaign records removed)
 Summary: the fast tree batch: two card buffers built from the map, how a destroyed tree is hidden, and the fast/close selection facts the rebuild uses.
 Evidence: MEASURED — pristine instructions; the fast/close selection section is the rebuild-cited part.
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-Source File: `C:\dev\ONSLAUGHT2\DXTrees.cpp` (allocator file string `0x006529b0`) | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: `DXTrees.cpp` (named by its debug path string at the allocator, `0x006529b0`) | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 
 > DirectX-specific tree rendering system for environmental vegetation
 
@@ -22,31 +22,32 @@ This focused read-back supersedes the older shadow/LOD guesses later in this
 note:
 
 - `CRTTree__Init` (`0x004DD7B0`) owns both a `CMesh` and a six-view
-  `CImposter`. `CRTTree__VFuncSlot02_BuildRenderOutputs` (`0x004DD960`) submits
+  `CImposter`. `CRTTree__Render` (`0x004DD960`) submits
   the mesh when horizontal camera distance is at or inside
   `g_MeshQualityDistance`, or while the tree is falling. The image value at
   `0x006321A0` is `30.0`; boot options can overwrite it from
-  `defaultoptions.bea` OptionsTail `+0x0C`. The installed max-quality snapshot
-  read on 2026-07-22 stores `70.0` (`0x428C0000`) there. The separate capability
+  `defaultoptions.bea` OptionsTail `+0x0C`. A max-quality options snapshot kept by the maintainer
+  (maintainer evidence, not published; persisted user state, not shipped data), read on 2026-07-22, stores `70.0` (`0x428C0000`) there. The separate capability
   branch in `CRTTree__Init` writes `45.0`.
-- `CRTTree__VFuncSlot03_UpdateVisibilityState` (`0x004DD850`) queues
-  `CDXEngine__RenderImposterBillboardSet` (`0x00543300`) outside that boundary.
+- `CRTTree__RenderImposter` (`0x004DD850`) queues
+  `CDXImposter__Render` (`0x00543300`) outside that boundary.
   The helper calls `CDXImposter__BuildQuadGeometry` six times: four faces whose
   basis advances by about `-π/2`, then two faces tilted by `+π/2` and `+3π/2`.
   Serialized half-extents are scaled by `0.99`. The exact six atlas cells and
   extents for every Level 100 pine are recorded in the
-  Level 100 asset note (`rebuild/OnslaughtRebuild.Godot/Assets/Level100/README.md` in Onslaught-Career-Editor).
-- `CDXTrees__BuildTreeGeometry` emits an additional primary standing card per
+  Level 100 asset note (`rebuild/OnslaughtRebuild.Godot/Assets/Level100/README.md` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Godot/Assets/Level100/README.md) at commit `f44e31e`).
+- `CDXTrees__Build` emits one primary standing card per
   tree. Its CTree virtual selector at `0x004F6540` computes
-  `(tree_object_address >> 4) & 3`; a placement ordinal is not equivalent static
-  evidence. The second buffer is a horizontal square using serialized `VIEW` 4
+  `(tree_object_address >> 4) & 3`, so the variant depends on the tree's object address,
+  not on its placement order; placement order is not static evidence for it. The second buffer is a horizontal square using serialized `VIEW` 4
   and half-size `selected_standing_half_width * 0.7`.
 - `CDXTrees__Render` always draws the primary buffer. It draws the horizontal
   buffer only when absolute camera-height minus sampled-ground-height exceeds
   `20.0`; that comparison is not horizontal range LOD.
 - Default/world rendering enables alpha test with reference `8` and
   greater-or-equal comparison. The close mesh pass uses anisotropic stage-zero
-  minification, linear mip filtering, max anisotropy `4`, and `-1` mip bias.
+  minification, linear mip filtering, max anisotropy `4`, and a `-1` mip bias. That bias is unverified here: the
+  [default render-state note](d3d-default-render-state-block.md), section 7, says sampler-setter writes of the mip LOD bias are discarded before the device, and no other path that sets it for this pass is named. The cheapest falsifier is a controlled capture of the device's bias during that pass.
   The fast batch uses point min/mag and alpha reference `8`; its mip filter
   setting is not established here.
   The observed `0x008554FC = 1` chooses its unlit white-factor `MODULATE2X`
@@ -56,13 +57,13 @@ note:
 
 | Address | Function |
 | --- | --- |
-| `0x0055a350` | `CDXTrees__CDXTrees` |
+| `0x0055a350` | `CDXTrees__ctor` |
 | `0x0055a360` | `CDXTrees__scalar_deleting_dtor` |
 | `0x0055a380` | `CDXTrees__dtor` |
 | `0x0055a390` | `CDXTrees__Init` |
-| `0x0055a3b0` | `CDXTrees__ReleaseBuffers` (returns `int`) |
-| `0x0055a400` | `CDXTrees__Reset` |
-| `0x0055a420` | `CDXTrees__BuildTreeGeometry` |
+| `0x0055a3b0` | `CDXTrees__DeleteDeviceObjects` (returns `int`) |
+| `0x0055a400` | `CDXTrees__Shutdown` |
+| `0x0055a420` | `CDXTrees__Build` |
 | `0x0055aa10` | `CDXTrees__Render` |
 | `0x0055ae40` | `CDXTrees__HideTree` (takes the tree object) |
 
@@ -94,16 +95,16 @@ All are members with the receiver in ECX. Slot 1 of the `CDXTrees` vtable (`0x00
 | Index | Address | Function |
 |-------|---------|----------|
 | 0 | 0x0055a360 | CDXTrees__scalar_deleting_dtor |
-| 1 | 0x005019c0 | VFuncSlot_09_005019c0 |
+| 1 | 0x005019c0 | shared stub (decompilation name `CDXFrontEndVideo__RestoreDeviceObjects`) |
 | 2 | 0x00405930 | (inherited) |
 | 3 | 0x00405930 | (inherited) |
-| 4 | 0x0055a3b0 | CDXTrees__ReleaseBuffers |
+| 4 | 0x0055a3b0 | CDXTrees__DeleteDeviceObjects |
 
 Slots 5-15 after the table hold float and data values, not further function pointers.
 
 ## Functions
 
-### CDXTrees__CDXTrees (0x0055a350)
+### CDXTrees__ctor (0x0055a350)
 **Constructor**
 
 Stores the `CDXTrees` vtable pointer.
@@ -127,29 +128,29 @@ Restores the `CDXTrees` vtable pointer and calls the base-class destructor at `0
 ### CDXTrees__Init (0x0055a390)
 **Initialize**
 
-Registers itself with the shader render list at `0x00855bb0` through `CShaderBase__Init`
+Registers itself on the device-object list at `0x00855bb0` through `PCLTShell__AddDeviceObject`
 (`0x00512ca0`, called at `0x0055a393`-`0x0055a399`) and sets both buffer pointers (`this+0x08`,
-`this+0x0C`) to NULL.
+`this+0x0C`) to NULL. The decompilation places that list in the shell class, `PCLTShell`. Whether it is a member of the state-cache object that the [default render-state note](d3d-default-render-state-block.md) places at the same global is not established here; the cheapest check is the list head's offset within that object in the pristine bytes.
 
 ---
 
-### CDXTrees__ReleaseBuffers (0x0055a3b0)
+### CDXTrees__DeleteDeviceObjects (0x0055a3b0)
 **Release Vertex Buffers**
 
 Destroys and frees each `CVBufTexture` that exists, nulls both pointers and returns 0.
 
 ---
 
-### CDXTrees__Reset (0x0055a400)
-**Reset**
+### CDXTrees__Shutdown (0x0055a400)
+**Shutdown**
 
-Releases the buffers through its own virtual slot `+0x10` (`ReleaseBuffers`), then unlinks
-itself from the render list at `0x00855bb0` through `CShaderBase__UnlinkFromRenderObjectLists`
+Releases the buffers through its own virtual slot `+0x10` (`DeleteDeviceObjects`), then unlinks
+itself from the device-object list at `0x00855bb0` through `PCLTShell__RemoveDeviceObject`
 (`0x00512cc0`).
 
 ---
 
-### CDXTrees__BuildTreeGeometry (0x0055a420)
+### CDXTrees__Build (0x0055a420)
 **Build Tree Geometry** - Main function
 
 Iterates through the world quadtree to find all tree objects and builds vertex/index buffers for rendering them as billboards.
@@ -185,7 +186,7 @@ Renders both prepared fast-tree buffers.
 
 **Algorithm:**
 1. Check if tree count > 0
-2. If buffers not built, call BuildTreeGeometry
+2. If buffers not built, call CDXTrees__Build
 3. Set up render states (blending, alpha test, etc.)
 4. Bind texture
 5. Render first buffer (main trees)
@@ -204,7 +205,7 @@ Renders both prepared fast-tree buffers.
 **Hide Tree**
 
 Hides one tree's cards in both buffers. Its only caller is
-`CRTTree__Destructor` (`0x004de001`), which passes its own `this`: the argument
+`CRTTree__dtor` (`0x004de001`), which passes its own `this`: the argument
 is the `CRTTree`, whose `+0x30` word is the tree's card index (written at
 `0x0055a82a`, or `0xffff` at `0x0055a98c`).
 
@@ -252,10 +253,11 @@ note for the individual falling-tree path.
 
 ## Callers
 
-| Address | Function | Context |
-|---------|----------|---------|
-| 0x0046cfe2 | CGame__LoadLevel | Called during level load |
-| 0x0055aa2e | CDXTrees__Render | Called if buffers not built |
+| Address | Caller | Calls | Context |
+| --- | --- | --- | --- |
+| 0x0046cfe2 | CGame__LoadLevel | CDXTrees__Build | Called during level load |
+| 0x0055aa2e | CDXTrees__Render | CDXTrees__Build | Called if buffers not built |
+| 0x004de001 | CRTTree__dtor | CDXTrees__HideTree | Only caller of HideTree; hides a destroyed tree's cards |
 
 ## Notes
 
@@ -263,6 +265,6 @@ note for the individual falling-tree path.
 
 2. **Quadtree Integration**: Tree geometry is built by iterating through the CMapWho quadtree system, which provides efficient spatial queries.
 
-3. **Dynamic Hiding**: Trees can be hidden at runtime (when destroyed) by zeroing their vertex positions, avoiding the need to rebuild the entire buffer.
+3. **Dynamic Hiding**: Trees can be hidden at runtime (when destroyed) by zeroing the corner offsets (standing cards) and the positions (horizontal cards), avoiding the need to rebuild the entire buffer.
 
 4. **Allocation**: Both CVBufTexture objects are allocated through `CDXMemoryManager__Alloc` (size 0x68, memory type 0x1f, `DXTrees.cpp` lines 94 and 106).

@@ -1,7 +1,7 @@
 # Battle Engine Aquila engine architecture
 
-Status: active, first-party architecture synthesis
-Last updated: 2026-10-29 (the private copy's location is named only as maintainer evidence)
+Status: active — first-party architecture synthesis
+Last updated: 2026-11-06 (Specimen line added; source-path strings reduced to file names; inventory counts cited to onslaught-decomp at 76e277d; earlier: the private copy's location is named only as maintainer evidence)
 Evidence: SOURCE — Jeremy Longley's first-party contemporary 47-slide Lost Toys
 GDC deck; MEASURED — exact PC retail strings, RTTI, source-path remnants, and
 the current function inventory; UNKNOWN — console-binary joins and every
@@ -12,6 +12,8 @@ PC instance is the generic `SoundManager.cpp` / PC-specific
 `pcsoundmanager.cpp` split; rendering and controller evidence support the same
 pattern, while the deck's exact `CShader` and console sound-manager names remain
 unconfirmed proposals/search seeds.
+
+Specimen: pristine PC retail `BEA.exe`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 ## First-party source
 
@@ -97,12 +99,12 @@ game code.
 
 ### Sound: strong shared/platform split
 
-The pristine PC executable contains the following exact ASCII remnants:
+The pristine PC executable (the specimen named in the header) contains the following exact ASCII remnants. For the two source-file strings only the file name is quoted; each is a developer source path inside the executable:
 
 | Raw file offset | Retail evidence | Meaning |
 | ---: | --- | --- |
-| `0x00232428` | `C:\dev\ONSLAUGHT2\SoundManager.cpp` | generic/shared source owner |
-| `0x0023E46C` | `C:\dev\ONSLAUGHT2\pcsoundmanager.cpp` | PC-specific implementation owner |
+| `0x00232428` | `SoundManager.cpp` | generic/shared source owner |
+| `0x0023E46C` | `pcsoundmanager.cpp` | PC-specific implementation owner |
 | `0x002322A8` | `.?AVCSample@@` | exact `CSample` RTTI |
 | `0x0023E2D8` | `.?AVCPCSample@@` | exact PC-specific sample RTTI |
 | `0x00222BF8` | `.?AVIAudibleThing@@` | exact `IAudibleThing` RTTI |
@@ -110,15 +112,18 @@ The pristine PC executable contains the following exact ASCII remnants:
 
 This is the strongest direct architecture join: generic and PC-specific source
 owners survive beside the same interface/sample vocabulary shown in the deck.
-All 34 shared `CSoundManager__*` production bodies are now semantically
+All 34 shared sound-manager bodies in the August 11 table are now semantically
 crosswalked against retained source and normalized-identical demo twins in the
-[`CSoundManager` report](audio/csoundmanager-shared-semantics.md).
+[`CSoundManager` report](audio/csoundmanager-shared-semantics.md). The 34 is the August 11 count; the inventory
+([onslaught-decomp `config/functions.tsv` at `76e277d`](https://github.com/dlprentice/onslaught-decomp/blob/76e277d4145cef793b489de7702bf6b9d1c4e977/config/functions.tsv), 2026-11-06) lists 31 `CSoundManager__*`
+functions, and the two counts are not reconciled here.
 They prove the 256-event pool, shared sample/effect and spatial policy, and
-calls into the PC backend for device and channel operations. All 20
-`CPCSoundManager__*` device-side bodies are now independently crosswalked in the
+calls into the PC backend for device and channel operations. The 20 device-side bodies in the August 11 table are now independently crosswalked in the
 [`CPCSoundManager` report](audio/cpcsoundmanager-backend-semantics.md),
 including DirectSound enumeration/buffers, the 64-slot channel table, IMA ADPCM
-decode, quality conversion, playback, and listener updates.
+decode, quality conversion, playback, and listener updates. The inventory at
+`76e277d` ([functions file](https://github.com/dlprentice/onslaught-decomp/blob/76e277d4145cef793b489de7702bf6b9d1c4e977/config/functions.tsv)) lists 23 `CPCSoundManager__*` functions; which 20 of them are the
+device-side bodies is recorded only in the unpublished August 11 table.
 
 The slide spellings `CXBOXSoundManager`, `SSoundEvent`, `GetSoundEvent`,
 `ShouldIBePlaying`, and `DevicePlay` were not found as exact ASCII in the
@@ -129,8 +134,8 @@ production symbols.
 
 PC retail contains exact `CVertexShader` RTTI, `VertexShader.cpp`, vertex-shader
 configuration/status strings, compact pixel-shader resource terminology, and
-engine render-state constants. The current function inventory has 23
-`CVertexShader__*` envelopes.
+engine render-state constants. The current function inventory ([`76e277d`](https://github.com/dlprentice/onslaught-decomp/blob/76e277d4145cef793b489de7702bf6b9d1c4e977/config/functions.tsv)) has 20
+`CVertexShader__*` functions.
 
 The deck's `CShader` abstraction is presented as a proposed semantic wrapper
 for DirectX vertex/pixel shaders and PS2 VU1 code. Exact `CShader` ASCII was not
@@ -141,7 +146,7 @@ exact cross-platform class name and whether the proposal shipped are open.
 ### Controller and other platform services
 
 The generic `Controller.cpp` source path and exact `CPCController` RTTI survive
-in PC retail; the current inventory has 15 `CPCController__*` functions. This
+in PC retail; the current inventory has 17 `CPCController__*` functions. This
 is consistent with the deck's controller boundary but still needs call/layout
 evidence before declaring a particular abstract interface.
 
@@ -192,8 +197,8 @@ bodies are normalized-identical in the independently linked PC demo.
 ### Building example
 
 The deck's sound example names `CBuilding`; PC retail contains exact
-`CBuilding` and `CBuildingNamedMesh` RTTI, and the current inventory has 16
-`CBuilding__*` envelopes. That proves the class token is production-real. It
+`CBuilding` and `CBuildingNamedMesh` RTTI, and the current inventory has 21
+`CBuilding__*` functions. That proves the class token is production-real. It
 does not prove the shown `CBuilding::Explode()` code is a literal retail body.
 Likewise, the deck's `LARGE_EXPLOSION` spelling is absent while shipped
 `default physics.dat` contains `Large Explosion`; the relationship is useful

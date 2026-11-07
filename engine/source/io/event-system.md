@@ -1,13 +1,15 @@
 # Event scheduler and active readers
 
 Status: active — source map and bounded retail static contract
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (source pin named as c3d8ac4 with the earlier line-number pin stated; the Flush range stated against the body's closing line; the rebuild citations moved to onslaught-godot at f44e31e and the 32/32 run labelled as a dated frozen-copy run)
 Summary: event admission, dispatch order, recycling and reader lifetimes; exact
 scheduler body checks support the Core implementation without establishing
 whole-game runtime parity.
 Evidence: MEASURED pristine instructions and focused Core tests;
 SOURCE-INFORMED names from pinned `references/Onslaught` commit
-`5352a81cdb838b145a57f7febc5d9fc4b0129ebb`. The separately retained runtime
+`c3d8ac464259942b83fa8aa7f867c856e77b734d` (line numbers were read at
+`5352a81cdb838b145a57f7febc5d9fc4b0129ebb`; the cited files are unchanged
+between the two). The separately retained runtime
 contract below remains a candidate and was not replayed or promoted here.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, 2,506,752
 bytes, SHA-256
@@ -86,7 +88,8 @@ only caller is `CGame__Update` (`0x0046eb5d`).
 
 ## Dispatch and reuse
 
-`eventmanager.cpp:311-411` and the checked `Flush` body establish this order:
+`eventmanager.cpp:311-411` (the whole `Flush` body; execution ends at line 397) and the
+checked `Flush` body establish this order:
 
 1. Visit the ready ring slot's lanes 0, 1 and 2 in order.
 2. Snapshot the overflow count **after ring callbacks and before overflow
@@ -148,15 +151,20 @@ absence of indirect save effects. Save layout belongs to the
 
 ## Rebuild coverage and remaining limits
 
-`RetailEventScheduler` (`rebuild/OnslaughtRebuild.Core/RetailEventScheduler.cs` in Onslaught-Career-Editor)
+The rebuild is developed in [onslaught-godot](https://github.com/dlprentice/onslaught-godot); the
+files named here are at its commit `f44e31e`. The Toolkit's copy of these files (in
+Onslaught-Career-Editor at commit `51129bab`) is a frozen reference, not built or tested
+there. `RetailEventScheduler` ([`rebuild/OnslaughtRebuild.Core/RetailEventScheduler.cs`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Core/RetailEventScheduler.cs))
 models routing, the clock, dispatch and recycling with opaque listener IDs.
-`RetailActiveReaderGraph` (`rebuild/OnslaughtRebuild.Core/RetailActiveReaderGraph.cs` in Onslaught-Career-Editor)
+`RetailActiveReaderGraph` ([`rebuild/OnslaughtRebuild.Core/RetailActiveReaderGraph.cs`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Core/RetailActiveReaderGraph.cs))
 models reader membership separately; it is not automatically wired into every
 scheduler listener. Core's reusable `Init` also clears its containers; that
 reset convenience is not proof that calling retail `Init` twice without
 `Shutdown` is valid.
 
-The focused `RetailEventSchedulerTests` fixture passed **32/32** on September 7.
+The focused `RetailEventSchedulerTests` fixture passed **32/32** on September 7; that is a
+dated run of the frozen Toolkit copy, and this document records no re-run against
+onslaught-godot's files.
 `Flush_OverflowCallbacksCannotExtendTheCapturedVisitCount` failed before the
 count-snapshot correction and passed afterward. It deliberately advances the
 clock inside a caller-supplied callback so a newly appended event becomes due;

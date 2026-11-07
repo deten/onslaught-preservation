@@ -1,8 +1,10 @@
-Status: active quick reference
-Last updated: 2026-04-29
-Source: migrated from archived Onslaught skills during the skill clean-slate pass.
-Summary: Engine singleton and subsystem ownership lookup.
 # Onslaught Engine Singletons Reference
+
+Status: active — quick reference for engine singleton and subsystem ownership
+
+Last updated: 2026-11-06 (pin and clone command added to the 2026-07-28 correction; Source line removed)
+
+Summary: Engine singleton and subsystem ownership lookup.
 
 This document provides detailed reference for the global singleton instances used throughout the Onslaught engine.
 
@@ -96,7 +98,11 @@ static DWORD mTextureStageStates[8][N_TEXTURESTAGESTATES];
 
 `grep -rn 'mRenderStateCache\|mTextureStageStateCache\|CheckForGeforce3\|SVSS\|STSS' references/Onslaught/`
 returns **zero hits**, and neither `GetWidth` nor `GetHeight` is declared in
-`ltshell.h` or `d3dapp.h`. The withdrawn text is quoted in full below so that a
+`ltshell.h` or `d3dapp.h`.
+
+That grep runs over Stuart Gillam's published source at commit `c3d8ac4` of the public reference fork [dlprentice/Onslaught](https://github.com/dlprentice/Onslaught), a fork of [stuart73/Onslaught](https://github.com/stuart73/Onslaught). This repository does not contain that source. To repeat the check, run `git clone https://github.com/dlprentice/Onslaught`, then `git -C Onslaught checkout c3d8ac4`, and run the grep over that clone.
+
+The withdrawn text is quoted in full below so that a
 reader who memorised any of it can tell it was corrected rather than lost, and so
 that nobody wastes time grepping for a name this document invented:
 

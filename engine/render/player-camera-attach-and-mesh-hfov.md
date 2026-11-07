@@ -1,11 +1,11 @@
 # The player camera, the cockpit attach, and what `HFOV` means
 
 Status: active — partial September 27 recheck; earlier sections remain inherited evidence
-Last updated: 2026-10-29 (the float constants given by value only; earlier: research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (Fov figure corrected to 73.74 degrees, copied-byte total, Toolkit paths qualified, sky-offset scope; earlier: the float constants given by value only; research-campaign records and decompiler-style code removed)
 Summary: original camera/projection findings, with a bounded recheck of position
 identities and aggregate result transport appended below. Other earlier claims
 were not reverified by that recheck.
-Evidence: MEASURED — September 27 retail byte/declaration alignment and 30
+Evidence: MEASURED — September 27 retail byte/declaration alignment and
 isolated original-code copy cases with two modified-copy controls, detailed below.
 Earlier sections retain their dated evidence; this recheck does not establish
 whole-camera runtime behavior, rendering or player acceptance.
@@ -14,7 +14,8 @@ SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 Date: 2026-07-26. Every address below is in the pristine Steam specimen
 (`SHA-256 74154BFAE14DDC8ECB87A0766F5BC381C7B7F1AB334ED7A753040EDA1E1E7750`),
-read read-only from the image's instructions and bytes via `tools/pe_read_va.py`.
+read-only from the image's instructions and bytes via `tools/pe_read_va.py` in
+Onslaught-Career-Editor at `51129bab`.
 Nothing was written.
 
 This answers a specific question: does retail place the player camera from the
@@ -94,17 +95,17 @@ hfov = 2*atan(1.00)   = 90.000000 degrees
 vfov = 2*atan(0.75)   = 73.739795 degrees
 ```
 
-at any resolution — the 0.75 is a fixed constant, not a viewport ratio, so at
-640x480 it happens to be square-pixel correct.
+The FOV values do not depend on resolution. The 0.75 is a fixed constant, not a viewport ratio, so square pixels hold only in 4:3 modes; 640x480 is one of them.
 
 ### Correction to a previously circulated number
 
-The figure "retail horizontal FOV = 73.71 degrees" originates in
-`<maintainer evidence>/ADVERSARIAL-GODOT-VIABILITY-2026-07-25.md:217`, where it is *derived
-from the reconstruction's own* `Fov = 58.7155f` by widening 58.7155 vertical to
-4:3. It was never a retail measurement. `tan(58.7155/2) = 0.5625 = 0.75 * 0.75`,
-i.e. the reconstruction applied the 0.75 aspect factor to the horizontal axis as
-well. Retail's vertical FOV is `2*atan(0.75)`, not `2*atan(0.75*0.75)`.
+The figure "retail horizontal FOV = 73.71 degrees" originates in `<maintainer
+evidence>/ADVERSARIAL-GODOT-VIABILITY-2026-07-25.md:217`, where it is *derived from the
+reconstruction's own* `Fov = 58.7155f` by widening 58.7155 vertical to 4:3. It was never a retail
+measurement. The derivation it states gives 73.74 degrees, not 73.71: `tan(58.7155/2) = 0.5625`, so
+widening to 4:3 gives `tan(h/2) = 0.75` and `h = 2*atan(0.75)`, which is 73.7398 degrees. In other
+words `0.5625 = 0.75 * 0.75`, i.e. the reconstruction applied the 0.75 aspect factor to the
+horizontal axis as well. Retail's vertical FOV is `2*atan(0.75)`, not `2*atan(0.75*0.75)`.
 
 ## 2. The camera-attach convention
 
@@ -145,7 +146,7 @@ installed at `CCockpit+8`):
 
 **So with no shake the cockpit mesh origin is exactly the camera position and
 its orientation is exactly the camera orientation. The retail attach offset is
-zero.** `Camera01`'s `CPOS (0.006004, -0.002597, 0)` is authoring slop about the
+zero.** `Camera01`'s `CPOS (0.006004, -0.002597, 0)` is authoring imprecision about the
 mesh origin, consistent with — but not the source of — that convention.
 
 `CCockpit::Render` is `0x0053bb50` (earlier analysis
@@ -237,10 +238,9 @@ guarded by a `'CORI'` tag compare, the file's `CORI` into `+0x108`
 hierarchy pose. It also short-circuits them away entirely when the local
 transform is identity (`+0x120`) or the local position is zero (`+0x11c`).
 
-So the shipped `CPOS`/`CORI` bytes are consumed by nothing: they are recomputed
-before first use. `tools/cmsh_cpos_cori_verify.py` already established that they
-equal the composed `HORI`/`HPOS` chain, which is why the substitution is
-invisible.
+So the shipped `CPOS`/`CORI` bytes are consumed by nothing: they are recomputed before first use.
+`tools/cmsh_cpos_cori_verify.py` (in Onslaught-Career-Editor at `51129bab`) already established that
+they equal the composed `HORI`/`HPOS` chain, which is why the substitution is invisible.
 
 ## 5. Measured against retail
 
@@ -248,8 +248,9 @@ Both values above were applied to the reconstruction — `Fov 58.7155 -> 73.7397
 and the cockpit root offset `(0, -0.01, -0.06) -> (0, 0, 0)` — and the gameplay
 plan was recaptured at 640x480 against retail's realised level offsets
 (`<maintainer evidence>/retail-reference-pristine/level100-gameplay/manifest.json`), then
-compared with `tools/compare_capture.py` and
-`rebuild/tools/gameplay-regions-level100.json`.
+compared with `tools/compare_capture.py` (in Onslaught-Career-Editor at `51129bab`) and
+[`rebuild/tools/gameplay-regions-level100.json`](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/tools/gameplay-regions-level100.json)
+in onslaught-godot.
 
 At retail offset `t0+25065 ms`, `material% / meanD`:
 
@@ -263,8 +264,8 @@ At retail offset `t0+25065 ms`, `material% / meanD`:
 | cockpit frame (right) | 96.03 / 50.6 | 90.73 / 36.1 | 95.00 / 42.9 | **94.73 / 45.9** |
 | threat circle | 89.45 / 40.6 | 89.45 / 40.6 | 67.16 / 27.0 | **67.16 / 27.0** |
 
-Whole-frame cockpit-dark mask agreement against retail
-(`tools/cockpit_edge_profile.py`, intersection over union):
+Whole-frame cockpit-dark mask agreement against retail (`tools/cockpit_edge_profile.py` in
+Onslaught-Career-Editor at `51129bab`, intersection over union):
 
 | | baseline | offset only | FOV only | **both** |
 | --- | ---: | ---: | ---: | ---: |
@@ -288,7 +289,8 @@ FULL FRAME `material% / meanD`, baseline -> both:
 | t0+42062 ms | 89.05 / 46.9 | 65.07 / 28.4 |
 
 The sky region is the cleanest single read: `72.03% / 32.9` -> `18.54% / 6.5` at
-every sampled offset. That is a field-of-view result, not a shading one.
+the first table's offset, t0+25065 ms (the timeline table gives full-frame values only). That is a
+field-of-view result, not a shading one.
 
 The opening pan improves by the same margin, which is expected:
 `CPanCamera::GetZoom` also returns 1.0 (`Camera.h:126`), so the pan runs on the
@@ -372,18 +374,16 @@ getter as returning nothing). This is a machine-level result, not a claim that
 the C++ source returns a pointer; orientation names and aggregate layouts remain
 open.
 
-Their 193 unchanged bytes copy **through the destination pointer supplied at
-entry `[ESP+0x4]`**, leave that pointer in EAX and return with four-byte cleanup.
-Thirty cases cover separate, unaligned, identical and forward/backward
-overlapping result storage. Forward overlap propagates sequentially; this is
-not a before-image copy guarantee. The experiment captured EAX, ESP delta,
-EBX/ESI/EDI/EBP and the complete 256-byte surrogate object and 80-byte result
-area, not every register, flags, transient write or stack byte. DF was clear.
-Two explicit one-byte mutants—source offset `0x34→0x38` and cleanup `4→8`—
-produced the predicted distinguishable contents and stack delta. The ELF
-permits only i386 read/write/exit after confinement; denied `getpid` is observed
-in every case. Independent review rechecked all retained observations and
-PE-to-ELF equality without rerunning them.
+Their 160 unchanged bytes (the sum of the copied-bytes column above) copy **through the destination
+pointer supplied at entry `[ESP+0x4]`**, leave that pointer in EAX and return with four-byte
+cleanup. Thirty cases cover separate, unaligned, identical and forward/backward overlapping result
+storage. Forward overlap propagates sequentially; this is not a before-image copy guarantee. The
+experiment captured EAX, ESP delta, EBX/ESI/EDI/EBP and the complete 256-byte surrogate object and
+80-byte result area, not every register, flags, transient write or stack byte. DF was clear. Two
+explicit one-byte mutants—source offset `0x34→0x38` and cleanup `4→8`— produced the predicted
+distinguishable contents and stack delta. The ELF permits only i386 read/write/exit after
+confinement; denied `getpid` is observed in every case. Independent review rechecked all retained
+observations and PE-to-ELF equality without rerunning them.
 
 Private driver: `<maintainer evidence>/test-runs/re-audit-20260926/camera-interface/original_copies.py`.
 Receipt: `copy-8uy536n3/receipt.json` within that owner, 66,980 bytes,

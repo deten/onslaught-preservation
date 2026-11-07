@@ -1,12 +1,11 @@
 # Game System
 
 Status: historical source analysis (December 2025), with bounded retail corrections to the debug-key description
-Last updated: 2026-10-29 (the debug-key table distinguished from the retail PC default bindings; earlier: research-campaign records removed)
+Last updated: 2026-11-06 (god flags, level-loss path, frame timing, state and lives names, multiplayer and FMV ranges, grade bounds, volume curve and Music.cpp citation checked against the pinned source; earlier: the debug-key table distinguished from the retail PC default bindings; research-campaign records removed)
 Summary: the game loop, level lifecycle, end-level data, music and sound managers as written in Stuart's source; the
 keyboard bindings below are distinguished from the selected retail PC table.
-Evidence: SOURCE — the historical analysis of Stuart's source, and the cited retail-matching controller and game
-source in onslaught-decomp; the remaining historical claims were not individually rechecked in this correction.
-Specimen: pristine `BEA.exe.original.backup`, SHA-256
+Evidence: SOURCE — the historical analysis of Stuart's source. Rechecked against the pinned source in the 2026-11-06 correction: the god-flag account, the level-loss path, the frame timing, the game-state and lives names, the multiplayer and FMV ranges, the secondary-objective bounds, the Music.cpp assignment and the master-volume curve. The debug-key table, the rest of the cheat text, the sound-channel and localisation notes and the career-integration tables are historical and were not individually rechecked.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Analysis from game.cpp/h, DXGame.cpp/h, PCGame.cpp/h, EndLevelData.cpp/h, Music.cpp/h, and SoundManager.cpp/h - December 2025
@@ -21,13 +20,13 @@ The game loop system provides the core execution framework through a class hiera
 
 ```
 CGame (base class - abstract interface)
-    ├── CDXGame (DirectX 8 implementation)
-    │       └── CPCGame (PC-specific extensions)
+    ├── CDXGame (DirectX implementation; the selected GAME under _DIRECTX)
+    ├── CPCGame (alternate PC lane; excluded from the selected source lane)
     └── CPS2Game (PlayStation 2 - not in provided source)
 ```
 
 **Platform Selection:**
-- PC builds use `CPCGame` extending `CDXGame`
+- The source's global `GAME` is `CDXGame` under `_DIRECTX` and `CPS2Game` otherwise ([synthesis](../stuart-source-synthesis.md), the global owners table). `CPCGame` derives from `CGame`, not `CDXGame` (`references/Onslaught/PCGame.h:9` at the pin). It is an alternate lane: whether the historical build excluded `PCGame.cpp` is unproven without a project file.
 - Xbox builds use `CDXGame` directly
 - PS2 builds use `CPS2Game` (not provided)
 
@@ -37,7 +36,7 @@ CGame (base class - abstract interface)
 
 | Constant | Value | Purpose |
 |----------|-------|---------|
-| `MAX_UPDATE_TIME` | 1.0f/40.0f | Game logic cap (40 FPS max) |
+| `MAX_UPDATE_TIME` | 1.0f/40.0f | Defined as a 40 FPS ceiling; only commented-out code uses it |
 | `CLOCK_TICK` | 0.05f | 50ms per tick = 20 ticks/second |
 | `MAX_PLAYERS` | 4 | Maximum simultaneous players |
 | `GAME_COUNT_WHEN_LOST_OR_DRAW` | 5.0f | Delay before returning to menu on loss |
@@ -46,9 +45,9 @@ CGame (base class - abstract interface)
 
 ### Timing Architecture
 
-- **Game logic updates**: Maximum 40 FPS (`MAX_UPDATE_TIME = 0.025s`)
+- **Game logic updates**: one model update per 20 Hz interval (`CLOCK_TICK`, 0.05 s). `MAX_UPDATE_TIME` (1/40 s, 0.025 s) is defined, but its only uses in the pinned source are commented out (`references/Onslaught/DXGame.cpp:131-147`, `references/Onslaught/PCGame.cpp:283-299`).
 - **Fixed time step events**: `CLOCK_TICK` intervals (50ms = 20 FPS physics)
-- **Rendering**: Runs as fast as possible (uncapped)
+- **Rendering**: repeats between model updates until the current interval ends (`mFrameLength`, 0.05 s by default; `references/Onslaught/game.cpp:2223`).
 
 ---
 
@@ -56,16 +55,16 @@ CGame (base class - abstract interface)
 
 | State | Value | Description |
 |-------|-------|-------------|
-| `NOT_RUNNING` | 0 | Game not initialized |
-| `PRE_RUNNING` | 1 | Loading/initializing |
-| `PANNING` | 2 | Intro camera pan |
-| `PLAYING` | 3 | Normal gameplay |
-| `LEVEL_LOST` | 4 | Single-player: mission failed |
-| `LEVEL_WON` | 5 | Single-player: mission completed |
-| `PLAYER_1_WON` | 6 | Multiplayer: Player 1 victory |
-| `PLAYER_2_WON` | 7 | Multiplayer: Player 2 victory |
-| `GAME_DRAWN` | 8 | Multiplayer: draw |
-| `QUIT` | 9 | Exiting level |
+| `GAME_STATE_NOT_RUNNING` | 0 | Game not initialized |
+| `GAME_STATE_PRE_RUNNING` | 1 | Loading/initializing |
+| `GAME_STATE_PANNING` | 2 | Intro camera pan |
+| `GAME_STATE_PLAYING` | 3 | Normal gameplay |
+| `GAME_STATE_LEVEL_LOST` | 4 | Single-player: mission failed |
+| `GAME_STATE_LEVEL_WON` | 5 | Single-player: mission completed |
+| `GAME_STATE_PLAYER_1_WON` | 6 | Multiplayer: Player 1 victory |
+| `GAME_STATE_PLAYER_2_WON` | 7 | Multiplayer: Player 2 victory |
+| `GAME_STATE_GAME_DRAWN` | 8 | Multiplayer: draw |
+| `GAME_STATE_QUIT` | 9 | Exiting level |
 
 ---
 
@@ -73,14 +72,14 @@ CGame (base class - abstract interface)
 
 | Type | Value | Description |
 |------|-------|-------------|
-| `NONE` | 0 | No quit requested |
-| `QUIT_TO_FRONTEND` | 1 | Return to main menu |
-| `QUIT_TO_SYSTEM` | 2 | Exit to OS (PC only) |
-| `LOAD_ERROR` | 3 | Asset loading failure |
-| `RESTART_LEVEL` | 4 | Restart current mission |
-| `QUIT_TIMEOUT` | 5 | Inactivity timeout |
-| `USER_QUIT_TO_FRONTEND` | 6 | User-initiated menu exit |
-| `USER_QUIT_TO_TITLE_SCREEN` | 7 | User-initiated title exit |
+| `QT_NONE` | 0 | No quit requested |
+| `QT_QUIT_TO_FRONTEND` | 1 | Return to main menu |
+| `QT_QUIT_TO_SYSTEM` | 2 | Exit to OS (PC only) |
+| `QT_LOAD_ERROR` | 3 | Asset loading failure |
+| `QT_RESTART_LEVEL` | 4 | Restart current mission |
+| `QT_QUIT_TIMEOUT` | 5 | Inactivity timeout |
+| `QT_USER_QUIT_TO_FRONTEND` | 6 | User-initiated menu exit |
+| `QT_USER_QUIT_TO_TITLE_SCREEN` | 7 | User-initiated title exit |
 
 ---
 
@@ -153,7 +152,7 @@ if (strstr(saveName, "B4K42") != NULL) {
 - The game checks if the save NAME **contains** "B4K42" (substring match, not exact)
 - If found, god mode is enabled for Player 1
 - In the internal build, god mode is runtime state (`CPlayer::mIsGod`) and the career also has a per-player `CCareer::mIsGod[2]` array in the source.
-- **Steam build correction (Feb 2026):** In the retail PC port, the save offsets previously written up as `mIsGod[]` are used by the Controls UI for per-player invert-Y toggles; the only persisted god-related field we track is `g_bGodModeEnabled` (CCareer `+0x2494`, file `0x2496`), and behavior remains cheat-gated.
+- **Steam build (checked against [god-mode.md](../../../mechanics/cheats/god-mode.md)):** the per-player god flags, `CCareer::mIsGod[0]` and `mIsGod[1]`, are saved in the career at the player 1 and player 2 rows of [save-format.md](../../../saves/save-format.md). The earlier 'invert-Y reuse' and 'not persisted' claims were wrong. The name `g_bGodModeEnabled` in older notes is unresolved and is not relied on here.
 
 ---
 
@@ -163,18 +162,14 @@ FMV (Full Motion Video) goodies are automatically unlocked when watching cutscen
 
 | Goodie ID Range | Content |
 |-----------------|---------|
-| 200-232 | FMV/cutscene unlocks |
+| 200-231 | The 32 default/movie descriptor rows, which the FMV grid cells select (valid descriptor indices run 0-231) |
+| 232 | Not a valid descriptor: the grid emits it for its last FMV cell, one past the 232-entry arrays |
 
 ### Auto-Unlock Logic (Lines 1139-1143)
 
-```cpp
-// When FMV playback completes:
-if (fmv_goodie_id >= 200 && fmv_goodie_id <= 232) {
-    CAREER.UnlockGoodie(fmv_goodie_id);
-}
-```
+When an FMV finishes, the source sets the goodie id to the FMV number plus 200, with FMV 33 mapped to id 232. If that goodie is neither new nor old, it sets the goodie to `GS_NEW` and increments the pending extra-goodies counter (`references/Onslaught/game.cpp:1132-1143` at the pin). The grid's id mapping is in [the synthesis](../stuart-source-synthesis.md).
 
-This explains why goodies 200-232 appear as "empty placeholders" in `FEPGoodies.cpp` - they're unlocked via the FMV system rather than kill counts or grades.
+So FMV-unlocked goodies are set by the FMV path rather than by kill counts or grades.
 
 ---
 
@@ -224,7 +219,7 @@ if (BUTTON_TOGGLE_GOD_MODE pressed) {
 }
 ```
 
-**Important:** This is the runtime toggle path. In the internal/source build it calls `SetIsGod`, which also writes career state. In Steam/retail, the persisted god-related field we track is `g_bGodModeEnabled` (file `0x2496`), and current evidence points to a split runtime toggle path that still produces real combat-damage protection when `Maladim` is active.
+**Important:** This is the runtime toggle path. In the internal/source build it calls `SetIsGod`, which also writes career state. In Steam/retail, the per-player god flags are saved in the career (the player 1 and player 2 rows of [save-format.md](../../../saves/save-format.md)), and current evidence points to a split runtime toggle path that still produces real combat-damage protection when `Maladim` is active.
 
 ---
 
@@ -234,7 +229,7 @@ Levels are identified as multiplayer based on their world number:
 
 | Range | Type |
 |-------|------|
-| 100-799 | Single-player campaign |
+| 100-800 | Single-player campaign, including the final level 800 |
 | 850-899 | Multiplayer levels covered by `CGame::IsMultiplayer` |
 | 900-905 | Special race/frontend modes; outside the range `CGame::IsMultiplayer` checks |
 
@@ -285,7 +280,7 @@ void CGame::DeclarePlayerDead(int number) {
         case CWorld::kCooperativeMultiplayer:
         case CWorld::kVersusMultiplayer:
             // Schedule respawn after 5 seconds
-            EVENT_MANAGER.AddEvent(5.0f, RESPAWN_PLAYER_N, this, START_OF_FRAME);
+            EVENT_MANAGER.AddEvent(5.0f, number == 1 ? RESPAWN_PLAYER_1 : RESPAWN_PLAYER_2, this, START_OF_FRAME);
             break;
     }
 }
@@ -306,34 +301,49 @@ Handles player respawn in multiplayer modes:
 
 ```cpp
 void CGame::RespawnPlayer(SINT inNumber) {
-    // Check lives in different modes
+    // Check lives in different modes (inNumber 0 is player 1, 1 is player 2)
     switch (WORLD.GetType()) {
         case CWorld::kCooperativeMultiplayer:
-            if (mPlayerLives[inNumber] == 0) {
-                DeclareLevelLost(P_OUT_OF_LIVES, TRUE);
+            if (inNumber == 0 && mPlayer1Lives == 0) {
+                DeclareLevelLost(P1_OUT_OF_LIVES, TRUE);
+                return;
+            }
+            if (inNumber == 1 && mPlayer2Lives == 0) {
+                DeclareLevelLost(P2_OUT_OF_LIVES, TRUE);
                 return;
             }
             break;
 
         case CWorld::kVersusMultiplayer:
-            if (mPlayerLives[inNumber] == 0) {
-                MPDeclarePlayerWon(otherPlayer);  // Other player wins
+            if (inNumber == 0 && mPlayer1Lives == 0) {
+                MPDeclarePlayerWon(2);  // Other player wins
+                return;
+            }
+            if (inNumber == 1 && mPlayer2Lives == 0) {
+                MPDeclarePlayerWon(1);  // Other player wins
                 return;
             }
             break;
     }
 
     // Decrement lives
-    if (mPlayerLives[inNumber] > 0)
-        mPlayerLives[inNumber]--;
+    if (inNumber == 0 && mPlayer1Lives > 0)
+        mPlayer1Lives--;
+    if (inNumber == 1 && mPlayer2Lives > 0)
+        mPlayer2Lives--;
 
     // Find spawn point (CSpawnPoint preferred, CStart fallback)
     // ...spawn logic...
 
-    // If spawn fails, retry after 1 second
+    // If spawn fails, restore the life and retry after 1 second
     if (!spawned) {
-        mPlayerLives[inNumber]++;  // Restore life
-        EVENT_MANAGER.AddEvent(1.0f, RESPAWN_PLAYER_N, this, START_OF_FRAME);
+        if (inNumber == 0) {
+            mPlayer1Lives++;
+            EVENT_MANAGER.AddEvent(1.0f, RESPAWN_PLAYER_1, this, START_OF_FRAME);
+        } else {
+            mPlayer2Lives++;
+            EVENT_MANAGER.AddEvent(1.0f, RESPAWN_PLAYER_2, this, START_OF_FRAME);
+        }
     }
 }
 ```
@@ -371,12 +381,15 @@ Spawn points are player-specific (`GetPlayerNumber()` returns 1 or 2) and can be
 
 ### Frame Timing System
 
-From `PCGame.cpp`:
+PCGame.cpp is the alternate lane (see Platform Selection). The main loop that drives it is `CGame::MainLoop` in the base class (`references/Onslaught/game.cpp:2076`).
+
+From the main loop (`references/Onslaught/game.cpp:2130-2223` at the pin) and the constants above:
 
 | Feature | Value |
 |---------|-------|
-| FPS Cap | 40 FPS maximum game logic updates |
-| Render FPS | Uncapped (runs as fast as possible) |
+| Model update | One per 20 Hz interval (`CLOCK_TICK` = 0.05 s; `mFrameLength` defaults to 0.05 s, `references/Onslaught/game.cpp:309`) |
+| Frame cap | `MAX_UPDATE_TIME` (1/40 s) is defined; its only uses (`references/Onslaught/DXGame.cpp:131-147` and `references/Onslaught/PCGame.cpp:283-299`) are commented out |
+| Render | Repeats within each model interval until the interval ends |
 | Physics tick | 20 FPS fixed (CLOCK_TICK = 0.05s) |
 
 ### Screen Capture System
@@ -437,20 +450,18 @@ This invalidates earlier hypotheses that the historically labeled "mystery regio
 
 The ranking (grade) is calculated based on score relative to level-specific thresholds:
 
-In outline (a paraphrase of `EndLevelData.cpp`, not a quotation): a score at or above the level's S-grade
+In outline (a paraphrase of `CGame::FillOutEndLevelData` in game.cpp at the pin, not a quotation): a score at or above the level's S-grade
 score gives a ranking of 1.0; a score between the D-grade and S-grade scores is interpolated linearly between
-them; anything lower gives 0.0. A time multiplier then scales the result, which is clamped to 0.0-1.0.
+them; anything lower gives 0.0. A time multiplier first scales the score, and the ranking is clamped to 0.0-1.0.
 
 **CRITICAL: Secondary Objectives Gate Ranking**
 
-Secondary objective completion directly affects achievable ranking:
+For levels that have secondary objectives, `CGame::FillOutEndLevelData` (`references/Onslaught/game.cpp:1028-1042` at the pin) raises a ranking below 0.4 to 0.4 when `IsAllSecondaryObjectivesComplete()` is true, and caps it at 0.6 when it is false. The source's own comments call 0.4 a C and 0.6 a B. `IsAllSecondaryObjectivesComplete()` (`references/Onslaught/EndLevelData.cpp:21-49`) returns false when any secondary objective has failed.
 
 | Secondary Status | Minimum Rank | Maximum Rank | Notes |
 |------------------|--------------|--------------|-------|
-| ALL completed | C (0.4) | S (1.0) | Full ranking range available |
-| ANY failed | E (0.0) | B (0.6) | **Cannot achieve S or A rank!** |
-
-This explains why some players report being "stuck at B-rank" despite high scores - failing ANY secondary objective caps the maximum achievable grade at B (0.6).
+| None failed (function returns true) | 0.4 (C) | 1.0 | Full ranking range available |
+| Any failed (function returns false) | 0.0 | 0.6 (B) | **The ranking cannot exceed 0.6** |
 
 ### Data Flow: EndLevelData → Career
 
@@ -467,7 +478,7 @@ CCareer::Update() called
     │         │
     │         ├─── GAME_STATE_LEVEL_WON: Process updates
     │         │
-    │         └─── GAME_STATE_LEVEL_LOST: Discard (no updates)
+    │         └─── GAME_STATE_LEVEL_LOST: goodie state only (no progression updates)
     │
     ├─── Update mBaseThingsExists (base objectives)
     │
@@ -484,7 +495,7 @@ CCareer::Update() called
 
 **Key Behaviors:**
 
-1. **GAME_STATE_LEVEL_WON only**: Career updates ONLY trigger on level victory. Level losses do not modify the save file.
+1. **GAME_STATE_LEVEL_WON only**: progression updates trigger only on level victory. A loss runs only the goodie-state recalculation (`references/Onslaught/Career.cpp:382-385` at the pin), with no change to slots, kill totals, rankings or node completion. Whether a loss changes the saved goodie bytes is not measured here.
 
 2. **Rankings only improve**: If current save has A-rank (0.8) and you finish with B-rank (0.6), the save retains A-rank. Rankings never decrease.
 
@@ -539,7 +550,7 @@ In the Steam build analyzed for this repo, `CAREER.GetMusicVolume()` maps to ret
 
 ### Bug Found
 
-Line 448 has assignment (`=`) instead of comparison (`==`) - classic C bug.
+`CMusic::PlayFromList` (`references/Onslaught/Music.cpp:448` at the pin) assigns `mPlayType` inside its condition, so the null-selection branch forces random mode. That reads as a typo for a comparison, which is an inference from the source text. The released build behaves the same way ([cmusic-shared-semantics.md](../../audio/cmusic-shared-semantics.md)).
 
 ---
 
@@ -579,7 +590,7 @@ Multiple volume channels with independent control:
 | `mRadioMessageVolume` | Radio voice comms | PS2: 0.70, PC: 0.42 |
 | `mHUDMessageVolume` | HUD feedback | 0.45 |
 
-**Note:** Radio message volume is lower on PC (0.42 vs 0.70) - likely tuned for different speaker setups.
+**Note:** the retained source sets radio message volume to 0.70 on PS2 and 0.42 on the other targets (`references/Onslaught/SoundManager.cpp:98-104` at the pin).
 
 ### Sound Tracking Types (ESoundTrackingType)
 
@@ -605,12 +616,11 @@ Note: Retail file offsets use the true view mapping `file_off = 0x0002 + career_
 
 ### PC Volume Curve (CPCSoundManager)
 
-PC uses a non-linear volume curve for better perceptual scaling:
+The retained source converts the master volume in `CSoundManager::SetMasterVolume` (`references/Onslaught/SoundManager.cpp:156-173` at the pin). On non-PS2 targets it maps a linear 0-1 setting `v` to `1 - tan((1 - v) * 1.38) / tan(1.38)`; the career keeps the linear setting. On PS2 the value is used unchanged. The music volume (`CMusic::SetVolume`, `references/Onslaught/Music.cpp:557-572`) uses the same expression, scaled to 0-127.
 
-`CPCSoundManager::SetVolume()` maps a linear volume through `tan(volume * PI/4)`, a non-linear curve.
-
-- PS2 uses linear volume mapping
-- PC's tan() curve provides better perceived volume at low settings
+- The mapping is concave: its output lies above the linear line across (0, 1), about 0.43 at a 0.1 setting and 0.84 at 0.5.
+- The pin has no `CPCSoundManager::SetVolume()`. The PC channel volume comes from the attenuated event volume in `pcsoundmanager.cpp`.
+- The released retail and demo builds store the supplied float directly and do not apply this conversion ([csoundmanager-shared-semantics.md](../../audio/csoundmanager-shared-semantics.md)), so the curve is source-only.
 
 ### Localization System
 
@@ -654,7 +664,7 @@ These levels use a panning camera intro instead of the standard fixed camera, as
 | `game.h` | Game states, quit types, constants |
 | `DXGame.cpp` | DirectX game loop implementation |
 | `DXGame.h` | CDXGame class definition |
-| `PCGame.cpp` | PC-specific game loop (40 FPS cap, F8 screenshots) |
+| `PCGame.cpp` | Alternate PC game lane, not the selected class (its 40 FPS frame cap is commented out; F8 screenshots) |
 | `PCGame.h` | CPCGame class definition |
 | `EndLevelData.cpp` | Runtime level completion data (NOT saved) |
 | `EndLevelData.h` | EndLevelData struct definition |
@@ -673,7 +683,3 @@ These levels use a panning camera intro instead of the standard fixed camera, as
 - [battle-system.md](battle-system.md) - Battle Engine mechanics, god mode implementation
 - [../frontend/fep-systems.md](../frontend/fep-systems.md) - Cheat code implementation
 - [../../../mechanics/cheats/god-mode.md](../../../mechanics/cheats/god-mode.md) - God mode investigation
-
----
-
-*Last updated: December 2025*

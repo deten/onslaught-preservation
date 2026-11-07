@@ -1,7 +1,7 @@
 # Terrain shade plane — origin, ownership, and axis order
 
 Status: active dated finding
-Last updated: 2026-10-29 (the patch site is named, not quoted; its bytes stay in the baseline's patch-site table; earlier: research-campaign records removed)
+Last updated: 2026-11-06 (build path reduced to the file name; the shade-index offset of onslaught-godot's tool, the texel and cell zero shares stated, and the frame of the 61,930-pixel triple noted as unstated; earlier: the patch site is named, not quoted; its bytes stay in the baseline's patch-site table; earlier: research-campaign records removed)
 Summary: the terrain lighting-index plane is map data read verbatim from the `MMAP` chunks, with its ownership and axis order.
 
 > Verdict: the terrain lighting-index plane is **map asset data read verbatim from
@@ -58,7 +58,7 @@ member. Nothing else in the binary can reach the plane.
 `CMixerMap__Init` @ `0x005232b0`:
 
 - allocates `0x14004` bytes for `0x1000` (= 64×64) 0x14-byte slots from
-  `C:\dev\ONSLAUGHT2\mixermap.cpp` line `0xf6`, storing the array at `this+0`;
+  the retail allocation debug string naming `mixermap.cpp` line `0xf6`, storing the array at `this+0`;
 - allocates **`0x40000` bytes** from the same file line `0xf7`, storing it at
   **`this+4`**;
 - reads the 4,096 slots through `CMixerMap__InitSlot`;
@@ -108,14 +108,18 @@ The first reading partitions perfectly: **every one of the 26,836 non-zero shade
 texels lies on non-flat terrain and not one lies on the plateau.** The
 transposed reading does not. Therefore the plane is `shade[y*512 + x]`, and
 `tile_flags = cellY*64 + cellX` — which is the convention
-`rebuild/tools/materialize_retail_assets.py` already uses
-(`cell_index = tile_y*64 + tile_x`, `shade[(y+1)*512 + (x+1)]`, mixer weights at
-`[local_y*9 + local_x]`).
+`rebuild/tools/materialize_retail_assets.py` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot) uses for the cell index
+(`cell_index = tile_y*64 + tile_x`) and the mixer weights (`[local_y*9 + local_x]`).
+For the shade lookup that tool reads one texel further on each axis,
+`shade[(y+1)*512 + (x+1)]` (clamped at 511), and its code comment ties that offset to
+the blit's bilinear interpolation, which lands on the far corner. This note's formula
+has no such offset. The one-texel difference is open here, not explained: resolving the
+blit's loop variables (section 3) would show which corner the plane index refers to.
 
 ## 4. The plane's sparsity is the sea floor, not a defect
 
-The 90%-zero figure is geography. The non-zero support is one compact blob
-(rows 144–368, columns 136–432); 3,582 of the 4,096 8×8 cells are entirely zero
+The 90%-zero figure is geography. At texel level, 26,836 of the 262,144 texels are non-zero, so 89.8% are zero. The non-zero support is one compact blob
+(rows 144–368, columns 136–432); at 8×8 cell level, 3,582 of the 4,096 cells (87.5%) are entirely zero
 and 315 entirely non-zero. Within the non-flat island the distribution is
 mean 22.06, median 22, p10 15, p90 32, max 63.
 
@@ -137,9 +141,9 @@ Blue saturates at 14, red and green at 29. Averaging the rendered output over
 the island's actual shade histogram and comparing against the saturated entry
 gives a **saturated / as-authored ratio of (1.348, 1.306, 1.023)**, against the
 measured retail / reconstruction-macro transfer function of
-**(1.360, 1.285, 1.073)** over 61,930 paired terrain pixels.
+**(1.360, 1.285, 1.073)** over 61,930 paired terrain pixels. That triple's frame and mask are not restated in this note. The 71,426-pixel measurement in [terrain-draw-stage-flags.md](terrain-draw-stage-flags.md) gives (1.400, 1.295, 1.075), 0.2 to 2.9% away per channel; which triple is the reference is open.
 
-That is the whole measured deficit, to within 1–5% per channel. Retail's visible
+That is the whole measured deficit, to within 1–5% per channel for the 61,930-pixel triple. Retail's visible
 terrain renders as if the lighting index were at the gradient's saturation
 point; the authored plane averages 22. **No change to the plane the asset
 actually contains can reach retail's brightness — clamping the entire island to

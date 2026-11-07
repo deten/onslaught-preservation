@@ -1,7 +1,7 @@
 # Engine System
 
 Status: active — source overview with a bounded retail initialization recheck
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (save-field statements reconciled with saves/, dated correction labels removed, snapshot pin relation stated; earlier: research-campaign records and decompiler-style code removed)
 Summary: engine architecture references and re-derived Engine initialization,
 resource and shutdown identities; remaining source descriptions are not retail acceptance.
 Evidence: MEASURED — September 27 pristine instructions and RTTI; the older
@@ -25,7 +25,8 @@ The five complete bodies below were checked against pristine
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`,
 and Stuart's source at `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`.
 Source names describe independently matched interfaces; source implementation
-differences remain material.
+differences remain material. The source files this note names have the same Git blob IDs at `5352a81` and at
+`c3d8ac4`, the commit the README pins for `references/Onslaught` citations, and `PS2Engine.h` is absent at both.
 
 | Address / retained name | Corrected or bounded finding |
 | --- | --- |
@@ -69,14 +70,7 @@ CEngine (base - abstract interface)
     └── CPCEngine (parallel PC implementation)           -- PCEngine.h:19
 ```
 
-**CORRECTED 2026-07-28.** This tree previously nested `CPCEngine (PC-specific
-extensions)` one level under `CDXEngine`. That derivation does not exist:
-`references/Onslaught/PCEngine.h:19` is `class CPCEngine : public CEngine`, the
-same abstract base `CDXEngine` derives from at
-`references/Onslaught/DXEngine.h:22`. The two are parallel implementations, not a
-base and an extension. `CPS2Engine` is INFERRED — it occurs only as
-`extern class CPS2Engine ENGINE;` at `engine.h:237`, and `PS2Engine.h` is not in
-the pinned drop.
+`references/Onslaught/PCEngine.h:19` is `class CPCEngine : public CEngine`, the same abstract base `CDXEngine` derives from at `references/Onslaught/DXEngine.h:22`. So `CPCEngine` and `CDXEngine` are parallel implementations, not a base and an extension. `CPS2Engine` is INFERRED — it occurs only as `extern class CPS2Engine ENGINE;` at `engine.h:237`, and `PS2Engine.h` is not in the pinned drop.
 
 Platform selection is compile-time via preprocessor:
 
@@ -126,9 +120,7 @@ mPlayer[VIEWPOINTS]   // Player per viewpoint
 
 ### Save File Implication
 
-This explains why the **internal build** CCareer contains per-player arrays (e.g., `mIsGod[2]`) to support split-screen multiplayer.
-
-**Steam build correction (Feb 2026):** Do not assume the internal build’s `mIsGod[]` fields exist on disk in the Steam PC port. In the retail binary, the persisted CCareer region at `+0x249C/+0x24A4` is used by the Controls UI for per-player invert-Y toggles (flight/jet + walker), and `+0x2498` is observed as reserved/unused padding.
+This explains why the **internal build** CCareer contains per-player arrays (e.g., `mIsGod[2]`) to support split-screen multiplayer. The retail save also keeps a god flag and an invert-Y entry for each player; the offsets are in the table under [What IS Saved](#what-is-saved-in-ccareer-not-engine) and in [saves/save-format.md](../../../saves/save-format.md).
 
 ```cpp
 // From CCareer in Career.h
@@ -162,16 +154,9 @@ persist through career/options files.
 
 > Parallel PC implementation of `CEngine`, sibling to `CDXEngine` — `PCEngine.h:19`
 
-**CORRECTED 2026-07-28.** This blockquote previously read "Extends CDXEngine with
-PC-specific features". It does not: `references/Onslaught/PCEngine.h:19` is
-`class CPCEngine : public CEngine`, exactly as `CDXEngine` is at `DXEngine.h:22`.
+`references/Onslaught/PCEngine.h:19` is `class CPCEngine : public CEngine`, exactly as `CDXEngine` is at `DXEngine.h:22`.
 
-This is not cosmetic. The table below is written as though these were features
-CPCEngine *adds on top of* CDXEngine. They are not inherited from CDXEngine —
-they are `CPCEngine`'s own members over the abstract base, so a reader porting
-water reflections or the PatchManager LOD ladder must not go looking for
-CDXEngine behaviour underneath them. (Under `_DIRECTX` the pinned drop selects
-`CDXEngine`, not `CPCEngine` — `engine.h:229-233`.)
+This is not cosmetic. The table below lists `CPCEngine`'s own members over the abstract base, not features it adds on top of CDXEngine. A reader porting water reflections or the PatchManager LOD ladder must not go looking for CDXEngine behaviour underneath them. (Under `_DIRECTX` the pinned drop selects `CDXEngine`, not `CPCEngine` — `engine.h:229-233`.)
 
 ### PC-Specific Features (CPCEngine's own, not inherited from CDXEngine)
 
@@ -181,6 +166,8 @@ CDXEngine behaviour underneath them. (Under `_DIRECTX` the pinned drop selects
 | **Screen Capture** | 1024x512 texture for blur effects (pause menu, transitions) |
 | **Split-Screen** | 2 viewpoints supported for multiplayer |
 | **Terrain LOD** | PatchManager with 4 detail levels: 33x33, 17x17, 9x9, 5x5 vertices |
+
+Source only. The retail render path is CDXEngine ([player-camera-attach-and-mesh-hfov.md](../../render/player-camera-attach-and-mesh-hfov.md), section 1), and these features are not shown to ship in the retail executable. The retail patch pools (three, not four levels) are in [DXPatchManager.md](../../render/DXPatchManager.md).
 
 ### Debug Flags (Bitmask)
 
@@ -249,14 +236,14 @@ These correspond to carrier-based missions where the Battle Engine starts on a m
 
 In the Steam build analyzed for this repo, these settings map to CCareer-region offsets below (entries marked pending still require full retail-path verification):
 
-| Setting | Offset | Type | Default |
+| Setting | CCareer offset (file offset = +2) | Type | Default |
 |---------|--------|------|---------|
 | `mSoundVolume` | 0x248C | float (raw IEEE-754) | 1.0 |
 | `mMusicVolume` | 0x2490 | float (raw IEEE-754) | 1.0 |
-| `g_bGodModeEnabled` | 0x2494 | int/bool (raw 0/1 observed) | 0 |
-| (reserved/unused) | 0x2498 | uint32 (observed 0) | 0 |
-| Invert Y (Flight/Jet) | 0x249C | int/bool array[2] (Steam: `0=Off`, non-zero=On; verified in `0x00407540`) | (varies) |
-| Invert Y (Walker) | 0x24A4 | int/bool array[2] (Steam: `0=Off`, non-zero=On; verification pending on walker path) | (varies) |
+| Player 1 god flag, `CCareer::mIsGod[0]` | 0x2494 | int/bool (raw 0/1 observed) | 0 |
+| Player 2 god flag, `CCareer::mIsGod[1]` | 0x2498 | int/bool (0 in the tracked gold save) | 0 |
+| Invert Y (Flight/Jet), players 1 and 2 | 0x249C | int/bool array[2] (Steam: `0=Off`, non-zero=On; verified in `0x00407540`) | (varies) |
+| Invert Y (Walker), players 1 and 2 | 0x24A4 | int/bool array[2] (Steam: `0=Off`, non-zero=On; verification pending on walker path) | (varies) |
 
 **Note**: These are `CCareer` members, not `CEngine` members. In the retail `.bes` file, CCareer bytes begin at `file + 2` (true dword view), so file offsets are `file_off = 0x0002 + career_off`. The historical 4-byte-aligned view can make small ints *appear* shifted (`0x00010000`), but that is a misaligned view.
 
@@ -264,17 +251,14 @@ In the Steam build analyzed for this repo, these settings map to CCareer-region 
 
 ## What is NOT Saved (Runtime-Only)
 
-These engine settings exist only at runtime and reset to defaults on game restart:
+The PC save layout in [saves/career-save-format-semantics.md](../../../saves/career-save-format-semantics.md) has no field for these engine values, and no save document describes one:
 
-- Gamma settings
-- Reflection toggles
 - Debug draw flags
-- All rendering state
 - Camera positions/orientations
 - Viewport configurations
-- Terrain LOD settings
-- Water reflection quality
 - Screen blur state
+
+Gamma settings, reflection toggles, water-reflection quality and terrain LOD are not on this list. No save document mentions gamma or reflection settings, and the options tail stores the landscape and mesh LOD values (see [the options tail](../../../saves/career-save-format-semantics.md#the-0x56-byte-options-tail)).
 
 ---
 
@@ -282,18 +266,18 @@ These engine settings exist only at runtime and reset to defaults on game restar
 
 **Indirectly useful.** The engine/system view confirms:
 
-1. **Visual/render option globals are serialized** in options entries + tail (`0x24BE..end`), but `.bes` load (`CCareer::Load(..., flag=1)`) does not apply that block immediately.
+1. **Visual/render option globals are serialized** in options entries + tail (`0x24BE..end`; see [the options tail](../../../saves/career-save-format-semantics.md#the-0x56-byte-options-tail)), but `.bes` load (`CCareer::Load(..., flag=1)`) does not apply that block immediately.
 2. **VIEWPOINTS=2 explains per-player array shapes** in internal/source classes.
 3. **Audio settings ARE saved** as `CCareer` members, not `CEngine` state.
 
 ### Architecture Insight
 
 Understanding the engine helps explain:
-- Why there's no "graphics settings" section in save files
+- Where the graphics settings are: in the options tail (see [the options tail](../../../saves/career-save-format-semantics.md#the-0x56-byte-options-tail)), not in a separate graphics section
 - Why audio volume IS saved (it's career progression metadata)
 - Why god mode is per-player (split-screen multiplayer support)
 
-The engine is important for understanding the game's architecture but has **no impact on .bes save file structure**.
+The engine is important for understanding the game's architecture. Its own state is not a field of the `.bes` layout, although the graphics values that configure it are stored in the options tail.
 
 ---
 
@@ -304,30 +288,22 @@ Steam `BEA.exe` does not** — it imports `d3d9.dll`. See
 [`../../render/d3d-default-render-state-block.md`](../../render/d3d-default-render-state-block.md)
 section 2.
 
-**CORRECTED 2026-07-28.** This section previously opened with the unqualified
-sentence "The game uses DirectX 8 (2000-era API):". That sentence is true of
-Stuart's source drop and false of the game people play, and this document gives a
-reader no way to tell which it meant — it interleaves a "Steam build correction
-(Feb 2026)" and a Steam-build `CCareer` offset table above.
-
 - **MEASURED (retail):** `BEA.exe.original.backup`, SHA-256
   `74154bfa…7750`, 2,506,752 bytes
   (`<maintainer evidence>/safe-copy-bea-pristine/`, read-only) contains `d3d9.dll` ×2 and
-  `d3d9d.dll` ×1 and **zero** occurrences of `d3d8.dll`. Re-read for this
-  correction on 2026-07-28; the live installed `BEA.exe` was not read, because it
+  `d3d9d.dll` ×1 and **zero** occurrences of `d3d8.dll`. Re-read on 2026-07-28; the live installed `BEA.exe` was not read, because it
   is deliberately patched. The vtable displacement evidence
   (`SetRenderState` at +0x0E4, and a `SetSamplerState` at +0x114 that D3D8 does
   not have at all) is in the binary-analysis note cited above and indexed from
-  `RE-INDEX.md`.
+  [`static-findings-index.md`](../../static-findings-index.md).
 - **SOURCE (pinned drop):** genuinely D3D8 — `ltshell.h:168-169`
   (`LPDIRECT3DDEVICE8`), `d3dapp.h:154-155` (`LPDIRECT3D8` /
   `LPDIRECT3DDEVICE8`).
 
-**Unchanged by this correction:** the feature bullets below are accurate
-descriptions of the pinned source's D3D8 usage and are not withdrawn. The
+The feature bullets below describe the pinned source's D3D8 usage. The
 equivalent D3D8 statement in
 [`../engine-singletons.md`](../engine-singletons.md)
-is also correct as written, because it is explicitly scoped to `ltshell.h`.
+is explicitly scoped to `ltshell.h`.
 
 ### Rendering Features (as written in the pinned D3D8 source)
 
@@ -476,7 +452,3 @@ Built-in screen recording via `CCAPTURE` class:
 - [platform-system.md](platform-system.md) - Platform abstraction layer
 - [../gameplay/game-system.md](../gameplay/game-system.md) - Game loop integration
 - [../../../saves/save-format.md](../../../saves/save-format.md) - Audio settings in save files
-
----
-
-*Last updated: December 2025*

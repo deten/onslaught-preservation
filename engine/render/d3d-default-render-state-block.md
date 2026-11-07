@@ -1,21 +1,16 @@
 # The default render-state block — `0x004EB1E0`, re-derived from bytes
 
 Status: active static contract
-Last updated: 2026-10-22 (neutral evidence wording)
+Last updated: 2026-11-06 (history removed; section references, counts and citations corrected)
 Summary: what the default render-state block 0x004EB1E0 sets on the device, re-derived from bytes; it fixes the default state, not the state at any particular later draw.
 Evidence: MEASURED — pristine instructions and whole-image scans; the state at later draws is not traced.
 Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
-`D3DStateCache__UseDefaultRenderState` at `0x004EB1E0` has been load-bearing for
-several committed rendering decisions — lighting enable, the two material
+`D3DStateCache__UseDefaultRenderState` at `0x004EB1E0` is load-bearing for
+several rendering decisions — lighting enable, the two material
 sources, the stage-0 texture arguments, and the *absence* of
-`D3DRS_COLORVERTEX` — while existing in **no tracked file**. It lived in working
-notes and in raw exports under the ignored `<maintainer evidence>/`. This document
-promotes it, and it is a **re-derivation, not a transcription**: the function
-body and every call site below were read from the specimen's own bytes.
-
-Three previously-believed statements did not survive that re-derivation. They are
-in §7, §8 and §9.
+`D3DRS_COLORVERTEX`. This document is a **re-derivation, not a transcription**:
+the function body and every call site below were read from the specimen's own bytes.
 
 ## 1. Specimen, method, and the bound
 
@@ -23,9 +18,9 @@ in §7, §8 and §9.
 | --- | --- |
 | Specimen | `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup` (untracked local input) |
 | sha256 | `74154BFAE14DDC8ECB87A0766F5BC381C7B7F1AB334ED7A753040EDA1E1E7750` |
-| Identity | The pristine Steam specimen named in the README |
+| Identity | The pristine Steam specimen, named in [`platforms/pc/retail-specimen-baseline.md`](../../platforms/pc/retail-specimen-baseline.md) |
 | Access | Read-only. The file was never opened for write and the Steam install was never touched. |
-| Tool | `tools/pe_read_va.py` section mapping + a capstone x86-32 linear sweep. |
+| Tool | `tools/pe_read_va.py` in Onslaught-Career-Editor at commit [`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50): section mapping + a capstone x86-32 linear sweep. |
 
 **Every scan in this document is bounded, and the bound is stated with it.**
 
@@ -37,12 +32,12 @@ agree independently with the function inventory row for this address, which is w
 the extent is treated as settled rather than assumed. There is exactly one `RET`
 and no tail-jump.
 
-This matters because of the trap that bit this project on 2026-07-27: an
-unbounded scalar/VA scan over `0x005386D0` read a hit that lay *inside the next
-function* and would have "proved" a name that had just been demoted. Nothing
-below is derived from an unbounded scan of a function body.
+This matters because an unbounded scalar or VA scan can read a hit that lies
+*inside the next function*, and such a hit can appear to prove a name for the
+function being scanned. Nothing below is derived from an unbounded scan of a
+function body.
 
-Whole-image scans (§7, §8) are deliberately unbounded **by design** and cover all
+Whole-image scans (§3, §8, §9) are deliberately unbounded **by design** and cover all
 four PE sections — `.text`, `.rdata`, `.data`, `.rsrc` — because the question
 they answer is an absence claim over the entire executable. Their scope is stated
 in full where they are used.
@@ -56,7 +51,7 @@ displacements used by the setters resolve on the `IDirect3DDevice9` layout:
 | --- | --- | --- | --- |
 | `+0x0B0` | 44 | `SetTransform` | `0x005514F8` |
 | `+0x0DC` | 55 | `SetClipPlane` | `0x004EBA79` |
-| `+0x0E4` | 57 | `SetRenderState` | `0x00513C63`, and §7 |
+| `+0x0E4` | 57 | `SetRenderState` | `0x00513C63`, and §8 |
 | `+0x104` | 65 | `SetTexture` | `0x00513A74` |
 | `+0x10C` | 67 | `SetTextureStageState` | `0x0051389A` |
 | `+0x114` | 69 | `SetSamplerState` | `0x00513925` |
@@ -66,19 +61,9 @@ displacements used by the setters resolve on the `IDirect3DDevice9` layout:
 
 Under Direct3D 8 `SetRenderState` sits at `+0x0A4`, and there is no
 `SetSamplerState` at all — the whole `0x005138B0` family would be unexplainable.
-Three committed comments call the `D3DRS_COLORVERTEX` default a "Direct3D 8
-default" (§9). The **conclusion** is unaffected — `D3DRS_COLORVERTEX` defaults to
-`TRUE` in both APIs — but the attribution is wrong and the correct D3D9 vtable
-indices are what make the decode below checkable.
-
-*Landed 2026-07-27 in commit `a4ca1405` ("docs(rebuild): the binary is Direct3D 9,
-and there are 490 render-state call sites, not 547"). The sentence above is kept
-in the present tense as the record of what was wrong; as of 2026-07-28 a grep for
-"Direct3D 8" over committed `.cs`, `.py` and `.gd` returns **zero**. One
-tracked-documentation residue survived that sweep and was corrected on
-2026-07-28: `d3d-fog-render-state-static-contract-2026-07-25.md` (to be published here after review),
-which carried seven `D3D8` / `IDirect3DDevice8` / `D3DCAPS8` attributions.
-Task #129.*
+The **conclusion** does not depend on the API version — `D3DRS_COLORVERTEX`
+defaults to `TRUE` in both APIs. The Direct3D 9 vtable indices are what make the
+decode below checkable.
 
 ## 3. The object graph, and the five setters
 
@@ -205,9 +190,9 @@ Three further render states are set on this function's behalf by callees:
   (`D3DFOG_EXP`) **only if** the caps dword `[0x00888A78]` has bit `0x100` set;
   when that bit is clear it writes `FOGTABLEMODE = 0` and `FOGVERTEXMODE`
   (`0x8C`) `= 1` instead (`0x00514077`, `0x00514096`).
-  That is the same slot the tracked
-  fog render-state contract (to be published here after review)
-  describes, now with its gate.
+  That is the same slot the fog render-state contract describes. Its public copy is
+  [`reverse-engineering/binary-analysis/d3d-fog-render-state-static-contract-2026-07-25.md`](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/reverse-engineering/binary-analysis/d3d-fog-render-state-static-contract-2026-07-25.md)
+  in Onslaught-Career-Editor at commit [`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50).
 - `0x004EB56A` → `0x004EBA30(1)` → `D3DRS_CLIPPLANEENABLE` (`0x98`) `= 1` with a
   clip plane `(0, 0, -1, [0x006FBDFC])` uploaded via `SetClipPlane` when
   `[0x0089D680]` is set and the FVF shadow is not the invalidate sentinel;
@@ -281,10 +266,10 @@ Two behaviours of the sampler setter change what these calls actually do:
 
 ## 8. Answer 5 — `D3DRS_COLORVERTEX` is never written, and here is the scope
 
-First, a correction of the question. **`D3DRS_COLORVERTEX` is `141` = `0x8D`.**
-State `60` = `0x3C` is `D3DRS_TEXTUREFACTOR`, and it **is** written — at
-`0x004EB3E8`, with the sentinel `0xF0CCFACE`. A search for "state 60" would have
-found a hit and drawn the opposite conclusion.
+**`D3DRS_COLORVERTEX` is `141` = `0x8D`.** State `60` = `0x3C` is
+`D3DRS_TEXTUREFACTOR`, which **is** written — at `0x004EB3E8`, with the sentinel
+`0xF0CCFACE`. A search for "state 60" therefore finds a write that is not
+`COLORVERTEX`.
 
 The absence claim is made at **whole-image** scope, in four layers.
 
@@ -343,7 +328,7 @@ require an actual `GetRenderState` call, not a shadow read.
 
 ## 9. Answer 6 — the call-site count, and where 547 came from
 
-**`0x004EB1E0` has 7 callers.** Not 547.
+**`0x004EB1E0` has 7 callers.**
 
 Method: an exhaustive byte scan of all four PE sections for `E8`/`E9` with a
 computed target of `0x004EB1E0`, plus a scan for the literal dword `0x004EB1E0`
@@ -361,37 +346,11 @@ references — so the function is not virtual and is not dispatched indirectly.
 | `0x0053F25F` | `CDXFMV__VFunc_11_0053F190` (`0x0053F180` is a separate 10-byte thunk) |
 | `0x00540F78` | `CDXFrontEnd__RenderStart` |
 
-The 547 figure is arithmetically identifiable and is **wrong in composition**.
-`Level100VertexDiffuseTests.cs` states it as the call sites "reachable from the
-three setters `0x00513BC0`, `0x00513C20` and `0x00513A50`", and
-`440 + 50 + 57 = 547` exactly. But `0x00513A50` is **`SetTexture`** (device
-vtable `+0x104`, shadow `0x008554D0` indexed by stage), not a render-state
-setter. Its 57 call sites could never have carried a render state, so quoting 547
-as the number of *render-state* call sites over-counts by 57. The correct figure
-is **490**.
-
-*Landed, in two steps.* **2026-07-27, commit `a4ca1405`:** the comment's figure
-was corrected to 490 and the phrase changed to "two general setters". **But the
-correction left `0x00513A50` in the setter list**, so the sentence then named
-three addresses under the word "two" and still attributed the 490 to the setter
-whose 57 sites the correction had just removed. **2026-07-28:** `0x00513A50`
-was deleted from that list and the two survivors annotated with their own
-counts. `rebuild/OnslaughtRebuild.Client.Tests/Level100VertexDiffuseTests.cs`
-now reads:
-
-> `D3DRS_COLORVERTEX` (`0x8D`) is written at none of the 490 render-state call
-> sites reachable from the two general setters `0x00513BC0` (440 sites) and
-> `0x00513C20` (50 sites), so it keeps its `TRUE` Direct3D **9** default.
-
-The text it replaced, quoted so the record survives, was "…reachable from the two
-general setters `0x00513BC0`, `0x00513C20` and `0x00513A50`, so it keeps its
-`TRUE` Direct3D **9** default." Comment only; no behavioural change. The sibling
-`RetailAquilaVertexDiffuseTests.cs` never carried the defect — it quotes 490 with
-no setter list at all.
-
-Separately, 547 was **never** a count of call sites of `0x004EB1E0`, and any
-restatement that reads it that way — "across all 547 call sites" of the default
-block — is a second, independent drift away from what the source comment said.
+The render-state call-site count is **490**: 440 through the cached setter
+`0x00513BC0` and 50 through the forced setter `0x00513C20`. The figure 547 is not a
+render-state count, and it is not a count of the callers of `0x004EB1E0` (7). It is
+`440 + 50 + 57`, and the 57 are the call sites of `0x00513A50`, which is **`SetTexture`**
+(device vtable `+0x104`, shadow `0x008554D0` indexed by stage), not a render-state setter.
 
 Summary of the counts, each from an exhaustive whole-image scan:
 
@@ -403,7 +362,8 @@ Summary of the counts, each from an exhaustive whole-image scan:
 | `SetTextureStageState` call sites | 80 |
 | `SetSamplerState` call sites | 32 |
 | `SetTexture` call sites | 57 |
-| Device `SetRenderState` encodings in the image | 9 |
+| Device `SetRenderState` encodings in the image | 10 |
+| of which load the device global | 9 |
 
 ## 10. What this evidence does **not** support
 
@@ -433,35 +393,21 @@ inverts cull winding. The default block does not fix fog on.
 `0x0046431E` between its draws, and the draw path (`0x005563D0` →
 `0x00555BE0`) has callees that were not scanned. `ALPHAREF 8` also holds only
 while `OLD_SCHOOL_ALPHA_REF` is 0. Cheapest falsifier: read the shadows
-`0x00855540 + 0x19·4`, `0x008555A0` and `0x008557F0 + 4` at the logo draw.
+`0x00855540 + 0x17·4`, `0x008555A0` and `0x008557F0 + 4` at the logo draw.
 
 **Which committed decisions have a capture behind them, and which do not:**
 
 | Committed decision | Static (§5–§8) | Runtime observation |
 | --- | --- | --- |
 | The base mesh pass runs **lit** | yes, `0x004EB30E` | **yes** — `D3DRS_LIGHTING` read from the shadow at `[0x00855764]` equals `1` at all 576 world and tree mesh draws of a Level 100 frame; the `RenderMeshCore` mode-2/mode-6 branches that clear it never fired across 4,393 mesh renders. See [`../controlled-runtime-observations.md`](../controlled-runtime-observations.md) and the lab note above. |
-| `DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1` | yes, `0x004EB33B` | **no** — static only, at the mesh draws. The terrain lane is the exception: `CDXLandscape::Render` was observed setting it to `D3DMCS_MATERIAL` for its own draw and restoring afterwards, which is itself proof that this default does **not** hold everywhere. |
+| `DIFFUSEMATERIALSOURCE = D3DMCS_COLOR1` | yes, `0x004EB33B` | **no** — static only, at the mesh draws. The terrain draw path is the exception: `CDXLandscape::Render` was observed setting it to `D3DMCS_MATERIAL` for its own draw and restoring afterwards, which is itself proof that this default does **not** hold everywhere. |
 | `AMBIENTMATERIALSOURCE = D3DMCS_COLOR1` | yes, `0x004EB35D` | **no** — static only. |
 | Stage-0 `COLORARG1 = TEXTURE` / `COLORARG2 = DIFFUSE`, `COLOROP = MODULATE` | yes, §7 | **no** — static only. The stage-state shadow at `0x008557F0` makes this cheap to measure and it has not been measured. |
 | `COLORVERTEX` left `TRUE` | yes, §8, whole-image | **no**, and not obtainable from the shadow (§8). |
-| Stages 1–3 disabled by default | yes, §7 | **no** — and known to be overridden in practice; multi-texture paths exist. |
+| Stages 1–3 disabled by default | yes, §7 | **no** — not measured; later draws may set these stages. |
 
 The honest position: **lighting-on is measured; everything else in this block is
 a static default that a later cached write can change without leaving a trace in
 this function.** Any reconstruction decision that needs the state *at a specific
 draw* should read the shadow arrays at that draw — `0x00855540` for render state,
-`0x008557F0` for stage and sampler state — using the probe pattern already
-committed in `tools/cdb_lightstate_probe.ps1`.
-
-## 11. Corrections this document makes
-
-1. **"Direct3D 8 default"** — the binary imports `d3d9.dll` and every setter
-   resolves on the `IDirect3DDevice9` vtable (§2). The conclusion survives;
-   the attribution does not.
-2. **"547 render-state call sites"** — `440 + 50 + 57`, where the 57 belong to
-   `SetTexture`. The render-state figure is **490** (§9).
-3. **"`D3DRS_COLORVERTEX` (value 60)"** — `COLORVERTEX` is `141`/`0x8D`. `60` is
-   `D3DRS_TEXTUREFACTOR`, which *is* written, at `0x004EB3E8` (§8).
-4. **`0x004EB1E0` has 7 callers**, not 547 (§9).
-5. Four `D3DSAMP_MIPMAPLODBIAS` writes in this function are silently discarded by
-   the setter and never reach the device (§7).
+`0x008557F0` for stage and sampler state — with a probe that is not published.

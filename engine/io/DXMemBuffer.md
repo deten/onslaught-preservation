@@ -1,10 +1,11 @@
 # CDXMemBuffer: retail file buffering and text I/O
 
 Status: active specimen-bound contract; dated historical records retained below
-Last updated: 2026-10-22 (VALIDATION citations pinned to sections; neutral evidence wording)
+Last updated: 2026-11-06 (pin and blob identity stated; a name-correction row dropped where its owner records it; superseded labels marked historical; superseded-label replacement for the ReadString body corrected to the authority name; earlier: VALIDATION citations pinned to sections; neutral evidence wording)
 Summary: source method identities, measured receiver fields, retail/source differences,
 and bounded original-code evidence for buffered reads, line reading and failed writes. File/device
 acceptance and complete save compatibility remain separate.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 Source File: `references/Onslaught/DXMemBuffer.cpp` | Binary: `BEA.exe.original.backup`
 
 ## Evidence and scope
@@ -14,8 +15,10 @@ All retail addresses below refer to
 SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 The September 27 pass independently decoded the complete twelve bodies below.
 Pinned source `references/Onslaught` at
-`5352a81cdb838b145a57f7febc5d9fc4b0129ebb` is an identity witness, not a claim
-of equivalent code. `DXMemBuffer.cpp` SHA-256 is
+`c3d8ac464259942b83fa8aa7f867c856e77b734d` is an identity witness, not a claim
+of equivalent code. `DXMemBuffer.cpp`, `DXMemBuffer.h` and `membuffer.h` have the
+same Git blob IDs at that commit and at `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`.
+`DXMemBuffer.cpp` SHA-256 is
 `c12a95cdf2f423239d2d298846f89d14554f550cb5ec68619b1be9e418ad505a`;
 `DXMemBuffer.h` is
 `6f28f9cffa0217bf48d18c6845620ea687d69c6227b34f6eb8416b5176e874ee`.
@@ -29,7 +32,8 @@ explicit. The seven method names that already matched were rechecked statically 
 Private evidence: `<maintainer evidence>/test-runs/re-audit-20260926/membuffer/` holds
 complete body/consumer packets, import/export witnesses, original-code drivers
 and retained input/output pairs. These files contain private retail evidence and
-remain outside Git. Native experiment commands and limits are also recorded in
+remain outside Git. The folder is named for the 26 September re-audit series; the
+pass recorded above is the 27 September one. Native experiment commands and limits are also recorded in
 [`VALIDATION.md`, "RE memory-buffer original code — September 27"](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/VALIDATION.md#re-memory-buffer-original-code--september-27).
 
 ## Method identities and transport
@@ -199,7 +203,7 @@ Receipt: `readstring-072doz1d/probe.json` under the private owner, SHA-256
 `d99ea51f050851da529913aa3c5ecdb3a4191cede1cfee7dca526da455c14cd6`.
 The earlier 63-case run is retained; its cases are byte-identical to the first
 63 in this expanded run. Independent review reconstructed all 67 results;
-root re-read the paired raw controls.
+an independent re-read covered the paired raw controls.
 
 ## Write/close failure behavior — 71 original-code cases
 
@@ -250,10 +254,11 @@ from a file, reads through it and closes/destroys it. These consumers bind the
 family to real code paths. They do not establish that every career/settings
 serialization helper uses it or prove a full startup/save round trip.
 
-The rebuild can use the measured byte consumption, buffering and source
-variations for compatibility. Companion publication must retain its existing
-verified-copy/write/reopen protection: retail Close returning true is not
-proof of a successful write.
+The [rebuild](https://github.com/dlprentice/onslaught-godot) can use the measured byte
+consumption, buffering and source variations for compatibility.
+[Companion](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/companion/OnslaughtToolkit.Godot/README.md)
+publication must retain its existing verified-copy/write/reopen protection: retail
+Close returning true is not proof of a successful write.
 
 Remaining work: confirm the receiver, signed-size and return-width findings
 through caller checks; test nonempty and compressed refill boundaries
@@ -269,8 +274,7 @@ names, signatures, behavior claims and coverage counts are not certified. The cu
 claims, including the old preference for descriptive names and the old
 `mCRCIndex`/`mFlushCount` layout. Historical aliases are retained here.
 
-> Binary-to-source function mappings for DXMemBuffer.cpp
-> Last updated: 2026-05-24
+> Binary-to-source function mappings for DXMemBuffer.cpp, recorded 2026-05-24 (historical).
 
 ## Name corrections — 2026-07-28
 
@@ -279,10 +283,11 @@ grade, and the limits of what a corrected name does and does not establish, are
 stated once at the area index (in the decompilation notes, not yet published).
 Old cell text is quoted below rather than deleted, so a reader who remembers the
 withdrawn label can tell it was corrected and not lost.
+The correction of the CDXPatch row that used to appear in the table below, with its old label,
+is recorded in [`DXPatchManager.md`](../render/DXPatchManager.md).
 
 | Address | Superseded label | Historical replacement | Correction |
 | --- | --- | --- | --- |
-| `0x0048f2f0` | `CDXLandscape__SetUpdateBoundsAndRebuildVB` | `CDXPatch__SetGridOriginStepAndRebuild` | class prefix and suffix both moved |
 | `0x004cf050` | `CMenuItem__Destructor` | `CMenuItem__Destructor_Thunk` | same class; suffix re-read |
 | `0x00548ec0` | `CDXEngine__FreeLandscapeCellList_Debug` | `CMemoryManager__DeleteTagList_CtorUnwind` | class prefix and suffix both moved |
 
@@ -295,6 +300,8 @@ unverified against the new name until it is re-measured.
 
 ## Superseded Labels
 
+These labels are historical. Where they differ from the current table above, that table governs.
+
 | Address | Superseded label | Historical replacement |
 |---------|------------------|---------------|
 | `0x00547d70` | `CChunker__CChunker` | `CDXMemBuffer__ctor` |
@@ -305,7 +312,7 @@ unverified against the new name until it is re-measured.
 | `0x005482c0` | `DXMemBuffer__GetFileSize` | `CDXMemBuffer__GetFileSize` |
 | `0x005482d0` | `DXMemBuffer__Skip` | `CDXMemBuffer__Skip` |
 | `0x00548570` | `DXMemBuffer__ReadBytes` | `CDXMemBuffer__Read` |
-| `0x00548820` | `DXMemBuffer__ReadLine` | `CDXMemBuffer__ReadLine` |
+| `0x00548820` | `DXMemBuffer__ReadLine` | `CDXMemBuffer__ReadString` |
 | `0x00548a70` | `DXMemBuffer__WriteBytes` | `CDXMemBuffer__WriteBytes` |
 | `0x00548c00` | `DXMemBuffer__Close` | `CDXMemBuffer__Close` |
 | `0x0048ddf0` | `thunk_DXMemBuffer__Close` | `CDXMemBuffer__Close_Thunk` |

@@ -1,14 +1,14 @@
 # Chunk readers and resource dispatch
 
 Status: active, bounded retail/source contract
-Last updated: 2026-10-22 (VALIDATION citations pinned to sections)
+Last updated: 2026-11-06 (source pin named as c3d8ac4 with the earlier line-number pin stated; the six-method correction restated in plain words and linked to its validation section; private receipt path in the maintainer-evidence form)
 Summary: re-derived resource routing and reader behavior; historical invented methods, tag meanings and validation claims are superseded.
 Evidence: MEASURED — complete selected pristine bodies, literal-selected calls and isolated original-code reader controls; SOURCE — pinned chunker, resource accumulator, engine, platform and Goodies definitions. No new whole-game loading run.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 The September 27 recheck covers 22 complete bodies, with retained byte hashes
 and disassemblies in `<maintainer evidence>/test-runs/re-audit-20260926/resource-dispatch/`.
-The source is `references/Onslaught` at `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`.
+The source is `references/Onslaught` at `c3d8ac464259942b83fa8aa7f867c856e77b734d`, the pin named in the README. The line numbers below were read at the earlier pin `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`; the cited files are unchanged between the two.
 It supplies identities to test, not an interchangeable implementation.
 
 ## Reader contract
@@ -34,14 +34,20 @@ A wrapped Skip delta must be interpreted there, not assumed to be harmless.
 The constructor, destructor and both Open overloads have only static evidence
 in this pass. Four smaller routines also have the isolated controls below.
 
-The six-interface correction (archived research record, not published)
-is promoted with exact live readback and independently restored recovery.
-Constructor, destructor, Close, GetNext and Skip now use automatic thiscall
-receivers in the same physical ECX location. Read returns int in full EAX,
-replacing the saved bool/AL type. Its three stack arguments do not move;
-low-word multiplication alone does not settle size/count signedness. The
-constructor's machine EAX=this return and the destructor's void return remain.
-These are bounded machine-interface corrections, not complete class typedefs.
+An earlier pass gave the wrong calling details for six reader methods: the
+constructor, destructor, Close, GetNext, Read and Skip. The corrections were
+checked by an exact live readback and by an independently restored recovery
+copy. Five of these methods (all except Read) take their object pointer as an
+implicit receiver in the ECX register, which the compiler supplies. Read returns
+a full int in EAX, where the earlier text said a bool in the AL byte. Read's
+three stack arguments keep their positions. Low-word multiplication alone does
+not settle whether size and count are signed. The constructor still returns
+`this` in EAX at machine level, and the destructor still returns void. These
+are corrections to the machine interface, not complete class definitions. The
+public summary of the checks is in
+[Reader interfaces — September 27](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/VALIDATION.md#reader-interfaces--september-27);
+the underlying files are not published, so that summary is the part a reader
+can check.
 
 Each chunk header is a four-byte tag followed by a four-byte payload size.
 `GetNext` does not search for a requested tag, validate nesting or distinguish
@@ -80,8 +86,8 @@ Two explicitly altered probe copies provide counterfactual controls: changing
 GetNext's signed admission branch to unsigned changes the supplied `-1` case;
 removing Read's counter write changes both the observed callee-entry state
 and the final state. Pristine bytes remain unchanged. The full records are
-`resource-dispatch/reader-sahv5bik/results.json` under the evidence owner’s
-parent; validation commands and exact private paths are in
+`<maintainer evidence>/resource-dispatch/reader-sahv5bik/results.json`;
+validation commands and exact private paths are in
 [`VALIDATION.md`, "Resource-reader identities and controls — September 27"](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/VALIDATION.md#resource-reader-identities-and-controls--september-27).
 Underlying buffer I/O, allocator outcomes, ownership and full dispatcher
 execution are outside these experiments.

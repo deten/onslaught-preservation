@@ -1,9 +1,10 @@
 # DXPatchManager.cpp
 
 Status: active — historical subsystem notes with scoped corrections below
-Last updated: 2026-10-22 (reconstructed code and research-campaign records removed; findings unchanged)
+Last updated: 2026-11-06 (loader receiver and function names follow the decompilation; earlier: reconstructed code and research-campaign records removed)
 Summary: retained patch-manager analysis; the Engine shutdown receiver is re-derived from pristine bytes, while other historical claims remain to audit.
-Source File: retail `DXPatchManager.cpp` label (implementation absent from pinned source); caller `references/Onslaught/DXEngine.cpp` | Binary: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: retail `DXPatchManager.cpp` label (implementation absent from pinned source); caller `references/Onslaught/DXEngine.cpp`
+Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > DirectX terrain patch manager for LOD (Level of Detail) rendering
 > Debug source path string for `DXPatchManager.cpp`: `0x0065211c`
@@ -14,15 +15,15 @@ In pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backu
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`,
 `CDXEngine::ShutDown` sets ECX to the global `0x009c64d8` at `0x0053d462`,
 then calls `0x005506e0` at `0x0053d467`. Earlier notes described that receiver
-as Engine fields, which was wrong. The caller is the case-distinct
-`ShutDown` method in slot 3, not base `Shutdown` in slot 0; see the
+as Engine fields, which was wrong. The caller is the `ShutDown` method (capital D)
+in slot 3, not the base `Shutdown` method in slot 0; see the
 interface correction (archived research record, not published).
 This verifies the call and receiver, not every historical assertion about the
 callee's body, object lifetime or complete subsystem behavior.
 
 ## Device lifecycle identity — September 27
 
-`0x0048f320` is `CLandscapeVB__InitDeviceObjects`, formerly
+`0x0048f320` is `CLandscapeVB__InitDeviceObjects`, formerly `CDXPatch__RestoreAndRebuildIfDirty` and then
 `CLandscapeVB__RestoreAndRebuildIfDirty`. Fresh complete-body and caller/RTTI
 checks place it in the initialization interface, not the restoration phase.
 The [platform note](../source/core/platform-system.md#retail-device-lifecycle--september-27-correction)
@@ -56,10 +57,10 @@ unverified against the new name until it is re-measured.
 
 DXPatchManager manages terrain patches for the landscape LOD system. It allocates pools of `CDXPatch` objects at different detail levels (likely near/medium/far) and manages landscape textures with mipmap levels.
 
-The system uses three patch pools with different vertex buffer configurations:
-- Pool 1: 800 patches, vertex size 2 (low detail)
-- Pool 2: 300 patches, vertex size 4 (medium detail)
-- Pool 3: 90 patches, vertex size 8 (high detail)
+The system uses three patch pools, each with its own **grid step** (the number of height cells along one side of a patch; a patch holds `(grid step + 1)^2` vertices):
+- Pool 1: 800 patches, grid step 2 (low detail)
+- Pool 2: 300 patches, grid step 4 (medium detail)
+- Pool 3: 90 patches, grid step 8 (high detail)
 
 Each patch contains vertex buffer data for terrain geometry rendering.
 
@@ -80,7 +81,7 @@ Main manager class that owns patch pools and landscape textures.
 | `+0x14` | count for pool 3 |
 
 ### CDXPatch
-Individual terrain patch with vertex buffer data.
+Individual terrain patch with vertex buffer data. The decompilation names this 0x50-byte object `CLandscapeVB` (see the name corrections above); this note keeps the older `CDXPatch` heading.
 
 **Layout (inferred), 0x50 bytes, derived from `CVBuffer`:**
 
@@ -96,8 +97,10 @@ Individual terrain patch with vertex buffer data.
 | `+0x44` | grid size/source step (2, 4 or 8) |
 | `+0x4C` | copy of the tile record's metadata |
 
+The loader described under Function Details fills its table and count on the manager, not on this object (the decompilation names it `CDXPatchManager__DeserializeAll`).
+
 ### CDXPatchPool (helper struct)
-Pool of patches at a specific detail level.
+Pool of patches at a specific detail level. The decompilation names this helper `CDXPatchList`; this note keeps the older heading.
 
 **Layout (inferred):** `+0x00` the patch array, `+0x04` the pool capacity.
 
@@ -105,18 +108,18 @@ Pool of patches at a specific detail level.
 
 | Address | Name | Size | Notes |
 |---------|------|------|-------|
-| 0x0048f1e0 | CDXPatch__CreateGridVertexBuffer | 0x30 | Creates a grid vertex buffer from one `grid_step` argument |
-| 0x0048f210 | CDXPatch__RebuildHeightGridVertexBuffer | 0x110 | Rebuilds height-sampled grid vertices |
-| 0x0048f2f0 | CDXPatch__SetGridOriginStepAndRebuild | 0x30 | Sets patch grid origin/step fields and rebuilds vertices from `CDXLandscape__UpdateLOD` callsite `0x00546fe6` |
+| 0x0048f1e0 | CLandscapeVB__Create | 0x30 | Creates a grid vertex buffer from one `grid_step` argument |
+| 0x0048f210 | CLandscapeVB__Rebuild | 0x110 | Rebuilds height-sampled grid vertices |
+| 0x0048f2f0 | CLandscapeVB__SetOrigin | 0x30 | Sets patch grid origin/step fields and rebuilds vertices from `CDXLandscape__UpdateLOD` callsite `0x00546fe6` |
 | 0x0048f320 | CLandscapeVB__InitDeviceObjects | 0x1e | September 27: DeviceObject initialization interface; earlier field/rebuild semantics remain separately bounded |
 | 0x00550380 | CLandscapeVB__ctor | 0x20 | Sets vtable to 0x005e5114 |
 | 0x005503a0 | CDXPatch_T3_005503a0 | 0x10 | Thunk to the `CVBuffer` destructor. Earlier analysis called it `CDXPatch__Destructor_thunk`; no `CDXPatch` type descriptor exists in the image and no vtable owns this address, so the class prefix is unproven. |
-| 0x005503b0 | CDXPatchManager__ReleasePatches | 0x20 | Releases patch pool via vtable call |
-| 0x005503d0 | CDXPatchManager__ResetPatchSlots | 0x30 | Resets all slot indices to -1 (0xFFFF) |
-| 0x00550400 | CDXPatchManager__AllocatePatchSlot | 0x30 | Finds free slot, returns patch pointer |
+| 0x005503b0 | CDXPatchList__dtor | 0x20 | Releases patch pool via vtable call |
+| 0x005503d0 | CDXPatchList__Reset | 0x30 | Resets all slot indices to -1 (0xFFFF) |
+| 0x00550400 | CDXPatchList__Allocate | 0x30 | Finds free slot, returns patch pointer |
 | 0x00550430 | CDXPatchManager__Init | 0x250 | Main initialization, creates 3 pools |
 | 0x005506e0 | CDXPatchManager__Shutdown | 0x50 | Frees all pools and textures |
-| 0x00550730 | CDXPatch__FreeData | 0x20 | Frees patch data buffer at +0x0C |
+| 0x00550730 | CDXPatchManager__FreeData | 0x20 | Frees patch data buffer at +0x0C |
 | 0x00550750 | CDXPatchManager__DeserializeAll | 0x98 | Loads patch data from resource file |
 
 ## Function Details
@@ -127,25 +130,25 @@ Pool of patches at a specific detail level.
 
 **Called from:** DXEngine initialization (0x0053d5f0) with parameters (800, 300, 90)
 
-**Purpose:** Initializes the patch manager with three pools of terrain patches at different LOD levels.
+**Purpose:** Initializes the patch manager with three pools of terrain patches at different grid steps.
 
 **Key Operations:**
 1. Allocates CDXPatchManager structure (0x1C bytes)
-2. Creates patch pool 1 with `pool1Count` patches, LOD level 2
-3. Creates patch pool 2 with `pool2Count` patches, LOD level 4
-4. Creates patch pool 3 with `pool3Count` patches, LOD level 8
-5. Allocates 48 CLandscapeTexture objects (0x9C4 bytes total, 0x34 each)
+2. Creates patch pool 1 with `pool1Count` patches, grid step 2
+3. Creates patch pool 2 with `pool2Count` patches, grid step 4
+4. Creates patch pool 3 with `pool3Count` patches, grid step 8
+5. Allocates 48 CLandscapeTexture objects (0x9C4 bytes total: 48 entries of 0x34 bytes plus a 4-byte count header)
 6. Calls CLandscapeTexture__SetupMipLevel for 3 LOD levels x 16 textures
 
 **Memory allocations:**
 - Pool 1: `800 * 0x50 + 4 = 64,004 bytes`
 - Pool 2: `300 * 0x50 + 4 = 24,004 bytes`
 - Pool 3: `90 * 0x50 + 4 = 7,204 bytes`
-- Textures: `0x9C4 = 2,500 bytes`
+- Textures: `48 * 0x34 + 4 = 2,500 bytes` (0x9C4)
 
-### CDXPatch__LoadFromFile (0x00550750)
+### CDXPatchManager__DeserializeAll (0x00550750)
 
-**Interface:** a `CDXPatch` member taking the chunk reader.
+**Interface:** a `CDXPatchManager` member taking the chunk reader.
 
 **Called from:** CResourceAccumulator__ReadResourceFile (0x004d7200)
 
@@ -158,7 +161,7 @@ Pool of patches at a specific detail level.
 4. Reads vertex data from file
 5. Sets loaded flag at offset +0x08
 
-### CDXPatchManager__AllocatePatchSlot (0x00550400)
+### CDXPatchList__Allocate (0x00550400)
 
 **Interface:** a member on the patch pool taking a 16-bit slot id (`RET 0x4`); returns the patch.
 
@@ -169,7 +172,7 @@ Pool of patches at a specific detail level.
 **Algorithm:** scans the pool for the first patch whose slot (`+0x3c`) is `-1`, stores the slot id there
 and returns that patch; returns null when the pool is exhausted.
 
-### CDXPatchManager__ResetPatchSlots (0x005503d0)
+### CDXPatchList__Reset (0x005503d0)
 
 **Interface:** takes the patch pool in ECX.
 
@@ -214,16 +217,16 @@ and returns that patch; returns null when the pool is exhausted.
 
 The patch manager implements a terrain LOD system:
 
-| LOD Level | Patch Count | Vertex Grid | Use Case |
+| Grid step | Patch Count | Vertex Grid | Use Case |
 |-----------|-------------|-------------|----------|
 | 2 | 800 | 3x3 | Distant terrain |
 | 4 | 300 | 5x5 | Medium distance |
 | 8 | 90 | 9x9 | Near terrain |
 
-Vertex count per patch: `(level + 1)^2`
-- LOD 2: 9 vertices
-- LOD 4: 25 vertices
-- LOD 8: 81 vertices
+Vertex count per patch: `(grid step + 1)^2`
+- Grid step 2: 9 vertices
+- Grid step 4: 25 vertices
+- Grid step 8: 81 vertices
 
 ## Xrefs to Debug Path (0x0065211c)
 
@@ -250,19 +253,19 @@ Vertex count per patch: `(level + 1)^2`
 
 | Address | Function | Static evidence |
 | --- | --- | --- |
-| `0x0048f1e0` | `CDXPatch__CreateGridVertexBuffer` | `RET 0x4`: one stack argument, the grid step. Stores it at `+0x44`, computes `(grid_step+1)^2` at `+0x38`, clears patch fields, writes slot marker `+0x3c = 0xffff`, and calls `CVBuffer__Create` with `0x14`-byte vertices and flags `0x102`. |
-| `0x0048f210` | `CDXPatch__RebuildHeightGridVertexBuffer` | Locks the buffer, walks a square grid from the X/Z origin at `+0x2c/+0x30` with step `+0x34`, samples `CWorld__GetHeightSamplePacked16`, writes `0x14`-byte vertex rows, unlocks, and marks `+0x40`. |
-| `0x0048f2f0` | `CDXPatch__SetGridOriginStepAndRebuild` | Earlier analysis called it `CDXLandscape__SetUpdateBoundsAndRebuildVB`. `RET 0x10`: four stack arguments after the receiver. `CDXLandscape__UpdateLOD` calls it at `0x00546fe6` straight after `CDXPatchManager__AllocatePatchSlot` returns a patch, passing two tile coordinates scaled by `8`, a grid step of `4 >> lod_slot` and the tile record's metadata from `[ESI+0x0b]`. The body stores them at `+0x2c`, `+0x30`, `+0x34` and `+0x4c`, then calls `CDXPatch__RebuildHeightGridVertexBuffer`. |
+| `0x0048f1e0` | `CLandscapeVB__Create` | `RET 0x4`: one stack argument, the grid step. Stores it at `+0x44`, computes `(grid_step+1)^2` at `+0x38`, clears patch fields, writes slot marker `+0x3c = 0xffff`, and calls `CVBuffer__Create` with `0x14`-byte vertices and flags `0x102`. |
+| `0x0048f210` | `CLandscapeVB__Rebuild` | Locks the buffer, walks a square grid from the X/Z origin at `+0x2c/+0x30` with step `+0x34`, samples `CWorld__GetHeightSamplePacked16`, writes `0x14`-byte vertex rows, unlocks, and marks `+0x40`. |
+| `0x0048f2f0` | `CLandscapeVB__SetOrigin` | Earlier analysis called it `CDXLandscape__SetUpdateBoundsAndRebuildVB`. `RET 0x10`: four stack arguments after the receiver. `CDXLandscape__UpdateLOD` calls it at `0x00546fe6` straight after `CDXPatchList__Allocate` returns a patch, passing two tile coordinates scaled by `8`, a grid step of `4 >> lod_slot` and the tile record's metadata from `[ESI+0x0b]`. The body stores them at `+0x2c`, `+0x30`, `+0x34` and `+0x4c`, then calls `CLandscapeVB__Rebuild`. |
 | `0x0048f320` | `CLandscapeVB__InitDeviceObjects` | Slot 1 of vtable `0x005e5114`. Calls the `CVBuffer` initialiser, rebuilds when `+0x40` is nonzero, and returns the initialiser's result. |
 | `0x00550380` | `CLandscapeVB__ctor` | The vector-constructor calls at `0x005504ab`, `0x0055052a` and `0x005505ad` use it for each `0x50`-byte pool entry. Calls `CVBuffer__ctor_base`, installs vtable `0x005e5114` and returns the receiver. |
 | `0x005503a0` | `CDXPatch_T3_005503a0` | The vector-destructor calls at `0x005504a6`, `0x00550525` and `0x005505a8` pass it beside the constructor. Tail-jumps to `CVBuffer__dtor_base`. |
-| `0x005503b0` | `CDXPatchManager__ReleasePatches` | Passed as a callback at `0x005506f0` over 8-byte pool entries; releases the array through vtable slot 0 with delete flag `3` and clears the pointer. |
-| `0x005503d0` | `CDXPatchManager__ResetPatchSlots` | `CDXLandscape__Reset` (`0x00545392`) and `CDXEngine__InvalidateLandscapeTilesAndPatchSlots` (`0x005473d5`) pass a pool in ECX. Walks the entries with `0x50` stride writing `0xffff` at `+0x3c`. |
-| `0x00550400` | `CDXPatchManager__AllocatePatchSlot` | `CDXLandscape__UpdateLOD` calls it at `0x00546fa6` with one stack slot id. |
+| `0x005503b0` | `CDXPatchList__dtor` | Passed as a callback at `0x005506f0` over 8-byte pool entries; releases the array through vtable slot 0 with delete flag `3` and clears the pointer. |
+| `0x005503d0` | `CDXPatchList__Reset` | `CDXLandscape__Reset` (`0x00545392`) and `CDXEngine__InvalidateLandscapeTilesAndPatchSlots` (`0x005473d5`) pass a pool in ECX. Walks the entries with `0x50` stride writing `0xffff` at `+0x3c`. |
+| `0x00550400` | `CDXPatchList__Allocate` | `CDXLandscape__UpdateLOD` calls it at `0x00546fa6` with one stack slot id. |
 | `0x00550430` | `CDXPatchManager__Init` | `CDXEngine__Init` calls it at `0x0053d6c3` with `800`, `300` and `90`. Allocates the pool table and three `0x50`-byte patch arrays, constructs the entries, creates grid vertex buffers for steps `2`, `4` and `8`, allocates 48 `CLandscapeTexture` entries and initialises three 16-texture mip groups. |
 | `0x005506e0` | `CDXPatchManager__Shutdown` | Destroys the pool table through `CDXLandscape__DestroyArrayWithCallback`, frees the count header, clears the pool pointer, releases the landscape-texture vector and clears its pointer. |
-| `0x00550730` | `CDXPatch__FreeData` | Reached from `0x005120cb`. Frees the data pointer at `+0x0c` through `CDXMemoryManager__Free` when it is set, then clears it. |
-| `0x00550750` | `CDXPatch__LoadFromFile` | `CResourceAccumulator__ReadResourceFile` calls it at `0x004d7875`. Reads `3x16` dwords into `+0x10` and a data count into `+0xd0`, allocates `count*2` bytes (DXPatchManager.cpp line `0x94`), reads 16-bit data into `+0x0c` and marks `+0x08` loaded. |
+| `0x00550730` | `CDXPatchManager__FreeData` | Reached from `0x005120cb`. Frees the data pointer at `+0x0c` through `CDXMemoryManager__Free` when it is set, then clears it. |
+| `0x00550750` | `CDXPatchManager__DeserializeAll` | `CResourceAccumulator__ReadResourceFile` calls it at `0x004d7875`. Reads `3x16` dwords into `+0x10` and a data count into `+0xd0` of the receiver, the manager (these offsets fit neither the 0x50-byte patch nor the 28-byte manager sized above, so they are unverified until the receiver is re-measured), allocates `count*2` bytes (DXPatchManager.cpp line `0x94`), reads 16-bit data into `+0x0c` and marks `+0x08` loaded. |
 
 `0x0048f180` is `CLandscapeTexture__InvalidateTileMaskOrRefreshAll`.
 

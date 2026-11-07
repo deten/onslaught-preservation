@@ -1,18 +1,22 @@
 # The per-node terrain colour light is absent from the PC path
 
-> Date: 2026-07-26
-> Last updated: 2026-10-22 (private evidence paths generalised for the onslaught-preservation layout)
-> Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe`, image base `0x00400000`,
-> 2,506,752 bytes; sections `.text 0x00401000+0x1d6f9d`, `.rdata 0x005d8000`,
-> `.data 0x00622000`.
-> Assets: `<maintainer evidence>/safe-copy-bea-pristine/data/`, read-only.
-> Verdict: **precise negative.** No baked landscape texture cache ships or
-> loads, and the per-node coloured light array does not exist in any shipped
-> heightfield. No source changed.
+Status: active dated finding
+Last updated: 2026-11-06 (header and specimen line in the repository's form, with the specimen SHA-256; byte sum corrected, MAP! residue stated, Reproduce in python3 form; earlier: private evidence paths generalised for the onslaught-preservation layout, 2026-10-22)
+Summary: a precise negative: no baked landscape texture cache ships or loads, and the per-node coloured light array does not exist in any shipped heightfield; no source changed.
+
+Date: 2026-07-26
+
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe`, SHA-256
+`e1436ef7e0ad9ccbddd43aaaca952f6e84d4b1a282835cead745efcfc32fadf4`,
+2,506,752 bytes — the **capture target**: pristine plus the
+`force_windowed` patch and nothing else.
+*(Corrected 2026-07-28. This line previously read "`BEA.exe`, SHA-256 `e1436ef7…`, 2,506,752 bytes (local pristine safe copy)". `e1436ef7` is **not** pristine: the pristine specimen is `BEA.exe.original.backup`, SHA-256 `74154bfa…`, in the same directory; see [the retail specimen baseline](../../../platforms/pc/retail-specimen-baseline.md). The two builds differ at exactly four bytes, at the `force_windowed` patch site recorded in [terrain-draw-stage-flags.md](terrain-draw-stage-flags.md), and no address cited in this note falls there. This is a specimen-label correction, not a re-measurement.)*
+Image base `0x00400000`; sections `.text 0x00401000+0x1d6f9d`, `.rdata 0x005d8000`, `.data 0x00622000`.
+Assets: `<maintainer evidence>/safe-copy-bea-pristine/data/`, read-only.
 
 This closes the last surviving candidate for the coloured, high-variance gain
 measured between retail's terrain and the macro cache
-(`retail/macro` 1.400 / 1.295 / 1.075, per-pixel gain sd 0.52 / 0.41 / 0.33).
+(`retail/macro` 1.400 / 1.295 / 1.075 over 71,426 usable terrain pixels, the same values as [terrain-draw-stage-flags.md](terrain-draw-stage-flags.md); per-pixel gain sd 0.52 / 0.41 / 0.33).
 
 ## 1. The shape that was being chased
 
@@ -77,7 +81,7 @@ Both are passed to the buffer-open helper at `0x0055e490` with mode string
 
 - Zero `E8`/`E9` relative call or jump targets in `.text` resolve to
   `0x00547860` (full linear scan of `0x00401000..0x005d7f9d`).
-- Zero occurrences of `60 78 54 00` as an operand anywhere in the image, so it
+- Zero occurrences of the little-endian encoding of this function's address as an operand anywhere in the image, so it
   is in no vtable and no function-pointer table.
 - The preceding function ends `ret 0xc` at `0x0054785c`, and `0x00547860`
   opens with a `__chkstk` prologue (`mov eax, 0x1062c; call 0x0055def0`), so it
@@ -99,7 +103,7 @@ colour interpolation above is dead in the shipped PC executable.
 0047f7dc  call 0x00423960             ; CChunkReader::Read(this, 0x13dc, 1)
 ```
 
-so field `+0x20` is whatever the asset carries. `tools/heightfield_node_array_probe.py`
+so field `+0x20` is whatever the asset carries. `tools/heightfield_node_array_probe.py` in [Onslaught-Career-Editor at `51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50)
 inflates every `.aya` under `data/resources` and reads `+0x20`/`+0x24` of every
 `CHFD` record of size `0x13dc`:
 
@@ -134,7 +138,7 @@ heightfield.)
 
 ## 5. Level 100 has no unread coloured asset either
 
-The complete chunk tree of `100_res_PC.aya`:
+The complete chunk tree of `100_res_PC.aya` (Bytes is each chunk's declared size, which excludes its own 8-byte header):
 
 | Path | Count | Bytes |
 | --- | --- | --- |
@@ -147,11 +151,11 @@ The complete chunk tree of `100_res_PC.aya`:
 | `SURF` | 1 | 18,564 |
 
 `HFLD` decomposes exactly into `CHFD` (`0x13dc` at file offset `0x10`) plus
-`HFDT` (`0xa2000` at `0x13ec`) — 8 + 8 + 5,084 + 8 + 663,552 = 668,652, with no
+`HFDT` (`0xa2000` at `0x13ec`) — (8 + 5,084) + (8 + 663,552) = 668,652, the HFLD payload without its own header, with no
 residue, so there is no colour payload hiding inside it. `MMAP` is a stream of
 `MCEL` records (`CMCL` 20 bytes + `MXRS` 81 bytes each) and the seven `MAPT`
-levels are the macro cache mips; `rebuild/tools/materialize_retail_assets.py`
-already parses all of them.
+levels are the macro cache mips; `rebuild/tools/materialize_retail_assets.py` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot)
+already parses all of them. The `MAP!` row is 4 bytes larger than its two listed children: their full sizes (668,660 and 877,597, each with its 8-byte header) sum to 1,546,257, and the table lists no other `MAP!` child. Those 4 bytes are unaccounted for here; the cheapest check is a header walk of the `MAP!` payload in `100_res_PC.aya`.
 
 ## 6. What this eliminates
 
@@ -167,11 +171,13 @@ stands unchanged at terrain mid-band 91.15% material / meanD 35.4, full frame
 
 ## Reproduce
 
-```powershell
-py -3 tools/heightfield_node_array_probe.py `
-    --resources <maintainer evidence>/safe-copy-bea-pristine/data/resources `
-    --extra rebuild/OnslaughtRebuild.Core/Assets/Level100/level100-heightfield.hfld.bin
+Run `tools/heightfield_node_array_probe.py` from [Onslaught-Career-Editor at `51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50) with `python3` on Linux or macOS. The command is one line:
+
+```sh
+python3 tools/heightfield_node_array_probe.py --resources <maintainer evidence>/safe-copy-bea-pristine/data/resources --extra <local Level 100 heightfield file>
 ```
+
+Both inputs are local materialized files, not files in this repository. `--resources` is the retail `data/resources` folder. `--extra` is the Level 100 heightfield chunk (`HFLD`), `level100-heightfield.hfld.bin`, which `rebuild/tools/materialize_retail_assets.py` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot) writes locally from a retail installation.
 
 Static retail evidence and shipped-asset bytes only. Runtime behaviour of the
 dead builder, the exact node struct layout beyond the `+0x18` stride and the

@@ -1,12 +1,11 @@
 # Controller System
 
 Status: active — mixed source reference and bounded retail evidence
-Last updated: 2026-10-29 (the debug-key table distinguished from the retail default bindings; the V-key god-mode statement corrected; earlier: retired tools no longer described as current)
+Last updated: 2026-11-06 (cheat-combo buttons, debug-button table scope, a byte run removed, CDB defined, public check command; earlier: the debug-key table distinguished from the retail default bindings; the V-key god-mode statement corrected; earlier: retired tools no longer described as current)
 Summary: controller architecture and retail differences; the keyboard queries
 and POV neutral comparison were rechecked on September 26, while other sections
 retain their own dated evidence and limitations. The September 27 joystick and
-recording recheck supplies exact retail guards, scales and transfer counts.
-September 30 byte matching resolves the mouse-recentering arithmetic and constants.
+recording recheck supplies exact retail guards, scales and transfer counts, and September 30 byte matching resolves the mouse-recentering arithmetic and constants.
 Evidence: MEASURED — bounded retail keyboard recheck and the dated evidence below;
 the separate pinned-source architecture is a reference, not proof of retail parity.
 Specimen: pristine `BEA.exe.original.backup`, SHA-256
@@ -115,8 +114,8 @@ does not establish inversion, every sensitivity setting, or jet mouse response.
 A fresh pinned-VC6 build matches all 272 bytes and every relocation of
 `0x0042da00` against the pristine specimen identified above. This is static
 instruction and constant evidence; no new physical mouse or live game test ran.
-The private source owner is `<decompilation>/src/Controller.cpp`; reproduction is
-`python -B tools/decomp.py check src/Controller.cpp -v` in that checkout.
+The measurement was taken in the maintainer's private decompilation checkout. The public source owner is `src/Controller.cpp` in [onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), where reproduction is
+`python3 tools/decomp.py check src/Controller.cpp -v`, with the inputs its README names (a Visual C++ 6 install in `BEA_VC6`, the DirectX 9.0 SDK folders, your retail `BEA.exe` in `BEA_PRISTINE`, and Wine).
 The root's integrated receipt is `<maintainer evidence>/controller-root-check-20260930.txt`.
 
 The arithmetic uses float constants `0x3f333333` (approximately `0.7`) and
@@ -183,7 +182,7 @@ These source-backed defaults do not establish which controls or camera a particu
 reconstructed `CGame::ReceiveButtonAction` retains the `BUTTON_TOGGLE_GOD_MODE` handler. This does not establish
 whether another input path can invoke it; see the separate [God mode evidence](../../../mechanics/cheats/god-mode.md).
 
-**O-key pause caveat:** Source maps `O` to `BUTTON_PAUSE`, and source free-camera code handles `BUTTON_PAUSE` by toggling pause/unpause. Clean Steam retail copied-runtime diagnostics do not accept that as default Steam behavior: the 2026-06-18 held-`O` pause checks produced no `BUTTON_PAUSE`, no `CGame__Pause`, and no `CGame__UnPause`; the broader key-census diagnostic observed `onceScanO=01` but zero O-specific key queries in the active polling/mapping path. A follow-up active mapping-table dump decoded `47` retail rows from `0x008892dc`, found one pause row at index `34`, and classified it as `runtime-table-pause-row-present-without-o-slot`; slot0 was `inputCode=0`, `pushType=8`, `keyArg=1`, slot1 was disabled/sentinel-like, and no `O` key argument (`0x18` or `0x4f`) was present for pause. The copied-executable patch `pause_o_scan_initializer_experiment` changes that initializer byte to `0x18`; accepted copied-runtime CDB evidence now covers one bounded free-camera pause/unpause context plus one level-100 normal-gameplay path where `O` opens the pause menu and `ENTER` resumes. Second-`O` normal-gameplay unpause, broad pause-menu safety, and control feel remain unproven.
+**O-key pause caveat:** Source maps `O` to `BUTTON_PAUSE`, and source free-camera code handles `BUTTON_PAUSE` by toggling pause/unpause. Clean Steam retail copied-runtime diagnostics do not accept that as default Steam behavior: the 2026-06-18 held-`O` pause checks produced no `BUTTON_PAUSE`, no `CGame__Pause`, and no `CGame__UnPause`; the broader key-census diagnostic observed `onceScanO=01` but zero O-specific key queries in the active polling/mapping path. A follow-up active mapping-table dump decoded `47` retail rows from `0x008892dc`, found one pause row at index `34`, and classified it as `runtime-table-pause-row-present-without-o-slot`; slot0 was `inputCode=0`, `pushType=8`, `keyArg=1`, slot1 was disabled/sentinel-like, and no `O` key argument (`0x18` or `0x4f`) was present for pause. The copied-executable patch `pause_o_scan_initializer_experiment` changes that initializer byte to `0x18`; accepted copied-runtime CDB (Windows console debugger) evidence now covers one bounded free-camera pause/unpause context plus one level-100 normal-gameplay path where `O` opens the pause menu and `ENTER` resumes. Second-`O` normal-gameplay unpause, broad pause-menu safety, and control feel remain unproven.
 
 ### Virtual Button System
 
@@ -277,8 +276,8 @@ The source code uses numeric button indices that map to standard PC gamepad layo
 | 3 | Y / Triangle | Help, Menu back |
 | 4 | LB / L1 | Change weapon (alternate) |
 | 5 | RB / R1 | Fire/charge weapon (alternate) |
-| 6 | LT / L2 | Change weapon, Cheat combo |
-| 7 | RT / R2 | Fire/charge weapon, Cheat combo |
+| 6 | LT / L2 | Change weapon |
+| 7 | RT / R2 | Fire/charge weapon |
 | 8 | Select/Back | Select button |
 | 9 | Start | Afterburner (held) |
 | 10 | L3 | - |
@@ -287,6 +286,8 @@ The source code uses numeric button indices that map to standard PC gamepad layo
 | 13 | D-Pad Right | Config up |
 | 14 | D-Pad Down | Menu down, Zoom out |
 | 15 | D-Pad Left | Config down |
+
+The cheat combo is L1 and R1 held together (see [Cheat Combo Detection](#cheat-combo-detection)). The typical layout above numbers them as buttons 4 and 5, and the trigger rows (6 and 7) do not carry it.
 
 ### Analog Stick Constants
 
@@ -311,7 +312,7 @@ above, whose only tests are the `±1.0` clamp and a sign gate at exactly `0.0`
 (VA `0x005D8BE0` = -1.0, `0x005D8568` = +1.0, `0x005D856C` = 0.0). Measured
 2026-07-30 in the pristine specimen
 `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`
-(sha256 `74154bfa…`, 2,506,752 bytes): the float32 `0.36` (`EC 51 B8 3E`) occurs
+(sha256 `74154bfa…`, 2,506,752 bytes): the float32 encoding of `0.36` occurs
 **zero** times in the file.
 
 Consequence: **retail's look axis has no dead zone.** Its floor is a quantum —
@@ -438,11 +439,11 @@ Current evidence indicates that:
 
 ---
 
-## Complete Virtual Button Constants (0-67)
+## Debug Button Constants (source/internal mapping)
 
-### Debug Buttons (0-15)
+### Debug buttons
 
-| Constant | Value | Mapped Key |
+| Constant | Value | Mapped key (source/internal mapping) |
 |----------|-------|------------|
 | `BUTTON_TOGGLE_GOD_MODE` | 0 | V |
 | `BUTTON_TOGGLE_FREE_CAMERA` | 1 | A, F |
@@ -456,8 +457,12 @@ Current evidence indicates that:
 | `BUTTON_LOOSE_LEVEL` | 12 | I |
 | `BUTTON_LOG_CAREER` | 13 | Z |
 | `BUTTON_COMPLETE_ALL_OBJECTIVES` | 14 | 7 |
+| `BUTTON_SAVE_CAREER` | 47 | S |
+| `BUTTON_LOAD_CAREER` | 48 | L |
 
-### NEW Debug Keys Not Previously Documented
+Buttons 8 to 10 (console navigation) are listed under Virtual Button System; their keys are in the list below.
+
+### Other debug keys
 
 - `O` = source/internal pause mapping; clean/default Steam row remains not O-bound, while the patched copied-runtime row has one bounded level-100 proof where `O` opens the pause menu and `ENTER` resumes
 - `A` and `F` = Free camera toggle (two bindings!)

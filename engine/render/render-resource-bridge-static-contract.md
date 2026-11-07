@@ -1,5 +1,9 @@
 # Render/resource static bridge
 
+Status: active static bridge, routing only
+Last updated: 2026-11-06 (header added; first use of AYA linked to its format contract)
+Summary: routes the [AYA](../../formats/aya-container.md) `MESH` and `TEXT` vocabulary into the retained static mesh, texture and render evidence; it does not prove runtime GPU behavior or visual output.
+
 This bridge routes AYA `MESH` and `TEXT` vocabulary into the retained static
 mesh, texture, and render evidence. It does not prove runtime GPU behavior or
 visual output.

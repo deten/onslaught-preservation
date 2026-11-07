@@ -1,10 +1,15 @@
 # Actor System
 
+Status: historical source analysis (December 2025)
+Last updated: 2026-11-06 (header added; water-death and god-mode statements reworded as source observations; emplacement flag name corrected; CComplexThing row aligned with thing-system.md; footer date removed)
+Summary: the CActor movement, physics timing and kill-category layer as written in Stuart's source; its water-death and god-mode statements are source observations, not retail findings.
+Evidence: SOURCE — the pinned Onslaught source (actor.cpp/h, Player.cpp, game.cpp); no retail behaviour is established here.
+
 > Analysis of actor.cpp/h - December 2025
 
 ## Overview
 
-The Actor system is the core movement component in the game's entity hierarchy. It manages physics, position, velocity, and orientation for all moving game objects. **This is runtime-only and has NO relevance to save files**, but understanding it explains kill categorization and why water death bypasses god mode.
+The Actor system is the core movement component in the game's entity hierarchy. It manages physics, position, velocity, and orientation for all moving game objects. **This is runtime-only and has NO relevance to save files**, but understanding it explains kill categorization and the in-water state that the pinned source checks for water death.
 
 ---
 
@@ -23,7 +28,7 @@ CThing -> CComplexThing -> CActor -> CUnit -> CBattleEngine
 | Class | Adds |
 |-------|------|
 | `CThing` | Base entity - position, type flags, lifecycle |
-| `CComplexThing` | Multi-part models, collision |
+| `CComplexThing` | Rotation, animation, scripting |
 | `CActor` | Movement, velocity, physics, ground/water state |
 | `CUnit` | AI, health, damage, weapons |
 | `CBattleEngine` | Player-controlled mech with jet/walker modes |
@@ -87,9 +92,9 @@ BOOL IsInWater()  { return (GetTime() - mLastTimeInWater < 0.25f); }
 BOOL IsOnObject() { return (GetTime() - mLastTimeOnObject < 0.15f); }
 ```
 
-**Why this matters for god mode + water death:**
+**Why this matters for god mode and water death (pinned source):**
 
-Water death is triggered via `DeclareInWater()` which sets `mLastTimeInWater` to current time. The death logic checks `IsInWater()` state, NOT health damage. God mode prevents **damage**, but water death uses **state declaration** - a completely different code path.
+In the pinned source, water contact is declared through state: `DeclareInWater()` sets `mLastTimeInWater` to the current time, and the water game-over check reads `IsInWater()` (`references/Onslaught/game.cpp:2523`), not health damage. God mode guards **damage**, so on the source's own terms it is a different code path. Whether god mode bypasses water death on the retail executable is an open question ([god mode, Open questions](../../../mechanics/cheats/god-mode.md#open-questions)).
 
 ```
 Water Contact
@@ -106,10 +111,10 @@ IsInWater() returns TRUE
 Water death logic triggered (state-based, NOT damage-based)
     │
     ▼
-Unit destroyed regardless of god mode
+Unit destroyed (no damage step on this path)
 ```
 
-This explains why god mode doesn't prevent water death - it's not a vulnerability/damage issue.
+In the pinned source the water decision is made by that state check, not by the damage code, so a god mode that only guards damage would not be expected to stop it. Whether it does on the retail executable is an open question.
 
 ---
 
@@ -124,7 +129,7 @@ void CPlayer::ThingKilledBy(CThing* thing) {
         mThingsKilled[TK_AIRCRAFT]++;
     if (thing->IsA(THING_TYPE_VEHICLE))
         mThingsKilled[TK_VEHICLES]++;
-    if (thing->IsA(THING_TYPE_GROUND_EMPLACEMENT))
+    if (thing->IsA(THING_TYPE_EMPLACEMENT))
         mThingsKilled[TK_EMPLACEMENTS]++;
     if (thing->IsA(THING_TYPE_INFANTRY))
         mThingsKilled[TK_INFANTY]++;  // typo preserved in source/binary
@@ -139,7 +144,7 @@ The `THING_TYPE_*` flags are set during entity initialization based on the actor
 |-------------|-----------------|---------------|
 | Helicopters, fighters | `THING_TYPE_AIR_UNIT` | TK_AIRCRAFT |
 | Tanks, APCs | `THING_TYPE_VEHICLE` | TK_VEHICLES |
-| Turrets, SAM sites | `THING_TYPE_GROUND_EMPLACEMENT` | TK_EMPLACEMENTS |
+| Turrets, SAM sites | `THING_TYPE_EMPLACEMENT` | TK_EMPLACEMENTS |
 | Soldiers | `THING_TYPE_INFANTRY` | TK_INFANTY (typo) |
 | Enemy Battle Engines | `THING_TYPE_MECH` | TK_MECHS |
 
@@ -159,8 +164,8 @@ The `THING_TYPE_*` flags are set during entity initialization based on the actor
 **However**, understanding the actor system explains:
 
 1. **Kill categorization** - The `THING_TYPE_*` flags determine which kill counter increments
-2. **Water death mechanism** - State-based, NOT damage-based, hence god mode doesn't prevent it
-3. **Physics timing** - 20 FPS tick rate explains movement granularity in save analyzer
+2. **Water death mechanism** - state-based, not damage-based in the pinned source; whether god mode covers it is an open question
+3. **Physics timing** - the 20 FPS tick rate explains movement granularity.
 
 ---
 
@@ -178,8 +183,4 @@ The `THING_TYPE_*` flags are set during entity initialization based on the actor
 
 - [thing-system.md](thing-system.md) - Base Thing/CComplexThing hierarchy
 - [../gameplay/battle-system.md](../gameplay/battle-system.md) - CBattleEngine specifics
-- [../../../mechanics/cheats/god-mode.md](../../../mechanics/cheats/god-mode.md) - Why god mode doesn't prevent water death
-
----
-
-*Last updated: December 2025*
+- [../../../mechanics/cheats/god-mode.md](../../../mechanics/cheats/god-mode.md) - open question: whether god mode covers water death

@@ -1,7 +1,7 @@
 # Thing System
 
-Status: historical source analysis (December 2025)
-Last updated: 2026-10-22 (research-campaign records removed)
+Status: historical — source analysis
+Last updated: 2026-11-06 (CActor role aligned with actor-system.md and source-hierarchy.md; version figures marked source-only; footer date removed)
 Summary: the `CThing` class hierarchy, its flags and init structures as written in Stuart's source.
 
 > Analysis from thing.cpp/h and InitThing.cpp/h - December 2025
@@ -29,7 +29,7 @@ Each level adds capabilities:
 - **CMonitor** - Base observer pattern for event handling
 - **CThing** - Basic game object with position, flags, and type
 - **CComplexThing** - Adds rotation, animation, and scripting
-- **CActor** - Game actors with AI and behavior
+- **CActor** - Movement, velocity, physics, ground/water state
 - **CUnit** - Combat units with health and damage
 - **CBattleEngine** - The player-controlled mech
 
@@ -306,7 +306,7 @@ void CInitThing::Load(CMEMBUFFER* buf) {
 
 ### Version History
 
-The format has at least **46 documented versions** with backwards compatibility:
+The pinned source's format has at least **46 documented versions** with backwards compatibility. These figures are source-only: the highest version this section describes is 46, the version the source treats as current. Retail level files reach version 50 (Level 100 and World 110; see [waypoint paths](../../../mechanics/waypoint-paths.md)).
 
 In outline: the loader branches on the version number, handling the legacy field layout below version 12,
 reading fields added in version 25 from that version on, and treating version 46 as current.
@@ -388,7 +388,3 @@ CInitThing deleted (no longer needed)
 - [actor-system.md](actor-system.md) - Movement and physics built on CThing
 - [../gameplay/game-system.md](../gameplay/game-system.md) - Kill tracking integration
 - [../../../saves/save-format.md](../../../saves/save-format.md) - Kill counter file structure
-
----
-
-*Last updated: December 2025*

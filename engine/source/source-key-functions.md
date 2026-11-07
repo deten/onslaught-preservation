@@ -1,6 +1,6 @@
-Status: active quick reference
-Last updated: 2026-10-22 (retired tools no longer described as current)
-Source: migrated from archived Onslaught skills during the skill clean-slate pass.
+Status: active — quick reference for key source function signatures
+Last updated: 2026-11-06 (raw stamp bytes removed; struct-layouts.md linked at its commit; the active-reader protocol marked as intended; the save-layout implication corrected; earlier: retired tools no longer described as current)
+Source: function excerpts from Stuart Gillam's published Onslaught source (pin c3d8ac4, see engine/source/README.md), with the corrections noted below.
 Summary: Key source function signature lookup.
 # Key Function Signatures
 
@@ -62,8 +62,8 @@ code block, attributing the retail stamp to the formula exactly as pinned. That
 attribution is false. The old line is quoted here rather than deleted so a reader
 who remembers it can tell it was corrected, not lost.
 
-- **MEASURED** — the retail stamp is `0x4BD1`: bytes 0-1 of
-  `tests_shared/fixtures/gold_career_save.bin` (10,004 bytes) are `d1 4b`.
+- **MEASURED** — the retail stamp is `0x4BD1`, measured from the fixture's first word
+  in `tests_shared/fixtures/gold_career_save.bin` (10,004 bytes).
 - **SOURCE** — `references/Onslaught/Career.cpp:22` declares
   `int CAREER_VERSION = 9 ;`, and nothing in the pinned corpus reassigns it. The
   only other occurrences are reads or comments: `Career.cpp:1049`, `:1075`,
@@ -76,10 +76,12 @@ who remembers it can tell it was corrected, not lost.
   yields `SWORD(9 + 150464) = 19401 = 0x4BC9`, eight short of the shipped stamp.
 
 **INFERRED** — `0x4BD1` falls out of the same formula with `BASE_VERSION = 17`,
-which is the derivation
-`struct-layouts.md` (archived research record, not published) already records
-under "Version Stamp Calculation": "The console port uses BASE_VERSION=17. The
-internal PC build used 9." That inference holds only if `sizeof(CCareer)` is
+which is the derivation that
+[`struct-layouts.md`](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/reverse-engineering/save-file/struct-layouts.md)
+in Onslaught-Career-Editor at `51129bab` (a map its header marks superseded in part)
+already records under "Version Stamp Calculation": "The console port uses
+BASE_VERSION=17. The internal PC build used 9." That inference holds only if
+`sizeof(CCareer)` is
 `0x24BC` in the shipping build; it has not been measured against a retail binary
 here, and this document does not assert it as measured.
 
@@ -96,14 +98,18 @@ class CSArray {
 };
 ```
 
-Implication: Save files are flat binary dumps.
+Implication: the CCareer core is a contiguous struct dump, with no length prefix or padding. A retail `.bes` adds a version word, an options block and a tail snapshot around that core ([save format](../../saves/save-format.md)).
 
 ## CActiveReader Smart Pointer
 
+The comments below give the intended protocol, as the pinned declarations and the synthesis read it. They are not an observed sequence, and the delivery code that would run it is absent from the drop.
+
 ```cpp
 CActiveReader<CUnit> mTarget;
-// When target destroyed:
-// 1. CMonitor::ToReadDied() called
+// When target destroyed (intended protocol):
+// 1. the reader's ToReadDied() is called
 // 2. mToRead = NULL
 // 3. Read() returns NULL safely
 ```
+
+`ToReadDied()` is declared on `CGenericActiveReader` (`references/Onslaught/activereader.h:19`), which `CActiveReader<T>` derives from (`activereader.h:29`). The generic `HandleEvent` that would deliver the deletion event is declared at `activereader.h:15` and never defined in the pinned drop. `Monitor.h`, the header that would define `CMonitor`, is absent ([synthesis](stuart-source-synthesis.md#active-readers-and-scheduled-deletion-safety)).

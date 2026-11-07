@@ -1,6 +1,6 @@
 # `CMusic` shared music-policy semantic recovery
 
-Status: active, bounded semantic recovery
+Status: active — bounded semantic recovery
 Last updated: 2026-10-22 (VALIDATION citations pinned to sections)
 Evidence: MEASURED — September 27 complete retail bodies and interface identities; September 20 original-code controls and August 11 source/demo comparison are retained evidence, not rerun here.
 Verdict: shared identities and source differences are rechecked; configured volume, later fade consumption and device acceptance remain distinct.
@@ -90,7 +90,7 @@ free calls preserve owned memory, so neither a safe lifetime nor a dangling
 access is established.
 
 Level 100 restoration selects policy category 2. The tested frontend route uses
-category 0 and Level 110 uses category 4, with original list selection/fallback
+category 0 and World 110 uses category 4, with original list selection/fallback
 and virtual-volume/play call ordering. Device failure returns can still lead to
 selection with an empty playlist. Actual playlist enumeration, platform setup,
 decoder timing and audible playback remain outside the experiment.

@@ -1,7 +1,7 @@
 # Terrain draw — texture-stage flags, and the falsification of both settings
 
 Status: active dated finding
-Last updated: 2026-10-29 (the patch site is named, not quoted; its bytes stay in the baseline's patch-site table; earlier: research-campaign records removed)
+Last updated: 2026-11-06 (state 15 labelled ALPHATESTENABLE, as the CDXTrees__Render call sets it; the closing gain stated as 1.40x; earlier: the patch site is named, not quoted; its bytes stay in the baseline's patch-site table; earlier: research-campaign records removed)
 Summary: the one unmodelled texture-stage choice in the terrain draw, and the measurements that falsify both of its settings.
 
 > Verdict: `CDXLandscape__RenderTerrain` has exactly **one** unmodelled degree of
@@ -59,7 +59,7 @@ Consequently, and against the specific candidates the previous pass named:
 - **No `D3DRS_TEXTUREFACTOR`.** `RenderState_Set` is `SetRenderState` — confirmed
   by `CDXTrees__Render`'s `RenderState_Set(0x13,5)` / `(0x14,6)` / `(0x1b,0)` /
   `(0x0f,1)` = `SRCBLEND=SRCALPHA`, `DESTBLEND=INVSRCALPHA`,
-  `ALPHABLENDENABLE=0`, `ZWRITEENABLE=1`. `RenderTerrain` never issues state
+  `ALPHABLENDENABLE=0`, `ALPHATESTENABLE=1`. `RenderTerrain` never issues state
   `0x3c`.
 - **No `D3DTA_TFACTOR`.** No `COLORARG` in the function takes the value `3`.
 - **No `D3DTA_COMPLEMENT`.** No argument carries the `0x10` flag bit.
@@ -173,7 +173,7 @@ mechanism, and nothing here licenses inserting a factor to land it.
 
 With the compositor, the shade plane, fog, the `TEXTURE` stage chain, the
 offline PS2 cache generator, and now the terrain draw's full stage-argument
-census and its single flag all eliminated, the 1.36x is not produced anywhere
+census and its single flag all eliminated, the 1.40x is not produced anywhere
 inside `CDXLandscape::RenderTerrain`. The remaining surface is the frame-global
 one the terrain draw does not own — device gamma/brightness, the back-buffer
 format and its `RGB565` quantisation, or the presentation path — which would

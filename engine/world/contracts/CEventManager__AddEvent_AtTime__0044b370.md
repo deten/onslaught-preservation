@@ -1,7 +1,7 @@
 # CEventManager__AddEvent_AtTime
 
 Status: active bounded contract
-Last updated: 2026-10-22 (research-campaign records removed; findings unchanged)
+Last updated: 2026-11-06 (raw instruction bytes removed, the triple defined, a fragment completed, the source commit named, unpublished receipts marked; earlier: research-campaign records removed; findings unchanged)
 Summary: specimen-bound static scheduler contract plus two retained Level-100
 runtime queue envelopes. Two gap-free calls with distinct caller/payload
 identities insert equal-time reused events into one priority-0 ring list in FIFO
@@ -12,7 +12,7 @@ pinned source/body synthesis, retained trace call/entry/return contexts, exact
 queue/event write pairs, and injected wrong-payload/time/receiver/list controls.
 Specimen: pristine `BEA.exe`, 2,506,752 bytes, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-Source File: `references/Onslaught/eventmanager.cpp` | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: `references/Onslaught/eventmanager.cpp` at `c3d8ac4` (the README's pin; byte-identical at `5352a81`) | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 
 > Address: `0x0044b370`
 
@@ -23,8 +23,8 @@ Source File: `references/Onslaught/eventmanager.cpp` | Binary: BEA.exe, SHA-256 
   `111aca6daabef73837e0740f27b1b15017c2778f67d8492337f23c564c7b4595`;
   that is a runtime-image pin, not a pristine-image equivalence claim.
 - `RET 0x18` appears on each visible exit; the selected calls return through
-  `0x0044b5b2` bytes `C2 18 00`. The exact trailing control
-  `[0x0044b5b5,0x0044b5c0)` stayed unexecuted (`0/0/0`) in both full and
+  `0x0044b5b2`. The exact trailing control
+  `[0x0044b5b5,0x0044b5c0)` stayed unexecuted (`0/0/0`: function entries, calls, returns) in both full and
   selected replays.
 
 ## Calling convention
@@ -37,7 +37,7 @@ Source File: `references/Onslaught/eventmanager.cpp` | Binary: BEA.exe, SHA-256 
 
 ## Prototype and parameter semantics
 
-A member returning nothing, taking six stack arguments in this order: the event number, the target to
+The member returns nothing and takes six stack arguments, in this order: the event number, the target to
 call, a pointer to the requested time, the start-or-end priority, the data pointer and the event record to
 reuse.
 
@@ -165,6 +165,8 @@ function entries/calls/returns, three ring-join entries, and zero padding hits.
   established by the selected runtime arms.
 
 ## Runtime corroboration (bounded)
+
+(maintainer evidence, not published: the trace, raw captures and collectors below are held as `<maintainer evidence>/…`, and this section gives only their sizes, hashes and self-test results.)
 
 Trace: retained Level-100 opening, 6,199,181,312 bytes, SHA-256
 `f3e677f7df5f5563ebb468f46ca6041756271f84dfc28ddf37b59210a4552b50`;

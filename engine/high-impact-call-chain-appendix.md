@@ -1,7 +1,7 @@
 # High-impact call chains
 
-Status: active static summary
-Last updated: 2026-10-22 (retired tools no longer described as current)
+Status: active — static summary
+Last updated: 2026-11-06 (companion named; primary owner name follows the published function table; earlier: retired tools no longer described as current)
 Summary: static call chains with their product consequence for save and options persistence, the world lifecycle and text lookup.
 
 These chains explain product-relevant ownership and side effects. They are
@@ -11,18 +11,18 @@ static evidence unless a linked runtime contract says otherwise.
 
 | Path | Static chain | Product consequence |
 | --- | --- | --- |
-| Load game | `CFEPLoadGame__DoLoad` → `CCareer__Load` → conditional `CFEPOptions__WriteDefaultOptionsFile` | Loading a retail save can update the boot-time options snapshot. |
+| Load game | `CFEPLoadGame__StartLoad` → `CCareer__Load` → conditional `CFEPOptions__WriteDefaultOptionsFile` | Loading a retail save can update the boot-time options snapshot. |
 | Main menu save | `CFEPMain__Process` → `CCareer__Save` and `CFEPOptions__WriteDefaultOptionsFile`, with an optional platform save write | Career and global options can be persisted by the same frontend transition. |
 | Pause resume/exit | `CPauseMenu__ResumeGameAndPersistOptions` → `CCareer__Save` → optional platform save write → `CFEPOptions__WriteDefaultOptionsFile` | Resume/exit can update both career data and `defaultoptions.bea`. |
 | Debrief | `CFEPDebriefing__Initialize` prepares debrief state upstream of the persistence paths | Debrief initialization itself is not the save write. |
 
 Primary owners are
-[`CFEPLoadGame__DoLoad`](../saves/by-function/CFEPLoadGame__DoLoad.md),
+[`CFEPLoadGame__StartLoad`](../saves/by-function/CFEPLoadGame__DoLoad.md),
 [`CCareer__Save`](../saves/by-function/CCareer__Save.md),
 `CPauseMenu__ResumeGameAndPersistOptions` (in the decompilation notes, not yet published),
 and the [save/options contract](../saves/save-options-startup-compatibility.md).
-These relationships are why a save editor patches real baseline files, preserves
-unknown bytes, and writes separate outputs instead of synthesizing saves.
+These relationships are why the Onslaught Companion, in the
+[Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) repository, patches real baseline files, preserves unknown bytes, and writes separate outputs instead of synthesizing saves.
 
 ## World lifecycle
 

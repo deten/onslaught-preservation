@@ -1,20 +1,20 @@
 # CMonitor__AddDeletionEvent
 
 Status: active static contract with bounded execution coverage
-Last updated: 2026-10-22 (research-campaign records removed; findings unchanged)
+Last updated: 2026-11-06 (terms defined, notation made consistent, unpublished receipts marked as maintainer evidence; earlier: research-campaign records removed; findings unchanged)
 Summary: `CMonitor__AddDeletionEvent` at `0x00401040` lazily creates the monitor's deletion set and adds a
 reader cell at its head; two recordings show the lazy-allocation path and the insertion executing, but no
 retained trace ties one call's receiver, argument and result together.
 Evidence: MEASURED — exact pristine body, two hash-bound execution-coverage products, and two hash-bound
-`CGenericActiveReader__SetReader` null-rebind call envelopes. No new replay, recording or native execution.
+`CGenericActiveReader__SetReader` null-rebind call envelopes, all held as maintainer evidence. No new replay, recording or native execution.
 Specimen: pristine `BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-Source File: `Monitor.h` is absent from the pinned source drop; `activereader.h/.cpp` supplies architecture analogy only | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: `Monitor.h` is absent from the pinned source snapshot; `activereader.h/.cpp` supplies architecture analogy only | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 
 > Address: `0x00401040`
 
 ## Identity
 
-- Body `[0x00401040,0x004010bd]`, one range, 126 bytes, 39 instructions; raw pristine-body SHA-256
+- Body `[0x00401040,0x004010be)`, one range, 126 bytes, 39 instructions; raw pristine-body SHA-256
   `b9d3c4afa0c93e5eccdcfbdfabc974da517d24c4172fde6f3a65628127701017`.
 - Interface: a member with the receiver in ECX and one stack argument, the reader cell at
   `[entry ESP+4]`; it returns nothing and ends at `0x004010bb` with `RET 0x4`.
@@ -47,16 +47,16 @@ the event-delivery code absent, that is analogy, not proof for this retail funct
 ### Two recordings reach the successful lazy path
 
 The following independent recordings are hash-bound to copied runtime
-`E1436EF7E0AD9CCBDDD43AAACA952F6E84D4B1A282835CEAD745EFCFC32FADF4`:
+`e1436ef7e0ad9ccbddd43aaaca952f6e84d4b1a282835cead745efcfc32fadf4`:
 
 1. Level-512 opening trace, 6,031,409,152 bytes, SHA-256
-   `3D3A118FE211EAD7B1E41055E4150DCFF576B6D0CC64879C52D1163BECA94808`.
+   `3d3a118fe211ead7b1e41055e4150dcff576b6d0cc64879c52d1163beca94808`.
    Recording receipt SHA-256
    `dec087c4445c67a1c83d94054329c6af3f07caff43696c8ff6775d9bcf19be23`;
    coverage JSONL SHA-256
    `e00382036da957b09007a3c5eba5e1b16c45c1e1aa2d09039453e859960099c8`.
 2. Level-521 native take 4, 14,214,496,256 bytes, SHA-256
-   `45AB04297F32BB27AC0C80E8ECB0B332E666A9955CAEA0763A83984AFFB74AC2`.
+   `45ab04297f32bb27ac0c80e8ecb0b332e666a9955caea0763a83984affb74ac2`.
    Recording receipt SHA-256
    `c8e59da9db3f9fd4304d68dc667dc346e622d87c67fbff0fc17c4ec01fa86b98`;
    coverage JSONL SHA-256
@@ -79,12 +79,12 @@ invocation also occurred in either recording.
 
 ### Retained call-context controls do not target AddDeletionEvent
 
-The retained call-context catalog reports 92 local-lab call-context products.
+The retained call-context catalog reports 92 call-context products in `<maintainer evidence>/…` (archived research record, not published).
 An exact target-row search for `entry_va:"0x401040"` finds zero; exact searches
 also find no target row for `CMonitor__DeleteDeletionEvent @ 0x0042d9b0` or
 `CSPtrSet__AddToHead @ 0x004e5a80`.
 
-Two READY slices do target `CGenericActiveReader__SetReader @ 0x00401000` and
+Two call-context slices target `CGenericActiveReader__SetReader @ 0x00401000` and
 provide a useful can-fail control:
 
 - Level 512: call-context SHA-256
@@ -102,7 +102,7 @@ provide a useful can-fail control:
 Those are two independent null-rebind envelopes. The static SetReader body
 therefore skips its `AddDeletionEvent` call. The captures do not read the old
 monitor/set or prove a successful removal, so they are a can-fail control for
-registration only—not the requested DeleteDeletionEvent/removal readback.
+registration only—not the DeleteDeletionEvent removal readback, which is still open.
 
 ## Open questions
 
