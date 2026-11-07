@@ -1,10 +1,10 @@
 # BES save file format
 
 Status: supported retail/Steam specimen contract
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (specimen wording and published source named; tail field names aligned with the career semantics note; god-flag effect stated as a static reading; earlier: retired AppCore/WinUI tools in the past tense)
 Summary: supported byte layout and preservation policy; startup/load and tail semantics have scoped independent rechecks, not whole-format acceptance.
 Evidence: MEASURED — the scoped September 19 original-code controls and byte findings linked below; remaining field interpretations retain their older evidence limits.
-Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+Specimen: pristine Steam retail `BEA.exe`, held as `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 Supported career saves are exactly 10,004 bytes (`0x2714`) and begin with the
 16-bit version word `0x4BD1`. `CCareer__Load` and `CCareer__Save` copy a fixed
@@ -17,7 +17,7 @@ file_offset = 0x0002 + career_offset
 
 Older aligned-view notes read two bytes early and made ordinary values appear
 shifted by 16 bits. Product code and current documentation use the true view.
-Stuart's internal-build source is useful for logic and structure names, but the
+Stuart Gillam's published source (pinned as the [README](../README.md) describes) is useful for logic and structure names, but the
 retail executable and observed retail files own the on-disk contract.
 
 ## File layout
@@ -34,7 +34,7 @@ retail executable and observed retail files own the on-disk contract.
 | `0x248A` | 4 | `mCareerInProgress` | preserve unless explicitly edited |
 | `0x248E` | 4 | sound volume float | preserve on career edits |
 | `0x2492` | 4 | music volume float | preserve on career edits |
-| `0x2496` | 4 | player 1 god flag, `CCareer::mIsGod[0]` ([god mode](../mechanics/cheats/god-mode.md)) | scoped edit only; nonzero makes player 1's Battle Engine invulnerable |
+| `0x2496` | 4 | player 1 god flag, `CCareer::mIsGod[0]` ([god mode](../mechanics/cheats/god-mode.md)) | scoped edit only; static reading only: a nonzero flag is player 1's god flag in the god-mode code, and the effect on the Battle Engine is not yet measured ([god mode open questions](../mechanics/cheats/god-mode.md#open-questions)) |
 | `0x249A` | 4 | player 2 god flag, `mIsGod[1]` | preserve unless explicitly edited |
 | `0x249E` | 4 | P1 flight invert Y | scoped options edit only |
 | `0x24A2` | 4 | P2 flight invert Y | scoped options edit only |
@@ -98,7 +98,8 @@ hold the count — `CCareer::GetNumKilled` masks with `and eax, 0xFFFFFF` at
   `((value - 0x80) << 24)` over a preserved `word & 0xFFFFFF`.
 - Owner: `CFEPScreenPos` (type descriptor `0x00629DB0`, complete object locator
   `0x00613D10`, vtable `0x005DB858`). Its page reads both rows into one two-int
-  structure at `0x0051F470` and writes them back at `0x0051F490`; the adjusters
+  structure through `CScreenPosition__Read` (`0x0051F470`) and writes them back
+  through `CScreenPosition__Write` (`0x0051F490`); the adjusters
   at `0x0051FA20`-`0x0051FAE7` are asymmetric — word 0 steps `±4` clamped to
   `[-0x3F, +0x40]`, word 1 steps `±1` clamped to `[-0x32, +0x40]`.
 - `CCareer::Load` gates both at `0x0042126A`-`0x00421280`: outside `±0x40` the
@@ -173,10 +174,10 @@ Offsets are relative to `0x26BE` for the supported specimen.
 | `+0x24` | 4 | mipmapping-disallow flag |
 | `+0x28` | 4 | packed display-mode key: width, height, pixel-format class |
 | `+0x2C` | 4 | vsync flag |
-| `+0x30` | 4 | landscape maximum levels |
-| `+0x34` | 4 | texture resolution-loss shift |
-| `+0x38` | 4 | 32-bit texture allowance |
-| `+0x3C` | 4 | multisample override |
+| `+0x30` | 4 | landscape LOD quality |
+| `+0x34` | 4 | texture downscale shift |
+| `+0x38` | 4 | texture-compression mode |
+| `+0x3C` | 4 | current adapter/profile field |
 | `+0x40` | 4 | flip-speakers flag (negates each sound's x) |
 | `+0x44` | 4 | hardware-sound flag |
 | `+0x48` | 4 | sample-rate index |

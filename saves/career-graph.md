@@ -1,7 +1,7 @@
 # Career Graph (Nodes + Links) and Safe Unlocking
 
 Status: active reference for companion career edits
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (function names set to the function-name table; write precondition added to the unlock steps; unpublished save labelled)
 Summary: how the campaign graph (nodes, links and base-world survivor bitmaps) sits in the fixed-size Steam save, and how to unlock missions without corrupting it.
 Evidence: SOURCE-INFORMED from the pinned `Career.cpp`/`Career.h` with retail cross-references; on 2026-09-25 the retail career table at `0x00623e28` was compared word for word with `Career.cpp:24-60` and matched.
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -54,13 +54,13 @@ Practical patching implication:
 ## Retail Unlock Gate (Steam `BEA.exe`)
 
 In the Steam retail binary, mission availability on the career map is gated by:
-- `Career_IsWorldUnlocked` @ `0x00461a50`
+- `CFEPLevelSelect__IsWorldUnlocked` @ `0x00461a50`
 
 Observed behavior (decompile):
 - If `IsCheatActive(..., 1)` (TURKEY) is enabled, it returns **true** for any world.
 - World `100` (training) is always treated as **unlocked**.
 - Otherwise it resolves the node by world number and checks **incoming** links:
-  1. `node = CCareer__GetNodeFromWorld(&CAREER, world)` (`0x0041b8f0`); when no node has the
+  1. `node = CCareer__GetNodeFromWorldNo(&CAREER, world)` (`0x0041b8f0`); when no node has the
      world it returns **false** (`0x00461aba`)
   2. `parent_links = CCareerNode__GetParentLinks(node)` (`0x0041b9f0`)
   3. Returns **true** if any `CCareerNodeLink` in `parent_links` has `mLinkType == CN_COMPLETE (1)`.
@@ -82,7 +82,7 @@ Caller argument provenance (retail xrefs to `0x00461a50`):
 So the gate is called with **world ids**, not node indices.
 
 Retail post-load behavior note (inferred from decompile):
-- `CCareer__Load(..., flag!=0)` calls `CFEPLevelSelect__SelectLatestUnlockedWorld` (`0x00460a40`, with `ECX=0x0089dab8`) to scan the map table backward, column by column, and pick the most recent world where `Career_IsWorldUnlocked(world)` is true (gate call at `0x00460a7f`).
+- `CCareer__Load(..., flag!=0)` calls `CFEPLevelSelect__SetCurrentLevelToHighestAvailable` (`0x00460a40`, with `ECX=0x0089dab8`) to scan the map table backward, column by column, and pick the most recent world where `CFEPLevelSelect__IsWorldUnlocked(world)` is true (gate call at `0x00460a7f`).
 - This means link-state edits can influence not only visibility but also which map world is auto-selected after a career load.
 
 ## Link-Type Write Sites (Retail `BEA.exe`)
@@ -191,7 +191,7 @@ Notes:
 ## On-Disk Structure Validation (Steam Saves)
 
 We validated that the **structural** career graph fields in a real Steam `.bes` save match Stuart’s `level_structure` exactly:
-- Verified on `save-attempts/haha-cannon-goes-brrrrr.bes` (10,004 bytes).
+- Verified on a maintainer save, not published (`<maintainer evidence>/save-attempts/haha-cannon-goes-brrrrr.bes`, 10,004 bytes).
 - For nodes `0..42`:
   - `CCareerNode.mWorldNumber` matched `level_structure[i][0]`
   - `CCareerNode.mLowerLink == 2*i` and `mHigherLink == 2*i+1`
@@ -202,6 +202,8 @@ Implication: we can safely use the Stuart table for **index-level mapping** (nod
 ---
 
 ## Safe Unlocking Strategies (Save Editor Guidance)
+
+**Before any write:** make sure the game is not running, and work on a copy of the save, never the only copy. Keep the original file unchanged, write only to the copy, and read the copy back to check the changed fields and the 10,004-byte size before you use it.
 
 ### A) Unlock All Missions (Don’t Mark As Completed)
 
@@ -222,20 +224,20 @@ This is the lowest-risk unlock operation because it changes only the gate state 
 ```text
 LINKS_BASE = 0x1906
 LINK_SIZE  = 8
-USED_LINKS = 86   # 43 nodes * 2 links per node (campaign tree)
+LINK_SLOTS = 86   # 43 nodes * 2 link slots per node; 63 of the 86 carry a target, the rest are -1 (unused)
 
 // For link j:
 //   mLinkType @ LINKS_BASE + j*LINK_SIZE + 0x00  (u32)
 //   mToNode   @ LINKS_BASE + j*LINK_SIZE + 0x04  (i32)
 
-for j in [0 .. USED_LINKS-1]:
+for j in [0 .. LINK_SLOTS-1]:
   to = read_i32(file, LINKS_BASE + j*8 + 4)
   if to != -1:
     write_u32(file, LINKS_BASE + j*8 + 0, 1)   # CN_COMPLETE
 ```
 
 If you want *selective* unlock:
-- Find the target node index `i` by scanning `CCareerNode[i].mWorldNumber` in the nodes block (file `0x0006 + i*0x40 + 0x10`).
+- Find the target node index `i` by scanning `CCareerNode[i].mWorldNumber` in the nodes block (file `0x0006 + i*0x40 + 0x10`; the +0x10 node offset is listed in [save-structs.md](save-structs.md)).
 - Then set **at least one** incoming link with `mToNode == i` to `CN_COMPLETE (1)`.
 - For world-by-world incoming-link ids and natural conditions, use `career-unlock-recipes.md`.
 
@@ -262,9 +264,11 @@ Slots are documented in `struct-layouts.md` (archived research record, not publi
 
 ### D) Repair “Locked Because Only Broken Parents Exist”
 
+**Before any write:** make sure the game is not running, and work on a copy of the save, never the only copy. Keep the original file unchanged, write only to the copy, and read the copy back to check the changed fields and the 10,004-byte size before you use it.
+
 Common failure case in edited saves:
 - A node has incoming links, but all of them are `CN_COMPLETE_BROKEN (2)`.
-- `Career_IsWorldUnlocked` still returns locked because it only accepts `CN_COMPLETE (1)`.
+- `CFEPLevelSelect__IsWorldUnlocked` still returns locked because it only accepts `CN_COMPLETE (1)`.
 
 Safe repair:
 1. Identify target world `W` and node index `i` (`mWorldNumber == W`).

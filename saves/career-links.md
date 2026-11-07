@@ -1,13 +1,13 @@
 # Career Link Index Map (Steam)
 
 Status: active reference for companion career edits
-Last updated: 2026-10-22 (private evidence paths generalised for the onslaught-preservation layout)
+Last updated: 2026-11-06 (validation claim narrowed to the one tracked gold save; the save named in full)
 Summary: every campaign link index, its parent and target nodes, and the invariants the companion relies on.
 Evidence: SOURCE — `Career.cpp` `level_structure`; MEASURED — the tracked gold save and retail `ReCalcLinks`.
-Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`; gold save `tests_shared/fixtures/gold_career_save.bin`.
+Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`; the tracked gold save (`tests_shared/fixtures/gold_career_save.bin` in Onslaught-Career-Editor).
 
 This table enumerates the **campaign** link table indices (`CCareerNodeLink[200]`) for the Steam `.bes` format.
-It is derived from `references/Onslaught/Career.cpp` `level_structure` and validated against real Steam saves (node/link indices and `mToNode` targets match on disk).
+It is derived from `references/Onslaught/Career.cpp` `level_structure` and validated against the tracked gold save (the `mToNode` target of all 86 rows matches on disk).
 
 Key invariants (campaign tree only):
 - Node index `i` uses link indices `2*i` (lower) and `2*i+1` (higher).

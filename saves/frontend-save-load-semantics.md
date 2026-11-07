@@ -1,9 +1,9 @@
 # Frontend save/load and PC persistence semantics
 
 Status: active, bounded semantic recovery
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (options-writer input matched to the save records, god-mode evidence wording, one specimen wording; earlier: research-campaign records and decompiler-style code removed)
 Evidence: MEASURED — complete pristine retail bodies, retained frontend source,
-PC-platform call targets, released cheat-table bytes and callers, and fifteen
+PC-platform call targets, released cheat-table bytes and callers, and
 normalized-identical PC demo twins; UNKNOWN — destructive/fault-injected runtime
 behavior, console adapter parity, dialog pixels, and rebuild-wide persistence
 parity.
@@ -13,7 +13,7 @@ source `MEMORYCARD` service with the PC file adapter, treats save names
 case-insensitively, and expands the source's four plaintext cheat names into a
 six-entry XOR-obfuscated table.
 
-Specimen: pristine PC retail `BEA.exe`, SHA-256
+Specimen: pristine Steam retail `BEA.exe`, held as `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`;
 PC demo `BEA.exe`, SHA-256
 `d8637dd755b21c720c0cb8f71923f94d2a04a184d90f5343c2e868ce8606e5c2`.
@@ -65,8 +65,8 @@ and formatted.
 It allocates exactly `CCareer::GetSaveSize()` bytes, reads the selected `.bes`
 file through `PCPlatform__ReadSaveFile`, and calls `CCareer::Load` with flag
 `1`. A zero read result followed by a successful career load advances the
-frontend, marks autosave state, and—when `0x0082b5b0` is zero—writes the
-loaded options block as the default-options file. Career rejection receives a
+frontend, marks autosave state, and—when `0x0082b5b0` is zero—writes every byte of the
+original read buffer (the file's volumes, bindings and tail included) as the default-options file, through `CFEPOptions__WriteDefaultOptionsFile`; see [`by-function/CFEPLoadGame__DoLoad.md`](by-function/CFEPLoadGame__DoLoad.md). Career rejection receives a
 bad-version path. File-read failure rechecks the storage device and separates
 removal/invalid-device handling. Every allocated buffer reaches the memory
 manager free path.
@@ -132,7 +132,7 @@ The pristine table decodes exactly as follows:
 | 0 | `MALLOY` | Goodie unlock/state override. |
 | 1 | `TURKEY` | Campaign-world availability bypass. |
 | 2 | `V3R5IOF` | No released caller found; the retained-source version-display meaning remains only a source hypothesis for this PC build. |
-| 3 | `Maladim` | God-mode menu gate; later runtime evidence confirms the toggle and normal combat-damage effect. |
+| 3 | `Maladim` | God-mode menu gate; the toggle and normal combat-damage effect are observed in unarchived runtime notes ([`mechanics/cheats/god-mode.md`](../mechanics/cheats/god-mode.md), Runtime notes). |
 | 4 | `Aurore` | Free-camera action gate. |
 | 5 | `lat<0xEA>te` | Goodie state/gating override. The third byte is CP1252/Latin-1 `0xEA`, not UTF-8. |
 

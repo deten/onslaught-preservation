@@ -5,7 +5,7 @@ Last updated: 2026-10-22 (research-campaign records and decompiler-style code re
 Evidence: MEASURED — September 27 complete slot writer executed with intercepted CRT/name boundaries;
 September 19 selected PC read/name/card-info bodies executed with
 intercepted file/UI services; inherited August evidence — complete retail
-bodies, retained interfaces and eleven normalized-identical PC demo twins; UNKNOWN —
+bodies, retained interfaces and normalized-identical PC demo twins; UNKNOWN —
 fault-injected filesystem runtime behavior, upstream filename constraints,
 console adapter parity, and rebuild-wide persistence parity.
 Verdict: the released PC build does implement the console-shaped memory-card
@@ -13,7 +13,7 @@ interface. It projects one permanently present pseudo-card over ordinary
 `savegames\\<name>.bes` files. The retained PC header contains earlier stubs,
 not the shipped bodies.
 
-Specimen: pristine PC retail `BEA.exe`, SHA-256
+Specimen: pristine Steam retail `BEA.exe`, held as `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`;
 PC demo `BEA.exe`, SHA-256
 `d8637dd755b21c720c0cb8f71923f94d2a04a184d90f5343c2e868ce8606e5c2`.

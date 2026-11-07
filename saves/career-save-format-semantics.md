@@ -4,7 +4,7 @@ Status: active, bounded semantic recovery
 Last updated: 2026-10-22 (retired tools no longer described as current)
 Evidence: MEASURED — complete pristine retail bodies and instruction streams,
 the supported 10,004-byte save specimen, retained `CCareer` source, typed
-frontend callers, and eight normalized-identical PC demo twins; UNKNOWN —
+frontend callers, and normalized-identical PC demo twins; UNKNOWN —
 fault-injected load/write behavior, other-platform layouts, arbitrary option
 table configurations, and rebuild-wide persistence parity.
 Verdict: the released PC serializer is recovered. It is not the retained
