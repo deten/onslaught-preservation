@@ -1,7 +1,7 @@
 # Onslaught preservation
 
 Status: active — the repository's front page
-Last updated: 2026-11-06 (contribution routing, evidence labels, how to check a specimen and the second and third Toolkit pins stated; earlier: the rebuild's measured comparison scope is linked to its current record; earlier: onslaught-godot described as its own README describes it; earlier: related projects linked; Onslaught-Career-Editor citations pinned to one commit)
+Last updated: 2026-11-06 (the mirror index defined; contribution routing, evidence labels, how to check a specimen, the earlier fork commit and the second and third Toolkit pins stated; the companion's planned phase-out stated; earlier: the rebuild's measured comparison scope is linked to its current record; earlier: onslaught-godot described as its own README describes it; earlier: related projects linked; Onslaught-Career-Editor citations pinned to one commit)
 Summary: what this repository documents about *Battle Engine Aquila*, where to start in each section, how to read a
 finding, the licence, related projects and how to contribute.
 
@@ -65,11 +65,13 @@ patch site, as [CONTRIBUTING.md](CONTRIBUTING.md) allows.
   public reference fork of [stuart73/Onslaught](https://github.com/stuart73/Onslaught); for example,
   `references/Onslaught/Career.cpp` is
   [`Career.cpp` at that commit](https://github.com/dlprentice/Onslaught/blob/c3d8ac464259942b83fa8aa7f867c856e77b734d/Career.cpp).
+  Some documents cite the fork's earlier commit [`5352a81`](https://github.com/dlprentice/Onslaught/tree/5352a81cdb838b145a57f7febc5d9fc4b0129ebb), which the source synthesis names as its pinned commit; `c3d8ac4` adds new files and changes none of the files present at `5352a81`, so a citation to one of those files gives the same lines at either commit.
   `references/AYAResourceExtractor/<file>` cites his
   [AYAResourceExtractor](https://github.com/stuart73/AYAResourceExtractor) at the pinned commit
   [`53b10b0`](https://github.com/dlprentice/AYAResourceExtractor/tree/53b10b083b59cfd7e72849c15bec8b608eaf8a23).
 - `<maintainer evidence>/…` names a receipt (capture, probe output, readback) kept privately by the maintainer
   because it holds retail bytes or machine detail. Its hash, where given, identifies it.
+- The *mirror index* cited by the format documents (`<maintainer evidence>/bea-asset-mirror/INDEX.jsonl`, schema `onslaught.asset-mirror-index.v1`) is the maintainer's private manifest of the installed retail files: one row per file, with its SHA-256 and format classification. [`formats/README.md`](formats/README.md) describes it, and the format documents cite its row counts and hashes.
 - A path cited "in Onslaught-Career-Editor", such as `tools/…`, `rebuild/…`, `companion/…`, `tests_shared/…` or
   `VALIDATION.md`, names the file at commit [`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50) of
   [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor), where the tools, the rebuild and the companion were developed when the finding
@@ -110,7 +112,7 @@ Credits are in [`history/attribution.md`](history/attribution.md).
   describes the measured routes and their limits.
 - [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) (also called the Toolkit): Onslaught
   Companion, the app for careers, saves, settings and backups, with the game's lore and lore book, and the project's
-  goal and plan (to be renamed onslaught-companion).
+  goal and plan (to be renamed onslaught-companion). Its player capabilities are to move into Onslaught CE, and the separate app is to be phased out after verified replacement; it has no published release yet.
 - [stuart73/Onslaught](https://github.com/stuart73/Onslaught): Stuart Gillam's published Onslaught source, which
   many findings here cite.
 

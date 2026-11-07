@@ -1,7 +1,7 @@
 # Index
 
 Status: active — the front door to this repository's findings
-Last updated: 2026-11-06 (the no-game-data sentence states the short quoted strings; earlier: patch notes marked historical; related projects linked)
+Last updated: 2026-11-06 (evidence labels defined; retail addresses and patch bytes moved out of the summary rows; the Toolkit's phase-out plan for the companion stated; earlier: the no-game-data sentence states the short quoted strings; earlier: patch notes marked historical; related projects linked)
 Summary: where each kind of finding about *Battle Engine Aquila* lives in this repository, the evidence rules
 every claim meets, and the patch analyses, per-subsystem contracts and machine-readable tables.
 
@@ -22,6 +22,21 @@ counts and names of their own time; read them as history.
 - Agreement with a rebuild does not re-prove retail behaviour.
 - This repository holds no executables, copies of the game's data files, saves, debugger logs or decompiler output;
   short quoted strings appear only where a finding needs them. Retail inputs stay with whoever owns the game.
+- The `Evidence:` labels `MEASURED`, `SOURCE`, `INFERRED` and `UNKNOWN` are defined in the README's
+  [How to read a finding](README.md#how-to-read-a-finding). Three other terms recur in the notes: a *copied runtime* is a
+  controlled run of a copy of the game, not of the installed files; a *pinned v2 collector* is the version-2 tool that reads
+  a run's trace into the rows a note compares, pinned to that version so that a replay repeats; a *receipt* is the record of
+  a run (a capture, probe output or readback), held privately under a `<maintainer evidence>/…` placeholder when it holds
+  retail data or machine detail (README).
+
+Evidence labels: `MEASURED`, `SOURCE`, `INFERRED` and `UNKNOWN` are defined in [How to read a finding](README.md#how-to-read-a-finding).
+`RETAIL-STATIC` marks a claim read independently from the unpatched baseline executable, its function inventory, RTTI, and
+shipped strings or tables; the grade is defined in the source synthesis's [evidence vocabulary](engine/source/stuart-source-synthesis.md#evidence-vocabulary).
+`WITHDRAWN` marks a claim that a dated correction struck out and withdrew; read the correction before relying on the text.
+
+## Terms
+
+- **Core**: `OnslaughtRebuild.Core`, in the `rebuild/` tree of [onslaught-godot](https://github.com/dlprentice/onslaught-godot), the earlier fixed-point rebuild, kept as reference only. Pages that say Core mean this unless they say otherwise.
 
 ## Start here
 
@@ -63,19 +78,21 @@ correction before acting on either.
 | Document | Anchor, and how far the claim reaches |
 | --- | --- |
 | [CLI defaults and complete parser](platforms/command-line/CLIParams__ParseCommandLine.md) | Initializer ownership (CLIParams, not Unit AI); four defaulting controls, 47 isolated original-parser cases and the 25-option static map. Actual startup and downstream acceptance remain open. |
-| [Windowed mode](platforms/display/windowed-mode-analysis.md) | **Partially superseded 2026-07-28.** `-forcewindowed` is real and reachable, but its parser gate `0x00662f3e` is BSS, zero at load, and is set only by `-testeur` earlier on the same command line. There is no file byte to edit. The two-gate model and the startup-flow patch at file offset `0x12A644` stand. |
-| [Extra-graphics feature gate](platforms/patches/extra-graphics-feature-gate-patch.md) | `GEFORCE_FX_POWER` registers with default `0`; `0x004CDD40`, `6A 00` → `6A 01`, with the companion row that ignores `cardid.txt` vendor/device matching. |
+| [Windowed mode](platforms/display/windowed-mode-analysis.md) | **Partially superseded 2026-07-28.** `-forcewindowed` is real and reachable, but its parser gate is BSS, zero at load, and is set only by `-testeur` earlier on the same command line. There is no file byte to edit. The two-gate model and the startup-flow patch stand; the document gives the addresses and their specimen. |
+| [Extra-graphics feature gate](platforms/patches/extra-graphics-feature-gate-patch.md) | `GEFORCE_FX_POWER` registers with default `0`; the patch site and its bytes are in the document, with the companion row that ignores `cardid.txt` vendor/device matching. |
 | [Version overlay](platforms/patches/version-overlay-patch.md) | The opt-in `V1.00 - PATCHED` marker as a pair: a visible pointer row and a hidden cave-string row. One copied-game title/menu run confirmed the marker. |
-| [Frontend clear-screen colour](platforms/patches/frontend-clear-screen-color-patch.md) | Three mutually exclusive immediates at `0x00540F88` in `CDXFrontEnd__RenderStart`; source anchor `references/Onslaught/DXFrontend.cpp`. |
-| [Goodies gallery display unlock](platforms/patches/goodies-gallery-display-unlock-patch.md) | Forces the existing display flag inside `CFEPGoodies__Process` (`0x0045D7F4`). **Display only — it does not alter save progression.** |
+| [Frontend clear-screen colour](platforms/patches/frontend-clear-screen-color-patch.md) | Three mutually exclusive immediates in `CDXFrontEnd__RenderStart`; source anchor `references/Onslaught/DXFrontend.cpp`. |
+| [Goodies gallery display unlock](platforms/patches/goodies-gallery-display-unlock-patch.md) | Forces the existing display flag inside `CFEPGoodies__Process`. **Display only — it does not alter save progression.** |
 | [Free-camera Aurore-gate bypass](platforms/patches/free-camera-aurore-gate-bypass-patch.md) | NOPs the `IsCheatActive(4)` gate on `BUTTON_TOGGLE_FREE_CAMERA` in `CGame__ReceiveButtonAction`, plus eight keyboard cave variants. **Experimental.** |
-| [Pause-key default row](platforms/patches/pause-key-default-row-patch.md) | One immediate in `OptionsEntries__InitDefaultSingleBindingsTable` (`0x005144CD`, `01` → `18`). **Experimental.** |
+| [Pause-key default row](platforms/patches/pause-key-default-row-patch.md) | One immediate in `OptionsEntries__InitDefaultSingleBindingsTable`; the patch site and its bytes are in the document. **Experimental.** |
 
 ## Static contracts by subsystem
 
 Bounded static maps, one subsystem each. They establish addresses, call relationships, constants and structures in
 the analysed specimen, not runtime behaviour, exact layouts or source-body identity.
 [Mapped systems](engine/mapped-systems.md) names the current owner document for each system.
+The terms the render contracts use, such as the x87 precision settings and relocations, are
+explained in the [render glossary](engine/render/README.md#glossary).
 
 | Subsystem | Contract |
 | --- | --- |
@@ -103,7 +120,7 @@ the analysed specimen, not runtime behaviour, exact layouts or source-body ident
 Per-function contracts sit beside their subsystem: [Battle Engine](mechanics/battleengine/contracts/README.md),
 [world](engine/world/contracts/README.md), [unit AI](mechanics/ai/README.md), [career](mechanics/career/README.md)
 and [save functions](saves/by-function/README.md). Function-level notes that were mostly records of the research
-process have moved to the decompilation notes; [DECOMP-BOUND.md](DECOMP-BOUND.md) lists them.
+process were removed from this repository; their per-function notes are not yet published. [DECOMP-BOUND.md](DECOMP-BOUND.md) lists them.
 
 Machine-readable tables:
 
@@ -127,5 +144,5 @@ Machine-readable tables:
 - [Assets and modding boundary](formats/public-assets-and-modding.md)
 
 The companion app for careers, saves, settings and lore is [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) (to be renamed
-onslaught-companion); it does not patch executables. To play the game, see [onslaught-ce](https://github.com/dlprentice/onslaught-ce); the
+onslaught-companion); it does not patch executables. Its player capabilities are to move into Onslaught CE, and the separate app is to be phased out after verified replacement; it has no published release yet ([the Toolkit's PROGRAM.md](https://github.com/dlprentice/Onslaught-Career-Editor/blob/main/PROGRAM.md), Companion row). To play the game, see [onslaught-ce](https://github.com/dlprentice/onslaught-ce); the
 rebuild is [onslaught-godot](https://github.com/dlprentice/onslaught-godot).
