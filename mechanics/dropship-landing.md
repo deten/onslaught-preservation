@@ -1,13 +1,12 @@
 # Dropships: landing, unloading and leaving
 
-Status: active static contract for the rebuild's U-17 and World 110 landing craft
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Status: active — static contract for the [C# Godot rebuild](https://github.com/dlprentice/onslaught-godot)'s U-17 and World 110 landing craft
+Last updated: 2026-11-06 (unverified script text marked, state and threshold corrections, event owners named, Lander scripts corrected; earlier: research-campaign records and decompiler-style code removed)
 Summary: the landing-state machine of a `CDropship`, what `Land()` starts, how the landing craft
 unload their spawners, how a craft withdraws and is removed, what its turret does, and the AI
 event schedule in each AI state. Flight is in [dropship flight](dropship-flight.md).
 Evidence: MEASURED — instruction reads of the pristine specimen and `default physics.dat`,
-re-derived by a second review from a read-only research pass. Items the research traced but the RE
-lane has not re-derived are listed as such. No runtime capture of a dropship.
+re-derived by a second review from a read-only research pass. Items the research traced but the reverse-engineering pass has not re-derived are listed as such. No runtime capture of a dropship.
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`; `data/default physics.dat`
 SHA-256 `e1fb3dedbeb29b4b4151da2c8cbbdc940b716b1a2321e1d6a9ba1542c74ada14`.
@@ -22,8 +21,8 @@ The state is `+0x27c`. `Init` starts an airborne craft in state 0 and a grounded
 | State | Meaning | Entered by | Left when |
 | --- | --- | --- | --- |
 | 0 | flying | `Init` (airborne); the AI think in state 5 | `Land()` → 2; the AI's move to 1 (never, for these craft) |
-| 1 | flying to an AI-chosen landing point | the AI think in state 0 (`0x0044864f`) | within 10.0 (2D) of a valid point → 2 |
-| 2 | turning round | slot 118 (`0x00447a6c`) | Move: `|yaw − +0x2a0| < 0.1` → slot 119 → 3 |
+| 1 | flying to an AI-chosen landing point | the AI think in state 0 (`0x0044864f`); never entered for these craft (see below) | within 10.0 (2D) of a valid point → 2 |
+| 2 | turning round | slot 118 (`0x00447a6c`) | Move: `|yaw − +0x2a0| < 0.1f`, the float32 value widened to double ([unit contract](unit-battleengine-gameplay-static-contract.md#dropship-landing-turn-threshold--october-1)) → slot 119 → 3 |
 | 3 | descending | slot 119 (`0x00447aca`) | AI think: can continue and touched ground in the last 0.15 s → 6; cannot continue → slot 120 → 5 |
 | 6 | doors opening | `0x00448110`; `Init` (grounded) | Move → 4 when the doors reach the ground or finish opening |
 | 4 | doors open, unloading | Move, from state 6 | AI think: spawners empty and none in use → 7 |
@@ -105,7 +104,7 @@ The guide (`0x00448930`) sets thrust A and the Euler targets; see
 
 ## Unloading
 
-For a craft landed by its script (both World 110 `Lander` scripts):
+For a craft landed by its script (row 12, script `Lander2`, which calls `Land()`; [World 110 construction order](../levels/world-110-construction-order.md)):
 1. In state 4, each AI think with spawners not empty sets the unit's `+0x1f0` through slot 82
    (`0x00448704`, `0x00405e10`).
 2. Every tick, the unit step calls `DoSpawn` (`0x004e3c60`) for each spawner in `+0x18c`,
@@ -151,11 +150,11 @@ Traced by the research pass, not re-derived here:
   (`0x005db520`) times its forward axis in x and y; while `+0x244` is 2 it posts event 2000 at
   −1 through slot 116
   (`0x004fb050-0x004fb12f`).
-- **Event 2000 (SHUTDOWN)** reaches `CComplexThing::HandleEvent`. At `0x004f438c-0x004f439e`,
+- **Event 2000 (SHUTDOWN)**, a thing event, reaches `CComplexThing::HandleEvent`. The mission script's wait is also event 2000, delivered to the script ([waypoint paths](waypoint-paths.md#following)). At `0x004f438c-0x004f439e`,
   when the game state (`0x008a9ac0`) is at most 3 and the thing has a mission script
   (`+0x74`), it calls the script's slot 2 (`0x00533810`), which runs the script's
   `shutdown()` ("Lander Escaped"; IScript in the decompilation notes, not yet published).
-  This matches `thing.cpp:677-683`. The thing's own shutdown follows.
+  This matches `references/Onslaught/thing.cpp:677-683`. The thing's own shutdown follows.
   - For a `CDropship` that shutdown is slot 2, `0x00447100`. It removes the craft from the
     landing grid (`0x0050b020` on `0x00855090`), then calls `0x00402d30`.
 - **Reported by the rebuild** (their byte reads, not re-derived here):
@@ -168,15 +167,15 @@ Traced by the research pass, not re-derived here:
 
 ## The U-17 in Level 100
 
-Its script is `SetAIState(AI_OFF); FollowWaypointWait("Transporter Path"); Retreat();`.
+Its script (not cited to a level-script line here; unverified) is `SetAIState(AI_OFF); FollowWaypointWait("Transporter Path"); Retreat();`.
 Under AI_OFF every AI 3000 only polls (below), so the think never runs: the U-17 never lands
-and its Trooper Spawner never fires. It flies the path (22 → 23 → 44, see
+and its spawner never fires. It flies the path (22 → 23 → 44, see
 [waypoint paths](waypoint-paths.md#level-100-paths)), then retreats, runs out and is removed.
 
 ## The AI
 
 `CDropshipAI` events go through the unit AI dispatcher (`0x004ff330`):
-- **AI_ONF (4), any event:** the AI update (slot 3, `0x004487e0`, one draw at `0x0044880f`),
+- **[AI_ONF](../levels/scripting/msl-scripting.md#ai-states) (4), any event:** the AI update (slot 3, `0x004487e0`, one draw at `0x0044880f`),
   then a poll: one draw at `0x004ff371` and event 3003 at `now + 2.0 + (r mod 65536) × 2⁻¹⁵`.
 - **Retreating (`+0x244` 1 or 2):** every event polls.
 - **3000:** under AI_ON and active (`+0x214`), the think (slot 9, `0x00448580`); otherwise a poll.
@@ -217,6 +216,6 @@ so the turret dies with it.
 
 | Question | Cheapest falsifier |
 | --- | --- |
-| The unload counts (25 tanks, 20 grunts) and their timing | Count Light Gun Tanks and Muspell Grunts created after "Landing Started" in World 110, in a copied runtime |
+| The unload counts (25 tanks, 20 grunts) and their timing | Count Light Gun Tanks and Muspell Grunts created after the landing starts in World 110, in a copied runtime |
 | The spawn placement, clearance and exit-walk details listed as research-traced | Static trace of `0x004e3f90` and `0x004ffbb0`, or a runtime log of member positions |
 | Whether the door-stop test uses the moving door or the rest pose | Log slot 88's type-27 output during state 6 in a copied runtime |

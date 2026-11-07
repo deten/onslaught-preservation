@@ -1,8 +1,9 @@
 # CCareer__ReCalcLinks
 
 Status: active — container traversal rechecked; remaining progression policy is a retained lead
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (Specimen line added; earlier: removed private-evidence references and decompiler-style code)
 Summary: progression traverses the returned child-link prefix, not unconditionally both slots.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 Source File: references/Onslaught/Career.cpp | Binary: BEA.exe (pristine specimen below)
 
 > Address: `0x0041bdf0`
@@ -11,14 +12,14 @@ Source File: references/Onslaught/Career.cpp | Binary: BEA.exe (pristine specime
 
 ## September 27 traversal correction
 
-The prior blanket source/signature verification is withdrawn. In pristine
+The prior blanket source/signature verification is withdrawn as of 2026-09-27. In pristine
 `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`,
-complete body `[0041bdf0,0041c158)` is 872 bytes, SHA-256
+complete body `[0x0041bdf0,0x0041c158)` is 872 bytes, SHA-256
 `32c68885a123f7d84e7ddc865353f2d1450dd77459c429fe5d9ec5ab15702d4c`.
-Call `0041be55` obtains GetChildLinks (in the decompilation notes, not yet published);
-`0041be5a–0041be87` tests the returned head/item, and
-`0041c0f2–0041c12e` advances through next/item with null termination.
+Call `0x0041be55` obtains GetChildLinks (in the decompilation notes, not yet published);
+`0x0041be5a–0x0041be87` tests the returned head/item, and
+`0x0041c0f2–0x0041c12e` advances through next/item with null termination.
 Thus the loop sees the returned prefix: zero, one or two items. A null lower
 slot suppresses a non-null higher slot during the preceding copy.
 

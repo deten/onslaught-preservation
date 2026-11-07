@@ -1,12 +1,12 @@
 # Battle Engine auto-aim, launch position and Gun emitters
 
-Status: active static contract for the rebuild's player shots
-Last updated: 2026-10-22 (neutral evidence wording)
+Status: active static contract for the player shots of the [onslaught-godot](https://github.com/dlprentice/onslaught-godot) rebuild
+Last updated: 2026-11-06 (non-public provenance wording removed, undefined terms defined, frozen-copy citations added; pinned-source citations name `references/Onslaught/`; earlier: neutral evidence wording)
 Summary: how the Battle Engine picks an auto-aim target and blends its aim offsets,
 where each player round starts (the cockpit mesh's Gun emitters) and in which
 direction, and which state that depends on.
 Evidence: MEASURED static reads of the pristine specimen; the shipped cockpit and
-drone meshes through the repository CMSH parser; `default physics.dat` and the
+drone meshes through the rebuild's CMSH parser; `default physics.dat` and the
 Aquila configuration. A read-only research pass traced the functions. A second review
 re-checked the cone constants, the offset blend, the absence of a fresh trace in
 `GetLaunchPosition` and the cockpit mesh name at their addresses. The composition-order subsection adds
@@ -17,10 +17,10 @@ Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.origina
 prefix `48876552`.
 
 Retail `HandleAutoAim` (`0x0040b6d0`) and `UpdateAutoAim` (`0x0040b120`) follow
-`BattleEngine.cpp:2446-2613` and `:2366-2443` in order and gates. The event cadence
+`references/Onslaught/BattleEngine.cpp:2446-2613` and `references/Onslaught/BattleEngine.cpp:2366-2443` in order and gates. The event cadence
 and draws are in the
 [final-wave contract](../../levels/level100-final-drone-wave.md#crosshair-and-auto-aim-refresh).
-Battle Engine fields (`BattleEngine.h:406-416`):
+Battle Engine fields (`references/Onslaught/BattleEngine.h:406-416`):
 - `+0x4c8` crosshair unit, `+0x4d0` last crosshair line report, `+0x4e0` auto-aim
   target;
 - aim offsets, desired / current / old: yaw `+0x4e4`/`+0x4e8`/`+0x4ec`, pitch
@@ -50,7 +50,7 @@ Battle Engine fields (`BattleEngine.h:406-416`):
     (`fistp`), y outer and x inner;
   - each cell's list from its head, newest first; no distance filter in the walk.
 - **Gates, in source order** (`0x0040b8b9-0x0040b94a`). These use direct field tests and the side-test helper.
-  The Target Drone result is given in brackets.
+  The Target Drone result, the Level 100 target unit described in [the construction order](../../levels/level100-construction-order.md#warm-up-units), is given in brackets.
   - side test `0x004fd3d0` [passes once its script sets it enemy];
   - not dying;
   - an air unit (type `0x400`) only with a predictive weapon [passes];
@@ -84,7 +84,7 @@ Battle Engine fields (`BattleEngine.h:406-416`):
     current) × 0.5 for yaw and pitch (`0x0040b5f7-0x0040b646`).
 
 Measured differences from the available pinned source include stealth × 0.01 instead
-of / 100, the 6003 due-time addition order and summation orders. Missing source headers
+of / 100, the 6003 due-time addition order (events 6002 and 6003 are defined in [the Level 100 final drone wave contract](../../levels/level100-final-drone-wave.md#crosshair-and-auto-aim-refresh)) and summation orders. Missing source headers
 and default arguments require their own retail evidence, as the visibility recheck below demonstrates.
 
 ### September 30 call-binding recheck
@@ -96,18 +96,18 @@ and `0x0040be40`, scanner slot 105 at `0x0040b9cb`, and Feature lockable slot 71
 Feature allegiance is the direct `+0xec` load at `0x0040bbca`. The unit's null-profile
 branches are at `0x0040b904`–`0x0040b914` and `0x0040b938`–`0x0040b948`.
 
-This caught unfinished bindings in the private C++ reconstruction: nine direct-call sites
+This caught unfinished bindings in the C++ reconstruction: nine direct-call sites
 still targeted declaration-only helpers instead of the retail virtual calls or inline reads.
 Those bindings are corrected, including weapon-profile Smart/AdjustAim reads through weapon
 `+0xa4`. The large auto-aim and launch-position functions remain unmatched; corrected call
 binding does not validate their entire behavior or establish a defect in the earlier Godot prototype.
 Machine code proves the passed address and dispatch slot, not whether the original C++ declaration
-spelled its output parameter as a pointer or reference. Other observations and asset measurements
-on this page retain their earlier evidence dates; no desktop/runtime acceptance was performed.
+spelled its output parameter as a pointer or reference. Observations and asset measurements
+on this page that carry no date have no evidence date of their own; no desktop/runtime acceptance was performed.
 
 ### October 1 visibility-call correction
 
-The private reconstructed `HandleAutoAim` caller relied on unchecked shared defaults
+The reconstructed `HandleAutoAim` caller relied on unchecked shared defaults
 and passed collision level 2, excluded-type mask 0 and map flag 0. The actual retail
 pushes at `0x0040becc`–`0x0040bed8` pass **1, 4 and 1**. The correction supplies
 these values explicitly in this caller; it does not change unrelated shared defaults.
@@ -134,11 +134,10 @@ an observation stop in this experiment, not a modeled collision result.
 A separate native experiment executes the original 29-byte map predicate at
 `0x00490ba7`–`0x00490bc3`: only flag 1 enables `position.Z >= map[+0x1034]`.
 Flags 0, 2 and -1 bypass that water-level branch. All 168 finite authored cases
-across masked PC24/53/64 agree with those reads; changing the admitted flag from 1
+across masked PC24/53/64 (x87 exceptions masked; x87 precision control of 24, 53 or 64 bits) agree with those reads; changing the admitted flag from 1
 to 2 changes sixty branch decisions. Terrain sampling, recursive refinement,
 water-level loading and the composed visibility outcome are outside this experiment.
-Its root owner is `<maintainer evidence>/map-water-root-20261001/native-v01/receipt.json`
-in the same private RE worktree.
+Its root owner is `<maintainer evidence>/map-water-root-20261001/native-v01/receipt.json`.
 
 All 190 exact controls and 253 other callable sections/relocations remain unchanged.
 That visibility-only draft had a 2,272-byte section versus the 2,290-byte retail body;
@@ -148,7 +147,7 @@ address; a scan instruction-validates twelve direct calls to the dispatcher but 
 not establish that routine, so its defaults remain unmodified. Full target admission,
 visibility outcomes and retail/Godot play acceptance remain separate.
 
-Private root reproduction in the maintainer's evidence:
+Root reproduction receipts, kept in the maintainer's evidence:
 `<maintainer evidence>/handleautoaim-root-20261001/call-boundary/receipt.json`, SHA-256
 `d9a4fdfc019dd6dedab7e39d95770a899bc460ed8e2143bd3436c83cdd0cc780`;
 `callee-readback.json` and `default-caller-readback.json` record the instruction reads
@@ -165,7 +164,7 @@ exact controls and all 253 other callable sections and relocation identities.
 Retail `0x0040bbec`–`0x0040bc32` rounds the X/Y displacements to binary32, retains
 the Z subtraction in extended precision, and sums `(Z² + X²) + Y²`. Its later pitch
 calculation calls `Magnitude` (`0x004026b0`) on the stored vector at `0x0040bcc8`.
-The old private candidate retained X for one multiply, rounded Z/Y and reused its
+The old candidate retained X for one multiply, rounded Z/Y and reused its
 earlier square sum for the later square root. A typed reference adapter for the
 existing slot-90 target-position calls and a separate feature squared-distance
 operation now reproduce the retail instructions. These are reconstructed interfaces,
@@ -200,7 +199,7 @@ The earlier 1,143-case counterexample receipt remains at
 
 ### October 1 complete auto-aim update match
 
-The private reconstruction of `UpdateAutoAim` (`0x0040b120`) now matches the entire
+The reconstruction of `UpdateAutoAim` (`0x0040b120`) now matches the entire
 1,344-byte section, its 1,330-byte body and all 41 independently bound relocations.
 The last difference was the prediction-speed magnitude sum at `0x0040b283`–`0x0040b291`.
 Naming the existing launch vector before applying the orientation makes VC6 retain
@@ -240,7 +239,7 @@ emitter's world pose, then:
   - `+0x3c` is rebuilt every Move by `UpdateRotation` (`0x00407a50`, called at
     `0x004095d1`) as `FMatrix(yaw + cos(R)·yawShake, pitch + cos(R)·pitchShake,
     roll + cos(R)·rollShake)` (`0x00408000-0x0040806a`), so it includes the jet's
-    roll and the shake term (`BattleEngine.cpp:1222-1224`).
+    roll and the shake term (`references/Onslaught/BattleEngine.cpp:1222-1224`).
   - Element [i][j] sums the three terms O[i][k]·A[k][j] on the x87 in this k
     order, then stores a float: [0][0] (1 + 0) + 2; [1][1], [1][2] and [2][1]
     (0 + 2) + 1; every other element (2 + 1) + 0.
@@ -307,10 +306,10 @@ Morphing only changes its animation: `flytowalk`/`walktofly`, then `walk`/`fly`.
   Guns 1-6 hang from `hood`, Guns 9-10 from `Object03`, Guns 11-12 from
   `Object01`, Guns 13-14 from the root. Only Guns 9-12 move between the poses.
   Gun 1 therefore sits 258 mm above the cockpit origin and Guns 13-14 186 mm below
-  it.
+  it, taking one mesh unit as one metre (the page does not establish the unit).
   Every emitter's forward axis stays within about 10° of the body's (y ≥ 0.984),
   so the 0.9 dot test passes unless the cockpit tilt is large. The values were
-  composed in double precision by `rebuild/tools/cmsh_static_preview.py`; the
+  composed in double precision by `rebuild/tools/cmsh_static_preview.py` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot); the
   runtime pose cache (`0x004b4cd0`) composes on the x87 and may differ in the
   last bits.
 
@@ -327,7 +326,7 @@ Each starts by copying the base matrix at cockpit `+0xb0` into `+0x2c`. In Walke
 `0x004250cc` → `0x0040d320`; the local yaw/pitch/roll matrix is the right operand.
 Jet's inlined product at `0x004252cb`–`0x004253e4` independently carries that order.
 This describes the inner cockpit tilt S, before the separate world composition B·S above.
-The decompilation previously reversed these operands and has been corrected; neither
+The working decompilation (not published) previously reversed these operands and has been corrected there; neither
 complete update body is yet a byte match.
 
 The maintainer reproduced 16 finite isolated cases against the pristine specimen named in
@@ -349,8 +348,7 @@ outside the compared output. These cases do not establish the complete Walker la
 all floating-point behavior, or player-visible cockpit motion.
 
 Private reproduction: `<maintainer evidence>/cockpit-root-20261001/`,
-`composition_probe.py` and `composition-probe.json`; source correction originated
-in private commit `faea76d`. The constructor initializes the base matrix to identity.
+`composition_probe.py` and `composition-probe.json`. The constructor initializes the base matrix to identity.
 A nonidentity base's reachability in ordinary gameplay has **not** been established;
 the authored controls demonstrate why the general operand-order contract matters,
 not that an earlier screenshot must have looked wrong.
@@ -364,4 +362,4 @@ not that an earlier screenshot must have looked wrong.
 | Whether the base matrix at cockpit `+0xb0` becomes nonidentity in normal play | Trace writes to the base matrix, then watch it through turning, damage and morphing in a copied runtime |
 | The second pose path `0x004b0fb0`, used without a pose cache or with render counter ≤ 1 | Static read of `0x004b0fb0` |
 | Whether script-spawned drones have `+0x214` = 1 at their first auto-aim query | Read it at spawn in a copied runtime |
-| Whether the CRTCutscene object (`0x005dea38`) traced by `cockpit-world-matrix-static-2026-07-26.md` is a second cockpit renderable beside this CRTMesh, or the same object misidentified | Read the cockpit's renderable fields after construction at `0x004244b0` |
+| Whether the CRTCutscene object (`0x005dea38`) traced by `reverse-engineering/binary-analysis/cockpit-world-matrix-static-2026-07-26.md` in [Onslaught-Career-Editor at commit `51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50) (its frozen `reverse-engineering/` copy) is a second cockpit renderable beside this CRTMesh, or the same object misidentified | Read the cockpit's renderable fields after construction at `0x004244b0` |

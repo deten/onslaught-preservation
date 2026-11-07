@@ -1,7 +1,7 @@
 # CBattleEngine__GetImportance
 
 Status: active static contract; former control-factor interpretation corrected
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (source pin set to the README commit; earlier: removed private-evidence references and decompiler-style code)
 Summary: retail GetImportance returns 5.0 when on ground and not on an object, otherwise 0.0; source identity and both contact predicates are resolved.
 Evidence: MEASURED — fresh static instructions, constants and RTTI; SOURCE — pinned definitions for the identified queries; UNKNOWN — complete-process contact observations and player acceptance.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -12,8 +12,8 @@ Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`
 
 The complete body is `[0x0040e910,0x0040e93a)`, 42 bytes, freshly read from the
 specimen above: SHA-256 `99f979d0b165369c6ad85f61547994dc791207c6107fdf492506eaf50f0ddc40`.
-Pinned Stuart source `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`,
-`BattleEngine.cpp:3453-3459`, identifies `CBattleEngine::GetImportance()`.
+Pinned Stuart source `c3d8ac464259942b83fa8aa7f867c856e77b734d`,
+`references/Onslaught/BattleEngine.cpp:3453-3459`, identifies `CBattleEngine::GetImportance()`.
 The RTTI-confirmed CBattleEngine vtable at `0x005d89c4` points here from zero-based
 slot 80 (`0x005d8b04`). The filename keeps an earlier analysis label for link stability. It is not a control-input multiplier.
 
@@ -33,8 +33,8 @@ The contact helpers subtract the object's timestamp at `+0xcc` (ground) or
 `+0xd4` (object) from the event-time float at `0x00672fd0`, compare with the
 single-precision value at `0x005d8588` (bits `0x3e19999a`, the stored `0.15f`),
 and return x87 C0. Ordered comparisons therefore use strict less-than;
-masked unordered comparisons also return 1. Pinned `actor.cpp:326-341` and
-`actor.h:45-47` support the identities.
+masked unordered comparisons also return 1. Pinned `references/Onslaught/actor.cpp:326-341` and
+`references/Onslaught/actor.h:45-47` support the identities.
 
 This body performs no object writes. Its receiver and virtual-call target must
 be valid; there is no null guard. Runtime replacement of the vtable can change

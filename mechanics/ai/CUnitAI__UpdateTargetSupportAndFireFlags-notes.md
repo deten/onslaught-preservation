@@ -3,19 +3,17 @@
 > Address: `0x004ff4f0`
 
 Status: active multi-build static contract plus replicated bounded-runtime note
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Source File: none — no current source-crosswalk row | Binary: pristine
-`BEA.exe.original.backup`, 2,506,752 bytes, SHA-256
-`74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Last updated: 2026-11-06 (specimen roles and status words stated in plain words, Core and Level 521 defined, Specimen line added; the GetSquadNB source is named by its pinned call sites; earlier: research-campaign records and decompiler-style code removed)
+Source File: none — no current row in the source crosswalk of the decompilation notes (not yet published)
+Specimen: pristine `BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 Summary: exact branch-specific reader transactions, ordered prerequisite/final
-fire-feasibility results, and replicated Level-521 call-context behavior. The
+fire-feasibility results, and replicated Level 521 (Versus The Hive, shared with level 522; see [the level inventory](../../levels/level-inventory.md)) call-context behavior. The
 function ran 169 times on 76 receivers and supplied the enclosing frame for all
 86 observed close-target selector calls.
 Evidence: MEASURED — exact pristine body authority from the canonical contract,
 then independently reproduced call-context event/invocation rows from two
 serialized read-only replays over the retained Level-521 take2 trace. The second
-replay was preregistered with exact positive and dark controls, reached wrapper
-READY, and reproduced all 1,169 shared cohort/control rows byte-for-byte.
+replay was preregistered with exact positive and dark controls, reached the wrapper's passing status (READY), and reproduced all 1,169 shared cohort/control rows byte-for-byte.
 
 ## Static identity and ABI
 
@@ -35,7 +33,7 @@ READY, and reproduced all 1,169 shared cohort/control rows byte-for-byte.
 ## Exact branch-specific state transactions
 
 Before either main arm, a current reader with target byte `+0x2C & 4` is cleared
-through lifecycle-aware `CGenericActiveReader::SetReader`.
+through lifecycle-aware `CGenericActiveReader__SetReader`.
 
 The direct/current-target arm is selected only when owner `+0x148` is nonnull
 and that receiver's virtual slot 83 (`vtable+0x14C`) returns zero. The recognized
@@ -52,8 +50,7 @@ support update, B, and A rather than retaining one eager pointer. A null reader
 returns with both results zero. State rejection clears the reader through
 `SetReader` and returns without support/B/A. A passing reader runs support,
 stores raw B first, and calls/stores A with literal context zero only when B is
-non-zero; the earlier pre-clear supplies the B-false A value. Core's
-`RetailUnitAIDirectTargetArm` preserves that phased order and keeps the later
+non-zero; the earlier pre-clear supplies the B-false A value. The reference Core project (`OnslaughtRebuild.Core` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot), reference material; `OnslaughtRebuild.Parity` is the simulation owner) has `RetailUnitAIDirectTargetArm`, which preserves that phased order and keeps the later
 fallback transaction separate.
 
 The fallback/candidate-scan arm does not pre-clear either result and preserves
@@ -73,13 +70,13 @@ proved nonzero producer passes literal `1` while propagating a target through a
 unit hierarchy.
 This arm leaves both reader and `+0x10` intact. If it cannot use that retained
 target, slot 11 owns the full selection/reader transaction documented in its
-canonical note. Core's `RetailUnitAITargetTransaction` preserves that exact
+canonical note. The reference Core project's `RetailUnitAITargetTransaction` preserves that exact
 choice and the following ordered calls/writes without owning the monitor.
 
 ## Ordered all-squads helper-call scan
 
 The fallback arm at `0x004FF592..0x004FF6AE` reads `0x008550A0`, now
-source-bound as `CWorld::GetSquadNB()` / `SPtrSet<CSquad>`, rather than a
+source-bound as `CWorld::GetSquadNB()` / `SPtrSet<CSquad>` (the pinned call sites are in the debug squad toggles, `references/Onslaught/game.cpp:2885` and `:2936`; the pinned tree has no `CWorld` declaration), rather than a
 UnitAI-private support list. `CSquad::Init` tail-appends successfully initialized
 squads and its virtual cleanup removes them before base shutdown, so the normal
 physical traversal order is squad initialization order.
@@ -100,7 +97,7 @@ every later node: there is no winner, deduplication, or early exit. Crucially,
 retail reads `node->next` only after this helper returns. The helper itself
 rejects null but can dispatch ordered spawners whose spawn path initializes and
 tail-appends a new squad; that appended node can therefore be visited during
-the same scan. Core's `RetailUnitAISquadSupportProbe` is a per-node interaction
+the same scan. The reference Core project's `RetailUnitAISquadSupportProbe` is a per-node interaction
 step rather than a frozen-list reducer. Its caller must execute each returned
 helper call before reading the live successor; world lifecycle, virtual calls,
 spawner iteration, and spawning remain outside Core.
@@ -126,8 +123,8 @@ names.
 Scenario: retained `level521-native-20260802-0018-take2` combat trace,
 full native replay window. Trace SHA-256
 `F7A8F93F7E499C4C92E6CC8FF5C301BDBBF1A70C80B64185E7A71A9D3A59FD5C`;
-runtime specimen SHA-256
-`E1436EF7E0AD9CCBDDD43AAACA952F6E84D4B1A282835CEAD745EFCFC32FADF4`.
+copied capture target SHA-256
+`E1436EF7E0AD9CCBDDD43AAACA952F6E84D4B1A282835CEAD745EFCFC32FADF4` (pristine plus the force_windowed patch; not pristine; see [the retail specimen baseline](../../platforms/pc/retail-specimen-baseline.md)).
 
 - Corrected replay target 1: 169 calls / 169 entries / 71 raw returns; 70
   validated gap-free return envelopes; every exact-count expectation passed.
@@ -156,10 +153,10 @@ runtime specimen SHA-256
 - Independent adjudication output SHA-256
   `2C4B7987EC08FBBFCC063C793196BD66BBF5093480B7D54899883F36AD6FF6A7`;
   promotion manifest:
-  `../unitai-targeting-runtime-replication-promotion-manifest-2026-08-24.tsv` (archived research record, not published).
-- The original run-a control design failed and remains preserved as a RED
-  plate. Promotion rests on the later preregistered corrected replay.
-- The take2 recorder receipt is RECONSTRUCTED/PARTIAL: the trace bytes are
+  `unitai-targeting-runtime-replication-promotion-manifest-2026-08-24.tsv` (archived research record, not published; not in this repository).
+- The original run-a control design failed and is kept as a record.
+  Promotion rests on the later preregistered corrected replay.
+- The take2 recorder receipt is partial and reconstructed: the trace bytes are
   hash-bound after lock release, but capture-time target hash was not
   independently bound. All claims are bounded to this copied-runtime trace.
 - No value watchpoint was collected. Exact per-invocation receiver dwords,

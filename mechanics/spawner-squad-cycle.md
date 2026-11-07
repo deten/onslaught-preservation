@@ -3,8 +3,8 @@
 Status: accepted static contract with a deterministic reconstruction boundary;
 authored definition reach closed, per-world/runtime invocation reach open
 Date: 2026-08-28
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Verdict: `CSpawnerThng__DoSpawn` admits one squad-production cycle, not one
+Last updated: 2026-11-06 (the spawner function spelled as the public decompilation has it, unpublished names marked, live copy of the transaction named; earlier: research-campaign records and decompiler-style code removed)
+Verdict: `CSpawner__DoSpawn` admits one squad-production cycle, not one
 unit. A passing call can publish an empty squad, consumes its finite amount
 slot even if squad allocation returns null, starts the first member wave
 synchronously, and retries failed member waves through event 3000 until enough
@@ -61,12 +61,12 @@ spawner closure below retains its original evidence and was not rerun for this a
 
 | Routine | Half-open range | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `CSpawnerThng__DoSpawn` | `[0x004E3C60,0x004E3F8B)` | 811 | `a21eb3fd7aad249edaca00b3dad1f9b42af222e5cb7b16251118130eb12316cc` |
+| `CSpawner__DoSpawn` | `[0x004E3C60,0x004E3F8B)` | 811 | `a21eb3fd7aad249edaca00b3dad1f9b42af222e5cb7b16251118130eb12316cc` |
 | member wave | `[0x004E3F90,0x004E43BB)` | 1,067 | `b2783b8993c6fae83fc3989f3e2d581d29568d23013f9485d3e206b46885f4d7` |
 | completion predicate | `[0x004E4430,0x004E4457)` | 39 | `6924a4d78a479ff95d511319fc08ec58f73ada86fe9096830bed31a12783a30c` |
 | event-3000 callback | `[0x004E4460,0x004E4474)` | 20 | `05d36a344cd4c2a325aaf5c4ca474ff4f9c1d7bddb280df80e11b826f17452be` |
 
-The pinned Stuart `InitThing.h` has SHA-256
+The pinned Stuart source `references/Onslaught/InitThing.h` (commit `c3d8ac4`) has SHA-256
 `5a7132f3d0fe5f95a8696675c99ef19fa6ddcc941d9065c7efd3018beab82fef`.
 Lines 410-425 name `CSpawnerInitThing`'s amount, squad size, member delay,
 initial delay, squad delay, unit name, and spawn script. Lines 623-635 define
@@ -85,9 +85,9 @@ spawner `+0x3DC`. The definition separately stores a raw class selector at
 
 Those values have different released lifetimes. Each cycle start re-resolves
 the current authored name, reads the current row's selector, and passes that
-selector directly to `CWorldPhysicsManager__CreateSquad`. Each member wave
+selector directly to `CWorldPhysicsManager__CreateSquad` (in the decompilation notes, not yet published). Each member wave
 instead passes the constructor-cached ordinal to
-`CWorldPhysicsManager__CreateThingByType`; that factory walks to the ordinal
+`CWorldPhysicsManager__CreateThingByType` (in the decompilation notes, not yet published); that factory walks to the ordinal
 and only then reads the row's selector. A missing name faults on the cycle-start
 path, while a missing/negative ordinal returns a null member. A registry reorder
 could therefore make squad and member selection diverge, although no released
@@ -302,8 +302,7 @@ has been established.
 
 ## Reconstruction boundary
 
-`RetailSpawnerCycleTransaction` (`rebuild/OnslaughtRebuild.Core/RetailSpawnerCycleTransaction.cs` in Onslaught-Career-Editor)
-now owns only the deterministic admission, counters, latches, due times, and
+`RetailSpawnerCycleTransaction` (`rebuild/OnslaughtRebuild.Core/RetailSpawnerCycleTransaction.cs` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot) at commit `f44e31e`, byte-identical to the frozen copy in [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit `51129bab`) owns only the deterministic admission, counters, latches, due times, and
 ordered adapter transcript. It preserves empty-squad publication before cycle
 commit, amount consumption on null squad, immediate first wave, optional
 attachment, retry without rollback, final release order, inactive late events,
@@ -325,7 +324,7 @@ released actor scenes.
 An adapter consuming `ScheduleEvent3000` must translate it exactly to a fresh
 `AddEvent(3000, spawnerListener, due, StartOfFrame, data: 0, reuse: -1)` call.
 Spawner teardown must clear that listener through the active-reader lifetime
-boundary without removing the filed event. `RetailEventScheduler` already owns
+boundary without removing the filed event. `RetailEventScheduler` (`rebuild/OnslaughtRebuild.Core/RetailEventScheduler.cs` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot) at commit `f44e31e`) already owns
 the resulting no-dedup, advance-before-flush, null-listener accounting, and
 recycling behavior; no parallel scheduler abstraction is needed.
 

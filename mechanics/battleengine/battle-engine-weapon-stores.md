@@ -1,7 +1,7 @@
 # Battle Engine weapon stores, charge and firing state
 
 Status: active static contract for the rebuild's player weapons
-Last updated: 2026-10-22 (neutral evidence wording)
+Last updated: 2026-11-06 (player-visible effects moved to open questions; source commits named at each citation; pinned-source citations name `references/Onslaught/`; earlier: neutral evidence wording)
 Summary: the Aquila's ammo and heat stores, when a shot spends them, cooling, the
 Missile Pod and Pulse Cannon Pod charge law, what an empty store blocks, and what
 `IsFiring` counts.
@@ -18,8 +18,8 @@ Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.origina
 `e1fb3dedbeb29b4b4151da2c8cbbdc940b716b1a2321e1d6a9ba1542c74ada14`.
 
 The Battle Engine and part functions match the pinned GPL source
-(`BattleEngine.cpp`, `BattleEngineJetPart.cpp`, `BattleEngineWalkerPart.cpp`,
-`BattleEngineDataManager.cpp`). `CWeapon` is not in that drop; its behaviour below
+(`references/Onslaught/BattleEngine.cpp`, `references/Onslaught/BattleEngineJetPart.cpp`, `references/Onslaught/BattleEngineWalkerPart.cpp`,
+`references/Onslaught/BattleEngineDataManager.cpp`). `CWeapon` is not in that drop; its behaviour below
 comes from the bytes.
 
 ## Stores
@@ -37,11 +37,11 @@ The Aquila Prototype record (configuration file offset `0x2d2`, version 12) list
 
 The loader `0x00510800` reads the file. `CBattleEngineData::Initialise`
 (`0x0040f590`) defaults every store to heat 0 and value 1000.0
-(`0x0040f741-0x0040f75b`, `BattleEngineDataManager.cpp:55-59`). `Load` (`0x0040f980`)
+(`0x0040f741-0x0040f75b`, `references/Onslaught/BattleEngineDataManager.cpp:55-59`). `Load` (`0x0040f980`)
 reads each store's heat flag into configuration `+0x70+4n` and its value into
-`+0x88+4n` (`0x0040fee8-0x0040ff0e`, `:357-362`). `CBattleEngine::Init`
-(`0x0040572f-0x0040577f`, `BattleEngine.cpp:303-312`) and `UpdateConfiguration`
-(`0x0040c650`, `:2923-2932`) clear overheat and start ammo stores full and heat stores
+`+0x88+4n` (`0x0040fee8-0x0040ff0e`, `references/Onslaught/BattleEngineDataManager.cpp:357-362`). `CBattleEngine::Init`
+(`0x0040572f-0x0040577f`, `references/Onslaught/BattleEngine.cpp:303-312`) and `UpdateConfiguration`
+(`0x0040c650`, `references/Onslaught/BattleEngine.cpp:2923-2932`) clear overheat and start ammo stores full and heat stores
 at 0.
 
 ## Spending and cooling
@@ -76,14 +76,16 @@ at 0.
 - The jet part (`0x00411cd4-0x00411d4b`) and walker part (`0x00413d91-0x00413e04`)
   call it only while the charge is below 100 × the highest present level: 100 for
   both pods.
+- The jet part's chargeability scan visits four profile entries
+  (`+10/+14/+18/+1c`, charge levels 1–4), and its highest-charge scan visits five
+  (`+0c..+1c`, levels 0–4).
 - The Missile Pod's charge runs 0, 8, …, 96, 104 and stops. Level 1 (Salvo) needs
   trunc(round(charge)/100) = 1, which first happens at 104, on the 13th charge call.
 - Both pods share this path. An ammo store costs nothing while charging; the Pulse
   pod's heat store gains its consumption per charge call (jet
   `0x00411d62-0x00411d98`, walker `0x00413e1e-0x00413e53`).
 - `ReadyToCharge` (`0x0050a080`) is true with no mode yet or once now > `+0x64`.
-- `ReadyToFire` (`0x00509f70`; the tracked 2026-08-31 name table still calls it
-  `TargetProfileContext__IsEligibleByDistanceBucketOrRange`):
+- `ReadyToFire` (`0x00509f70`):
   - with a current mode (`+0xa0`), true only when now > `+0x64` strictly
     (`0x00509f81-0x00509f8f`), with no charge or ammo condition;
   - with no mode yet, true when a charge level from trunc(round(`+0x60`)/100)
@@ -99,7 +101,7 @@ at 0.
 The pristine specimen above was read again for `00509e90..00509f6e` (222 bytes,
 SHA-256 `8ebe2891b1cc4bc9f033481cba0789765880bbc0aeceebeb49f495caa93a42d7`).
 `GetCurrentMode` is the reconstruction's name; neither weapon.cpp nor weapon.h
-exists in the pinned Stuart release. This section establishes the lookup, not
+exists in the pinned Stuart source (`c3d8ac464259942b83fa8aa7f867c856e77b734d`, the README pin). This section establishes the lookup, not
 an original source spelling or all of its inlined callers.
 
 - `00509e93..00509eb5` loads charge at weapon `+60`, converts it with x87
@@ -200,8 +202,7 @@ claimed gameplay consequence.
 
 ## Fire, empty stores and locks
 
-- `CWeapon::Fire` (`0x00506010`; named so in the working project, though the tracked
-  2026-08-31 table still says `ProjectileBurst__SpawnFromPercentBucketFallback`) resolves the level from
+- `CWeapon::Fire` (`0x00506010`) resolves the level from
   round(charge)/100 with fallback, then sets the mode.
   - It sets the reload deadline `+0x64` to now + `CWeaponReloadTime` (`0x0050611a`),
     zeroes the burst counter `+0x6c`, and zeroes Battle Engine `+0x5e0`, the source's
@@ -212,10 +213,11 @@ claimed gameplay consequence.
   - The 5001 handler (`0x00506930`) spawns while `+0x6c` is below the mode's burst
     size, increments `+0x6c` after each spawn (`0x005069c3`), and does nothing while
     the owner is dying (`0x00506948`).
-  - Retail quirk: Fire rewrites charge, level `+0x68` and mode `+0xa0` before its
-    reload check. A second trigger press during a salvo therefore switches the rest
-    of that burst to the launcher mode, because the handler reads the mode through
-    `+0x68` (`0x00506952`).
+  - Static contract: Fire rewrites charge, level `+0x68` and mode `+0xa0` before its
+    reload check, and the burst handler reads the mode through `+0x68`
+    (`0x00506952`). A Fire call during a burst therefore changes the level and mode
+    that the rest of that burst reads. Whether a second trigger press reaches that path
+    during a salvo, and what the player sees, is an open question below.
 - **Empty store and firing.** `FireWeapon` (`0x00409f20`, `:1958-1970`) has no ammo
   check, so Fire still resets the charge, sets the reload and runs the burst counter.
   Every burst event is refused in `WeaponFired`: no round, draw, lock or recoil. Each
@@ -224,10 +226,12 @@ claimed gameplay consequence.
 - **Empty store and charging.** Charging exits with an ammo store at or below 0
   (`0x00411cbc-0x00411cce`). `ChangeWeapon` skips a weapon whose consumption
   exceeds its store (`0x00411f3a-0x00411f49`).
-- **Empty store and locks.** `CanWeaponFire` is false (jet `0x00412570`: ammo
-  value > 0, or heat below capacity and not overheated; the walker version
-  `0x00414630` also checks active). So `HandleLocks` drops every lock each frame
-  and acquires none.
+- **Empty store and locks.** `CanWeaponFire` is false when the store is empty: the jet
+  check (`0x00412570`) admits a shot only when the ammo value is above 0, or the heat is
+  below capacity and not overheated; the walker version (`0x00414630`) also checks active.
+  `HandleLocks` calls this store check separately from weapon readiness, so with an empty
+  store the lock path receives a false result. What that does to locks in play is an open
+  question below.
 - **`WeaponOverheated`** (`0x0040f110`) only sets `mWeaponOverheatedTime`
   (`+0x60c`) to now when that is more than 4.0 s old. Its callers set the store's
   overheat flag first. `ChargeWeapon` additionally clears slow movement and forces a
@@ -241,10 +245,11 @@ The parts' shared `IsFiring` (`0x00414b30`) walks the part's weapon list at `+0x
 and returns 1 when any weapon's `CWeapon::IsFiring` (`0x0050a290`) holds: a current
 mode, `+0x6c` nonzero and `+0x6c` below the mode's `CWeaponBurstSize`. The walker's
 primary and Aug weapons are not in that list. A Missile Pod burst therefore counts
-from its first missile until its last spawns: 0.4 s for the launcher, 0.45 s for the
-salvo. Burst-size-1 weapons (both Vulcans) never count. `HandleLocks` asks the jet
-part in state 3 and the walker part otherwise, so a pod burst during a transform to
-walker is not seen.
+from its first missile until its last spawns, and the count stays true for 0.4 s in
+the launcher mode and 0.45 s in the salvo mode. Burst-size-1 weapons (both Vulcans)
+never count. `HandleLocks` asks the jet part in jet state 3 (the Battle Engine state word
+at `+0x260` equal to 3; see the [active-weapon count contract](contracts/CBattleEngine__CountFlag9CBySelectionMode__0040dc90.md))
+and the walker part otherwise, so a pod burst during a transform to walker is not seen.
 
 ## September 27 walker recheck
 
@@ -259,7 +264,8 @@ It confirms these implementation boundaries:
 - `00414019` is the store inside the 17-byte body `[00414010,00414021)`, SHA-256
   `338009a0afe409a13acfbba66d573a8981e8905526707547eec79b1f7884de34`.
   It selects a weapon, guards null and clears `+0x60`, matching source
-  LoseWeaponCharge at lines 602–606. Its former Monitor label is now corrected
+  `CBattleEngineWalkerPart::LoseWeaponCharge` at
+  `references/Onslaught/BattleEngineWalkerPart.cpp:602–606` (commit `5352a81c`, named above). Its former Monitor label is now corrected
   to LoseWeaponCharge; it must not be treated as firing.
 - The ammo-count getter uses `FISTP QWORD` at `0041449d`, then returns the low
   DWORD. It does not change the x87 rounding control locally. A truncating cast
@@ -313,8 +319,8 @@ expected cursor/index mutations are allowed. Four one-byte changes in separate
 probe executables are detected: wrong attachment field, reversed augmented
 selection, heat admitting equality and ammo admitting zero. The initial heat
 control used NaN, which does not distinguish `TEST AH,1` from `TEST AH,41h`
-under the following JZ; that insufficient control was retained and replaced
-with equality. The unchanged-body expectations were not altered.
+under the following JZ; the NaN control was kept as a record and replaced by an
+equality control. The unchanged-body expectations were not altered.
 
 Private driver: `<maintainer evidence>/test-runs/re-audit-20260926/walker/original_selection_stores.py`,
 SHA-256 `d5f8e1722d9c905b98ce55948f38b4bcf43eb232370c8fb65fdf068f593d1320`.
@@ -329,7 +335,7 @@ retail executable and real saves were not used as runtime outputs.
 
 The complete JetPart helper bodies and their actual caller transports were
 re-read from the same pristine specimen, against pinned source
-`BattleEngineJetPart.cpp:638–1089`. These results qualify the earlier prose:
+`references/Onslaught/BattleEngineJetPart.cpp:638–1089`. These results qualify the earlier prose:
 
 - Jet GetCurrentWeapon (`00412610`) walks from index zero, mutates cursor `+8`
   and returns null for an absent selection. It **does not repair the selected
@@ -342,8 +348,7 @@ re-read from the same pristine specimen, against pinned source
   store eligibility and weapon readiness separately.
 - Chargeability scans **four** profile entries `+10/+14/+18/+1c`, corresponding
   to charge levels 1–4. The highest-charge scan visits **five** entries
-  `+0c..+1c`, levels 0–4. The earlier Charge note's five-entry description for
-  the first loop is wrong. Initial ammo and maximum-charge admission reject
+  `+0c..+1c`, levels 0–4. Initial ammo and maximum-charge admission reject
   unordered comparisons; the later heat-capacity C0 test admits unordered
   while overheat is clear. Finite-value source reasoning alone omits that
   distinction. No change to a charging constant is justified by this audit.
@@ -365,8 +370,8 @@ re-read from the same pristine specimen, against pinned source
   The percentage getter clamps only above one; flag getters return full
   DWORDs. Existing ST0 return annotations are not newly proved by ST0 alone.
 
-The nine Jet/main identity and interface corrections (archived research record, not published)
-are live. Fire, AmmoCount, localized Name, Enable, Disable and CountActiveWeapons
+The nine Jet/main identity and interface corrections are in effect and recorded in the archived research record (not
+published). Fire, AmmoCount, localized Name, Enable, Disable and CountActiveWeapons
 now carry JetPart identities; the three main Enable/Disable/Count wrappers carry
 their source identities. Enable/Disable always forward Walker then Jet, whereas
 Count chooses Jet only in state 3. Name comparisons use bytes and are case-sensitive.
@@ -378,8 +383,9 @@ returns use bare RET. This is an annotation correction with unchanged transport.
 The localized result's existing short-pointer type does not prove its full
 representation or lifetime.
 
-Two implementation follow-ups are recorded for the rebuild. The
-remark in `RetailWeaponSelection.cs` saying an inactive current jet weapon can
+Two implementation follow-ups are recorded for the rebuild in
+[onslaught-godot](https://github.com/dlprentice/onslaught-godot), and both were open at
+this recheck. The remark in `RetailWeaponSelection.cs` saying an inactive current jet weapon can
 still fire should describe only store eligibility; its adjacent `00414610`
 icon citation now refers to the proven attachment getter. Also,
 `Level100PlayerWeaponRuntime.AdvanceCharge` uses a time-only helper, while
@@ -481,15 +487,16 @@ remain true across passes until sampling or latch clearing advances. The
 older partial source's zero digital value and keyboard argument counts must
 not replace the retail transport.
 
-Root independently decoded the complete bodies and checked the dispatch
-tables, initializer arguments and predicate/routing paths. Private evidence:
+An independent decode of the complete bodies checked the dispatch tables,
+initializer arguments and predicate and routing paths. Private evidence:
 `<maintainer evidence>/test-runs/re-audit-20260926/walker/fire-binding-bodies-v1.json`,
 SHA-256 `68ce70188a87fb5448ae9ee668d1778d3895218d49a679ac350368d955b31923`,
 plus `control-binding-bodies-v1.json` and the Player caller packet in that
 owner. This pass did not launch the game, inspect current settings or measure
-input cadence. Source comparisons use `Controller.cpp:148,258–315,443–486`,
-`PCController.h:21`, `PCController.cpp:80` and `Player.cpp:390` at the pinned
-commit above; raw retail dispatch decides where they differ.
+input cadence. Source comparisons use `references/Onslaught/Controller.cpp:148,258–315,443–486`,
+`references/Onslaught/PCController.h:21`, `references/Onslaught/PCController.cpp:80` and `references/Onslaught/Player.cpp:390` at source commit
+`5352a81cdb838b145a57f7febc5d9fc4b0129ebb` (the snapshot named in the September 27
+walker recheck); raw retail dispatch decides where they differ.
 
 ## Open questions
 
@@ -497,4 +504,6 @@ commit above; raw retail dispatch decides where they differ.
 | --- | --- |
 | Which x87 control/status state reaches the current-mode lookup in the running game, and whether fractional charge reaches the tested boundaries | Trace the control word, charge bits and lookup result in a copied retail runtime; compare values immediately around the level boundaries. The emulator comparison does not settle exception flags. |
 | How sampling, release-latch clearing and Flush interleave during actual gameplay, including held-charge/released-fire call frequency | In a copied runtime, trace the sampler, clear routines and `0042d9d0`, alongside `00409ef0`/`00409f20`; compare mapping passes with event and rendered frames |
-| Whether Level 100's Health Pad fires `Repair Pad` rounds at the player (reload 30 s, range 7) | Read the repair-pad AI update's firing conditions |
+| Whether Level 100's Health Pad (base-world row 2, with `CRepairPadAI`) fires `Repair Pad` rounds at the player | Read the repair-pad AI update's firing conditions |
+| Whether a second trigger press during a salvo switches the rest of that burst to the launcher mode, as the static Fire and burst-handler reads suggest | In a copied runtime, trace a second trigger press during a salvo: the level and mode the 5001 burst handler reads at each spawn, and the missiles spawned |
+| Whether an empty store drops held locks each frame in play | In a copied runtime with an empty store, trace the lock set and the `CanWeaponFire` result for each frame through `HandleLocks` |

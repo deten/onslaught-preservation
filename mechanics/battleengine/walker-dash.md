@@ -1,16 +1,16 @@
 # Walker dash: the retail timing window
 
-Status: active static contract for the rebuild's walker movement
-Last updated: 2026-10-22 (neutral evidence wording)
+Status: active — static contract for the [C# Godot rebuild](https://github.com/dlprentice/onslaught-godot)'s walker movement
+Last updated: 2026-11-06 (archived Core column labelled and the live Parity owner cited; 2026-10-19 comparison cited; years added; source paths and glossary links added; earlier: neutral evidence wording)
 Summary: a walker dash needs the opposite hard press to have started more than half of
 `mDashTime` and less than `mDashTime` before (0.1 to 0.2 s). The pinned source has only the
 0.2 s bound. The frame calculation assumes float32 event times and x87 single precision. At 20 event
 frames per second it always admits an opposite press 3 frames earlier and never one 1 frame
 earlier; one 2 or 4 frames earlier passes only on some frames, decided by rounding.
 Evidence: MEASURED — instruction reads of the pristine specimen; SOURCE —
-`BattleEngineWalkerPart.cpp`; EXECUTED — bounded native directional bodies below;
+`references/Onslaught/BattleEngineWalkerPart.cpp`; EXECUTED — bounded native directional bodies below;
 COMPUTED — the frame table below, from the byte-level predicate.
-The audit's research pass found the extra bound; a second review re-derived it from the bytes.
+An earlier pass found the extra bound; a second review re-derived it from the bytes.
 There is no runtime capture of a dash, and this pass has not measured the runtime
 x87 control word.
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
@@ -19,7 +19,7 @@ Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.origina
 ## The four gestures
 
 `CPlayer::ReceiveButtonAction` calls one walker-part function per stick direction with the
-stick value (`Player.cpp:421-441`). Each function works in two steps:
+stick value (`references/Onslaught/Player.cpp:421-441`). Each function works in two steps:
 
 1. When the stick crosses `mDashStart` in its own direction, it records the event time.
 2. When the stick crosses `mDashEnd`, it dashes if the opposite direction's recorded time is
@@ -34,7 +34,7 @@ The event time is copied as a raw float32 dword from `0x00672fd0` (`EVENT_MANAGE
 | `StrafeLeft` | `0x00413160-0x0041335f` | `0x004d3341` | `+0x30` (`0x004131cb`) | `+0x2c` (`0x00413203`) | 236 |
 | `StrafeRight` | `0x00413360-0x004135c1` | `0x004d3366` | `+0x2c` (`0x004133c9`) | `+0x30` (`0x004133fd`) | 290 |
 
-The tuning statics keep the source's initial values (`BattleEngineWalkerPart.cpp:30-35`). In
+The tuning statics keep the source's initial values (`references/Onslaught/BattleEngineWalkerPart.cpp:30-35`). In
 the pristine `.data` they are:
 
 | Static | Address | Value |
@@ -77,8 +77,7 @@ So a dash needs:
 
     now - mDashTime  <  last  <  now - 0.5 * mDashTime
 
-The source has only the left inequality (`if (mLastStartHard…Time > (EVENT_MANAGER.GetTime() -
-mDashTime))`, lines 140, 186, 236 and 290). The right inequality is retail-only.
+The source has only the left inequality (the test that the last hard-press time is later than the current event time less `mDashTime`, in `references/Onslaught/BattleEngineWalkerPart.cpp` lines 140, 186, 236 and 290). The right inequality is retail-only.
 
 **Precision assumption.** With x87 single precision, the two differences are rounded to
 float32 before the comparison. The retail control word at input dispatch has not been
@@ -91,9 +90,9 @@ Retail never passes it:
 - The behaviour table the device enumeration builds (`0x00529c21`, `0x00529cf8`,
   `0x00529dd2`, `0x00529ea9`) holds only `0x50`, `0x40`, `0x80` and `0x20`. None of them has
   bit `0x2`.
-- The source adds `FPU_PRESERVE` only under `_DEBUG` (`d3dapp.cpp:338-340`).
+- The source adds `FPU_PRESERVE` only under `_DEBUG` (`references/Onslaught/d3dapp.cpp:338-340`).
 
-The event time itself is `fl32(frame × 0.05f)` (`CEventManager.cpp.md`, `0x0044b600`) and does
+The event time itself is `fl32(frame × 0.05f)` (`CEventManager.cpp.md` (in the decompilation notes, not yet published), `0x0044b600`) and does
 not depend on the precision mode: the product fits in 48 bits, so it is rounded once. As a C#
 predicate, with explicit casts to keep each difference in float32:
 
@@ -111,13 +110,15 @@ static bool DashWindow(int nowFrame, int lastFrame)
 Let `k` be the number of event frames between the opposite hard press and the dash press. This
 counts one input sample per event frame.
 
-| `k` | Retail, single precision | Pinned source | Rebuild on 2026-09-26 (`Simulation.cs:2366`, `hardMoveTick > tick - 4`) |
+| `k` | Retail, single precision | Pinned source | Archived Core rebuild, 2026-09-26 (`Simulation.cs:2366`, `hardMoveTick > tick - 4`; superseded) |
 | --- | --- | --- | --- |
 | 0, 1 | never | always | always (k = 1) |
 | 2 | some frames: 10.5 % of the first 10 minutes, 12.1 % of the first hour; the first are 3, 6, 9, 21 and 42 | always | always |
 | 3 | always | always | always |
 | 4 | some frames: 22.3 % of the first 10 minutes, 6.1 % of the first hour; the first are 5, 7, 25, 28 and 30 | the same frames as retail | never |
 | 5+ | never | never | never |
+
+The Core column is superseded and cannot be checked against current source: its `hardMoveTick` check is in no current C# file in onslaught-godot or Onslaught-Career-Editor. The live simulation owner, OnslaughtRebuild.Parity, tests the window in `DashWindow` (`rebuild/OnslaughtRebuild.Parity/Things/BattleEngineWalkerPart.cs` in onslaught-godot): the last hard-press time must lie strictly between `now - DashTime` and `now - 0.5 * DashTime`, the same inequalities as above. The table does not tabulate that check per `k`.
 
 The numbers are computed by applying the predicate to every frame `n` (the dash press) with
 `last = EventTime(n - k)`:
@@ -139,17 +140,17 @@ hour and k = 4 on 62 %. The precision mode decides only those two rows.
 
 The two strafe dashes are asymmetric, as in the source:
 
-- `StrafeLeft` stores `mRollvel = +0.08` (`mov [edx+0x27c], 0x3da3d70a` at `0x004132b4`;
-  source line 246, `mRollvel=+DASH_BOOST_ROLL`).
-- `StrafeRight` subtracts: `fld [eax+0x27c]; fsub [0x005d8ccc] (0.08f); fstp [eax+0x27c]` at
-  `0x004134ae-0x004134ba` (line 300).
+- `StrafeLeft` stores the roll value +0.08 with a single immediate store at `0x004132b4`; source line 246
+  assigns the dash-boost roll constant to `mRollvel`.
+- `StrafeRight` subtracts the same 0.08 from the roll field: a load, a subtraction and a store, at
+  `0x004134ae-0x004134ba` (source line 300).
 
-The September 26 review reported this in the rebuild (`Simulation.cs:2349-2359`);
-that implementation was not rerun by the September 27 RE pass.
+The 2026-09-26 review reported this in the rebuild (`Simulation.cs:2349-2359`, in the archived Core snapshot, which is not in the current public source tree);
+that implementation was not rerun by the 2026-09-27 RE pass.
 
 ## September 27 complete-body recheck
 
-All four complete bodies and the Player caller were freshly decoded from the
+All four complete bodies and the Player caller were freshly decoded on 2026-09-27 from the
 pristine specimen above. They retain the two-sided timing window and asymmetric
 roll writes. Constructor `00412bc0` binds the six `g_dash_*` registrations, while
 the main initializer calls it at `00404faa` and stores its result at main `+0x578`.
@@ -171,18 +172,17 @@ Body SHA-256 values, in table order above:
 Private bodies/constants and complete caller witnesses are in
 `<maintainer evidence>/test-runs/re-audit-20260926/walker/identity-leads-v2.json` and
 `callers-v1.json`. The packet's candidate labels alone are not identity proof.
-These are static findings, not a new dash/input experiment. The earlier frame
-percentages were not recomputed by this pass.
+These are static findings, not a new dash/input experiment. The frame percentages in the per-frame table above were not recomputed by this 2026-09-27 recheck.
 
 ## Native slow-movement recheck — October 1
 
-The maintainer ran all four complete original directional bodies and their freshly compiled
+On 2026-10-01 the maintainer ran all four complete original directional bodies and their freshly compiled
 candidates in native i386 probes. The primary vtable at `0x005d89c4` identifies
 CBattleEngine through its RTTI; its ground-query and AddVelocity slots select the
 actual `0x00401f70` and `0x00404170` helpers. Those execute, along with the original
 Euler-matrix constructor at `0x004062d0`; no provider substitutes for their behavior.
 
-The 408 cases cover finite inputs and yaws, zero initial velocity, PC24/53/64, paired slow flags,
+The 408 cases cover finite inputs and yaws, zero initial velocity, [PC24](../README.md#shorthand-used-in-these-notes)/53/64, paired slow flags,
 grounded/no-dash movement and airborne/active-dash early returns. Original and
 candidate agree on receiver/configuration state and x87 flags in every case.
 All 135 paired Forward/Backward/StrafeLeft cases quarter the velocity increment
@@ -193,8 +193,8 @@ bytes, nonvolatile registers, stack canaries and x87 control/stack state are che
 
 This executes the earlier static asymmetry; it does not measure a player's charging
 state, physical input, dash activation, audio, subsequent world movement or live
-precision. Right strafe still has ten differing positions in its 624-byte candidate
-section; sampled agreement does not make it an exact match. The other three
+precision. Right strafe has ten differing positions in its 624-byte candidate
+section (the October 1 comparison). The later 2026-10-19 Parity run compared recorded output words for 1,864 dash cases and found them all equal ([onslaught-godot's parity record](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/PARITY.md), walker entry dated 2026-10-19); the two checks measure different things, so neither supersedes the other. Sampled agreement does not make right strafe an exact match. The other three
 directional sections already match completely, and 42 focused exact controls remain.
 The cheapest remaining player-level falsifier records the slow flag and resulting
 velocity during the same charging action in all four directions on a retail copy.
@@ -207,7 +207,7 @@ Maintainer evidence:
 ## Rotation and pitch use the yaw-right binding
 
 Fresh complete-body inspection also identifies `00413660` and `004136e0` as
-the source's Rotate and Pitch (`BattleEngineWalkerPart.cpp:347–355`), called
+the source's Rotate and Pitch (`references/Onslaught/BattleEngineWalkerPart.cpp:347–355`), called
 through the walker receiver at `004d337b` and `004d3390`. Their stack arguments
 are consumed as floating-point operands, not converted from integers.
 
@@ -231,9 +231,9 @@ The resulting writes are yaw velocity at main `+0x278` and pitch velocity at
 main `+0x280`, rather than direct orientation-angle changes. The action and
 category numbers in this section are decimal.
 
-Root independently decoded and checked all nine bodies in the private
-`<maintainer evidence>/test-runs/re-audit-20260926/walker/control-binding-bodies-v1.json`
-packet, SHA-256
+An independent re-decode, in the private evidence packet
+`<maintainer evidence>/test-runs/re-audit-20260926/walker/control-binding-bodies-v1.json`,
+checked all nine bodies; SHA-256
 `43f43da67b4e7073634c3de610a4b1aa61ec2c475451607c1d52c929fc43e9f5`.
 This establishes static ownership and selection, not the category chosen by
 current user settings or actual input sensitivity in a running game.

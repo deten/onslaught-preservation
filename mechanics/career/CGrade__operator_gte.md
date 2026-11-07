@@ -1,8 +1,9 @@
 # CGrade__operator_gte
 
 Status: active function note
-Last updated: 2026-10-22 (research-campaign records removed)
-Summary: `CGrade::operator >=` at `0x00420ac0`: S beats every grade, otherwise letters compare alphabetically.
+Last updated: 2026-11-06 (Specimen line added, letter order stated as rank, the source comparison described in words and not quoted; earlier: removed private-evidence references)
+Summary: `CGrade::operator >=` at `0x00420ac0`: S beats every grade, otherwise letters rank A (best) through E.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: `0x00420ac0`
 >
@@ -16,12 +17,7 @@ Summary: `CGrade::operator >=` at `0x00420ac0`: S beats every grade, otherwise l
 A member function on the left-hand grade that takes the right-hand grade letter as a `char` and returns a boolean.
 
 ## Behavior (source-parity)
-Equivalent to Stuart's inline operator:
-```cpp
-if (grade == 'S') return TRUE;
-if (right.grade == 'S') return FALSE;
-return grade <= right.grade;
-```
+Equivalent to Stuart's inline operator. An `S` on the left returns TRUE. Otherwise an `S` on the right returns FALSE. Otherwise it returns TRUE when the left letter is the same as the right letter or comes earlier in the alphabet, so `A` is at least `B` and `B` is not at least `A`.
 
 Interpretation:
 - Treats `S` as strictly highest.

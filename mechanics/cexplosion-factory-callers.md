@@ -67,8 +67,8 @@ installs the strict `CExplosion` vtables. Its callers then invoke virtual slot
 definition list used around these calls is the same explosion-definition list
 joined to `CRoundExplosion`.
 
-This is enough to advance the 21 newly corrected caller rows to bounded C1 in
-the tracked evidence register; `CDestroyableSegment::SpawnConfiguredExplosion`
+This is enough to advance the 21 newly corrected caller rows to the bounded level in
+the maintainer's evidence register (that register's scale is not published here); `CDestroyableSegment::SpawnConfiguredExplosion`
 was already corrected by the preceding round/explosion batch. Historical
 full-pass reports remain dated artifacts and may retain the old pickup names.
 

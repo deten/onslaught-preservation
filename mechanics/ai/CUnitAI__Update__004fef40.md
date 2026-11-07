@@ -1,11 +1,11 @@
 # CUnitAI__Update
 
 Status: active PC retail/demo static contract with deterministic rebuild boundary
-Last updated: 2026-10-22 (research-campaign records removed; findings unchanged)
+Last updated: 2026-11-06 (frozen-copy citation, reference-only type and test project named, confidence scale replaced by words; earlier: research-campaign records removed; findings unchanged)
 Summary: exact branch, side-effect, random-consumption, return-delay, and event-3000 scheduling contract for shared `CUnitAI` virtual slot 3 at `0x004fef40`.
 Evidence: MEASURED — pristine retail instructions and constants were independently decoded; the complete PC demo body and its event-3000 caller reproduce the same normalized instruction stream; no runtime or console equivalence is claimed.
 Specimen: pristine `BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-Source File: not_applicable (the pinned source drop has no UnitAI implementation) | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: not_applicable (the pinned source drop has no UnitAI implementation).
 
 > Address: `0x004fef40`
 
@@ -125,9 +125,9 @@ Indirect calls are this slot 4, owner slots `+0x150/+0x128/+0x158`, and target s
 
 ## Rebuild carry-forward
 
-`RetailUnitAIUpdateTransaction` reproduces the five finite paths, stage-local reader identities, ordered calls/writes, exact random-result consumption, final jitter cells, returned delay, caller zero override, and absolute event-3000 due bits. It accepts already-captured virtual results and random values so the shared RNG is not consumed before an earlier side-effecting virtual call. Concrete monitors, geometry/matrix execution, helper bodies, event dispatch, and actor wiring remain adapter-owned.
+The reference type `RetailUnitAIUpdateTransaction` (`OnslaughtRebuild.Core` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot), reference only) reproduces the five finite paths, stage-local reader identities, ordered calls/writes, exact random-result consumption, final jitter cells, returned delay, caller zero override, and absolute event-3000 due bits. It accepts already-captured virtual results and random values so the shared RNG is not consumed before an earlier side-effecting virtual call. Concrete monitors, geometry/matrix execution, helper bodies, event dispatch, and actor wiring remain adapter-owned.
 
-Six focused tests cover both primary sub-arms, fire-support with and without aim refresh, both idle cadences, strict sign equality, target rereads, clear-tail order, caller override, and the one-bit x87 rounding discriminator. They are contract tests, not proof of autonomous gameplay parity.
+Six focused tests in the `OnslaughtRebuild.Core.Tests` project of [onslaught-godot](https://github.com/dlprentice/onslaught-godot) (`RetailUnitAIUpdateTransactionTests.cs`) cover both primary sub-arms, fire-support with and without aim refresh, both idle cadences, strict sign equality, target rereads, clear-tail order, caller override, and the one-bit x87 rounding discriminator. They are contract tests, not proof of autonomous gameplay parity.
 
 ## Runtime corroboration
 
@@ -139,7 +139,7 @@ natural branch frequency, live pointer validity, or console behavior.
 ## Evidence
 
 - Disassembly summary: the `IScript.cpp` function notes, rows for `0x004fec60` and `0x004fef40` (in the decompilation notes, not yet published).
-- PC retail/demo body map: `pc-demo-retail-virtual-target-map-2026-08-11.tsv` (in the decompilation notes, not yet published).
+- PC retail/demo body map: `reverse-engineering/binary-analysis/pc-demo-retail-virtual-target-map-2026-08-11.tsv` in [Onslaught-Career-Editor at commit `51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50) (its frozen `reverse-engineering/` copy).
 - Pinned `references/Onslaught/eventmanager.cpp`,
   `references/Onslaught/scheduledevent.cpp`, and
   `references/Onslaught/activereader.cpp` independently support event
@@ -148,7 +148,7 @@ natural branch frequency, live pointer validity, or console behavior.
 
 ## Confidence
 
-1 — exact PC retail identity, complete branch/action/random/return law, enclosing event-3000 consumer, constants, and independently reproduced demo instruction shape are closed. Authored field names, virtual/helper side effects, runtime scenario distribution, console correspondence, and autonomous integration remain open.
+The exact PC retail identity, complete branch/action/random/return law, enclosing event-3000 consumer, constants, and independently reproduced demo instruction shape are closed. Authored field names, virtual/helper side effects, runtime scenario distribution, console correspondence, and autonomous integration remain open.
 
 ## Unresolved questions
 

@@ -1,8 +1,9 @@
 # CCareer__IsEpisodeAvailable
 
 Status: active function note
-Last updated: 2026-10-22 (research-campaign records removed)
+Last updated: 2026-11-06 (Specimen line added, unpublished fixture sentence replaced by what is and is not published; earlier: removed private-evidence references)
 Summary: `CCareer__IsEpisodeAvailable` at `0x00421570`: which campaign completions unlock each multiplayer episode.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: 0x00421570 | Source: `references/Onslaught/Career.cpp`
 
@@ -34,7 +35,7 @@ Source (`references/Onslaught/Career.cpp`): `CCareer::IsEpisodeAvailable(ep)`
 ## Notes
 - Multiplayer has 15 levels: 6 co-op + 6 skirmish + 3 versus
 - Some MP levels require campaign node completion to unlock
-- Explains why `test_no_nodes` save had 3/6 skirmish and 3/6 co-op LOCKED
+- A save with no completed campaign nodes (a maintainer-held test save; no receipt is published) showed three of six skirmish and three of six co-op levels locked, which is consistent with the gate above
 - Called at runtime, not stored directly in save file
 - The retail body confirms this gate checks `CCareerNode.mComplete` (`node+0x04 == 1`) for the world set in each case; it does not use link states.
 
