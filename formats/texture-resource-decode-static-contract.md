@@ -21,7 +21,7 @@ to runtime or pixel-fidelity claims.
 | Zlib/inflate | `CDXTexture__InflateStream_ProcessZlibState`, code-state, dynamic-tree and table builders | Stream/state/table topology is mapped; exact `z_stream` layouts and decompression behavior are not. |
 | Conversion and render handoff | packed-texel helpers, `CDXTexture__UploadDecodedBufferToSurface`, `CFastVB__RenderTriangleStripImmediate`, `CVBufTexture__DrawSpriteEx` | CPU conversion and render-facing handoff are visible; GPU upload and rendered pixels are not proven. |
 
-The retained function notes and
+The retained function notes (in the decompilation notes, not yet published) and
 [`../engine/render/mesh-resource-render-static-contract.md`](../engine/render/mesh-resource-render-static-contract.md)
 provide address-level context. Asset exporters (and, before it was retired, the WinUI Asset Library) may
 use this map to choose parsers and label uncertainty, but successful extraction

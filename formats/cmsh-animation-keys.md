@@ -2,16 +2,16 @@
 
 Status: active format contract — key convention, frame selection, interpolation and mode timing for PC meshes
 Date: 2026-10-16
-Last updated: 2026-10-16 (the skeletal path reads `last`; the companion's glTF export checked pose by pose)
+Last updated: 2026-11-06 (names checked against onslaught-decomp; commands and flags checked against the Toolkit at commit 51129bab; earlier: the skeletal path reads `last`; the companion's glTF export checked pose by pose)
 Verdict: a part's keys (`HORI`, `HPOS`, chosen through `VHFM`) are relative to its parent. Composing them from the
 root with column vectors (`position = Pp + Op·p`, `orientation = Op·O`) reproduces every cached model-space frame
-in the installed corpus: 143,871 `CPOS` positions and 141,044 `CORI` orientations, all within single-precision
-rounding (worst relative error 1.35e-6). Frames are selected by a mode's phase, scaled and offset into the
+in the installed corpus, all within single-precision
+rounding. Frames are selected by a mode's phase, scaled and offset into the
 part's virtual frames, and interpolated linearly element by element. Phases advance by the mode's rate once
 per 20 Hz game tick.
-Evidence: SOURCE + MEASURED. The evaluation follows the retail functions as byte-matched in the private
-decompilation, cited by name and address below. The composition was checked over the whole corpus with
-`python tools/cmsh_grammar_walk.py --compose --game GAME_FOLDER`.
+Evidence: SOURCE + MEASURED. The evaluation follows the retail functions named and addressed in
+[onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), the public naming authority, which is generated from the maintainer's working source. The composition was checked over the whole corpus with
+`python tools/cmsh_grammar_walk.py --compose --game GAME_FOLDER` from [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit [51129bab](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50), where `GAME_FOLDER` is the game folder of your own copy.
 Specimen: retail addresses cite `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`; the corpus is the installed
 `data/resources/meshes/*.aya`, 213 files, manifest digest
@@ -40,7 +40,7 @@ the root down:
   - `position = Pp + Op · p`
   - `orientation = Op · O`
 
-Every frame of every part's `CPOS`/`CORI` cache equals this composition (the counts are in the verdict). The
+Every frame of every part's `CPOS`/`CORI` cache equals this composition: 143,871 `CPOS` positions and 141,044 `CORI` orientations, all within single-precision rounding (worst relative error 1.35e-6). The
 caches are the game's precomputed model-space frames: `CMeshPart::BuildCache`, `0x004b1a40`, composes
 through `CMeshPart::GetWorldTransforms`, `0x004b0fb0`. An exporter can use either the keys or the caches; the
 keys are the authored data.
@@ -49,7 +49,7 @@ A cache holds one frame per virtual frame, or a single frame when neither the pa
 than one key. A part whose only key is the identity orientation, or the origin position, stores no
 orientation or position cache and borrows its nearest ancestor's (`mPositionStatic`/`mOrientationStatic`
 at part `+0x11C`/`+0x120`). That is why 38 parts have no `CPOS` and 1,263 no `CORI`: every one of them carries
-the static flag. The cache-length rule holds for all 4,009 installed parts.
+the static flag. The cache-length rule holds for all 4,009 installed parts: 3,774 in the first meshes of the 213 loose files and 235 in the 15 chained meshes ([cmsh-fields.md](cmsh-fields.md) lines 41-42).
 
 Every stored key orientation is orthonormal, but **920 of the 59,327 keys are reflections** (determinant −1).
 A format that wants a rotation and a scale needs a negative scale on one axis for those keys.
@@ -100,12 +100,12 @@ An animation mode is a record in the mesh's `CAMD` table:
 | name | 16 characters, for example `Walk`, `idle`, `dead_back` |
 | mode id | 1–10 are the engine's shared modes; 1000 and above are the mesh's own, chosen by name |
 | start | the first virtual frame |
-| last | `start + frame_scaler` (337 modes) or `start + frame_scaler − 1` (86 modes) |
+| last | `start + frame_scaler` for 337 modes, or `start + frame_scaler − 1` for 86 modes (a split this document does not match against the shared and mesh-specific split below) |
 | frame_scaler | the number of virtual frames the mode spans |
 | rate | how much of the mode plays per game tick |
 
 The engine's shared ids are walk (1), run (2), stand (3), shoot (4), shoot1 (5), shoot2 (6), shootwalk (7),
-fly (8), hover (9) and idle (10). The 423 installed modes are 86 shared and 337 mesh-specific, in 61 files.
+fly (8), hover (9) and idle (10). The 423 installed modes are 86 shared and 337 mesh-specific, in 61 files. This split is not the `last` split above, and this document does not check whether the two name the same modes.
 
 A thing playing a mode keeps a **phase** from 0 to 1 (`CAnimation::Process`, `0x00404790`):
 
@@ -148,11 +148,11 @@ authored animation without them:
 
 ## Mapping to glTF (guidance)
 
-This mapping is not part of the format. It is how the companion's exporter (`companion/OnslaughtToolkit.Godot/Assets/GltfExport.cs`)
-reproduces the game. Evaluated by the glTF rules from the exported files, every node of every exported
+This mapping is not part of the format. It is how the companion's exporter (`companion/OnslaughtToolkit.Godot/Assets/GltfExport.cs` in the Toolkit at commit 51129bab)
+reproduces the game. The Toolkit's program plans to move the companion's player capabilities into Onslaught CE and to phase the companion out, so this path may change. Evaluated by the glTF rules from the exported files, every node of every exported
 animation at every sample matches the composition above: 158 animations and 124,822 node poses, with a worst
-error of 5e-7 (`python tools/gltf_pose_check.py --game GAME_FOLDER --exports EXPORTS`, over the exports a
-`Development/AssetCheck.cs` run keeps with `ASSET_KEEP=all`).
+error of 5e-7 (`python tools/gltf_pose_check.py --game GAME_FOLDER --exports EXPORTS`, over the exports that a run of
+`companion/OnslaughtToolkit.Godot/Development/AssetCheck.cs` in the Toolkit keeps with `ASSET_KEEP=all`; `EXPORTS` is the folder of those exports).
 
 - **Nodes.** One node per part, parented as `PRNT` says. A node's rest transform is its key at virtual
   frame 0.
@@ -163,7 +163,7 @@ error of 5e-7 (`python tools/gltf_pose_check.py --game GAME_FOLDER --exports EXP
   - for reflected keys, a scale of −1 on one axis, with the rotation taken from the corrected matrix.
 
   The game interpolates matrices element by element, while glTF interpolates quaternions spherically, so
-  between samples the two differ slightly. They agree exactly at every sample.
+  between samples the two differ slightly. They agree to within 5e-7 at every sample.
 - **Skins.** One skin per skeletal part. The joints are the parts in its `BONE` list. Each inverse bind matrix
   is the inverse of that bone's model-space transform at virtual frame 0, the game's bind pose (see
   [cmsh-matrix-normal-deformation.md](cmsh-matrix-normal-deformation.md)). The vertex weights follow

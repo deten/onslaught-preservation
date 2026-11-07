@@ -1,9 +1,11 @@
 # Public assets and modding overview
 
 Status: public-safe overview
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (Evidence and Specimen lines added; the walker-to-jet interpretation cites the pinned BattleEngine.cpp lines; earlier: retired AppCore/WinUI tools in the past tense)
 Summary: what public changes may contain, and two controlled copied-game findings (one localization entry, one
 compiled mission command) that show which modified retail inputs the engine consumes.
+Evidence: MEASURED — the two controlled copied-game runs below; SOURCE — the pinned `BattleEngine.cpp` lines cited for the walker-to-jet interpretation only.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`; the [walker-to-jet timing record](../mechanics/battleengine/walker-transform-morph-timing-v1.md) names the same canonical Steam executable for its controlled copies, which used the same early-flight archive change.
 
 The companion's source tree and portable app do not include retail game assets or converted copies. Resource
 analysis, copied-game runs and the rebuild read a user's lawfully obtained installation as local input.
@@ -49,7 +51,7 @@ opcode `24`) and its command byte at decompressed payload offset `3658889`:
 descriptor `101` is `DisableFlightMode` and descriptor `100` is
 `EnableFlightMode`. Retail observation distinguished the walker-to-jet state
 write at `BEA.exe+0xA753` from the disabled-flight return at
-`BEA.exe+0xA87D`. Stuart's `BattleEngine.cpp` supports the interpretation—the
+`BEA.exe+0xA87D`. Stuart's `references/Onslaught/BattleEngine.cpp:2040-2041` at `c3d8ac4` supports the interpretation—the
 walker morph returns while flight mode is disabled—but the copied Steam runtime
 establishes the released behavior.
 

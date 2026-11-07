@@ -3,14 +3,14 @@
 Status: active source/history/removed-release audit; format claims remain bounded by
 current corpus and retail evidence
 Date: 2026-08-22
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
+Last updated: 2026-11-06 (pins named by repository, the Toolkit commit for the audit tool stated, count and citation corrections, machine-local paths removed; earlier: links updated for the onslaught-preservation layout)
 Verdict: **Stuart intentionally published the extractor implementation and its
 reverse-engineered format assumptions. Nothing in the removed release proves
 that original Battle Engine Aquila source was published. No extra named
 type/member/resource/string/import format surface was found in the removed
 release, and the binaries predate two surviving-source fixes. Behavioral
-equivalence is not established: no source-build IL comparison was made, and 47
-mixed-mode native/non-IL bodies remain semantically uninspected.
+equivalence is not established: no source-build IL (intermediate language) comparison was made, and the
+native/non-IL bodies of the two mixed-mode DLLs (managed and native code in one file) remain semantically uninspected; the [managed metadata section](#managed-metadata-and-release-il-inventory-not-source-build-equivalence) counts them.
 Current AYA/CMSH tools already corroborate or supersede most extractor claims.
 The remaining actionable gaps are skinning/blending, PB-family payloads, TEXR
 layer semantics, and a few explicitly unproved labels. The September 30 retail
@@ -18,21 +18,21 @@ consumer recheck corroborates the weight dimensions and contradicts the
 extractor's extra bone-count multiplier for bone slots.**
 Evidence: SOURCE + CORPUS-MEASURED + BINARY-METADATA — complete read of every
 first-party source/project/history entry at AYA fork commit
-`53b10b083b59cfd7e72849c15bec8b608eaf8a23`, upstream commit
+`53b10b083b59cfd7e72849c15bec8b608eaf8a23`, AYA upstream commit
 `4e04952a200e29040a68fc8648e835f9a7d608d1`, all seven removed release blobs at
-initial commit `801f3ba8166405a472f97f4909b5ee4ff3ed633e`, deterministic PE/ECMA-335
+initial commit `801f3ba8166405a472f97f4909b5ee4ff3ed633e`, deterministic PE (Windows executable format) and ECMA-335 (the .NET standard for metadata and IL)
 metadata and IL-body hashing without loading an entry point, deterministic FBX
 parsing from the surviving source, and a complete 92-row crosswalk to current
 owners.
 Source specimens: AYA tree `8641b14865756c354a22c458bc83fc649231d279`;
-upstream tree `c59837bde3fd196bc8897c97bf53437366788bed`;
+AYA upstream tree `c59837bde3fd196bc8897c97bf53437366788bed`;
 Onslaught tree `7a8d0a83257ff7a2e9831455eca576ade11decbd` at
 `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`.
 
 The source comparison above identifies the historical audit snapshot. On October 14,
-Stuart added 21 mesh source/header files at upstream
-`b3b771091fd1c5a4708c1762d8472e7ca565f599`; the current fork/submodule pin is
-`c3d8ac464259942b83fa8aa7f867c856e77b734d`. All previous source blobs are unchanged.
+Stuart added 21 mesh source/header files at Onslaught upstream
+`b3b771091fd1c5a4708c1762d8472e7ca565f599`; the current Onslaught fork pin, the one used for
+`references/Onslaught` citations, is `c3d8ac464259942b83fa8aa7f867c856e77b734d`. All previous source blobs are unchanged.
 The current lexical audit finds 28 of the 29 format tokens; only `PBKT` has no hit.
 These additions have been downloaded and pinned, not compared with retail behavior.
 The old zero-hit result and the contract classifications below remain dated evidence,
@@ -40,15 +40,14 @@ not a semantic assessment of the newly published code.
 
 No removed executable was launched. No retail asset, binary, or extracted
 payload is tracked by this audit. Removed blobs were materialized only under the
-ignored `<maintainer evidence>/hermes-kanban-campaign-2026-08-22/aya-extractor-audit/`
-workspace, hashed, inspected as data, and left untracked.
+ignored `<maintainer evidence>/` workspace, hashed, inspected as data, and left untracked.
 
 ## Plain answers
 
 | Question | Answer |
 | --- | --- |
 | Was source intentionally published? | **Yes.** Commit `801f3ba` added the solution, first-party source, third-party source, template, and release artifacts together. The later README explicitly points readers to the solution and describes the C#/C/C++ components (`references/AYAResourceExtractor/README.md:12-24`). |
-| Did the extractor release prove in-house source reuse? | **No.** The extractor uses independently named C# readers and exporter code. The historical Onslaught snapshot `5352a81` contained none of the 29 AYA/CMSH asset fourcc tokens. The October 14 additions now contain 28; their relationship to the extractor implementation and retail remains to be assessed. |
+| Did the extractor release prove in-house source reuse? | **No.** The extractor's C# reader and exporter code uses names that differ from the historical snapshot's names; whether that implementation is independent is unproven (see [Historical comparison with Stuart's Onslaught drop](#historical-comparison-with-stuarts-onslaught-drop)). The historical Onslaught snapshot `5352a81` contained none of the 29 AYA/CMSH asset fourcc (four-character code) tokens. The October 14 additions now contain 28; their relationship to the extractor implementation and retail remains to be assessed. |
 | Do removed binaries contain extra implementation knowledge? | **No extra named type/member/resource/string/import format surface was identified.** The main DLL's 19 type definitions, 67 release IL bodies, and sole empty `.resources` manifest map by name/signature to surviving source or compiler/SDK generation; the native EXE is a .NET apphost with no CLR metadata. This is not behavior-equivalence proof: source-built IL was not compared, and the mixed-mode DLLs retain 47 native/non-IL bodies whose semantics were not inspected. Build-path/PDB strings are the only affirmative unpublished metadata found. |
 | Are there new actionable format facts? | **No new released-format field is established solely by the removed extractor binaries.** The retail consumer recheck below adds a third contradicted claim: the extractor's bone-slot size has an extra bone-count factor. `CCUS`, `BONW`, and `BONS` remain absent from the earlier measured corpus; static consumer evidence now bounds the latter two formulas. |
 
@@ -68,17 +67,17 @@ Its six classifications are intentionally disjoint:
 ## Pins, history, and publication intent
 
 The public history contains ten commits. Only four stages change what this
-audit can conclude:
+audit can conclude; the last column marks them:
 
-| Commit | Date | Effect |
-| --- | --- | --- |
-| `7c3d47c67c89c450850da7e1ac66a7ac043b161f` | 2023-05-22 12:03:43 +01:00 | Added repository support and a placeholder root MIT text. |
-| `801f3ba8166405a472f97f4909b5ee4ff3ed633e` | 2023-05-22 12:03:46 +01:00 | Added all source/projects, `BoxWithTextures.fbx`, and the seven release artifacts. Initial tree: `3dae0f60f8821b5240677f0f946dfd9c3ad4dba5`. |
-| `e4bf31d96f0281a394d03272353d1960098a8a1e` through `1e2459a8a7614c975cf37a93a8b7e3ed7a20bbd9` | 2023-05-22 | Added/expanded the README into an explicit source and limitations description. |
-| `e7c6f371c39331e1062dc09091fa95adc55457e6` | 2023-05-22 12:13:54 +01:00 | Removed the EXE, four DLLs, and two runtime JSON files. Removal tree: `9dc21993bd2464f6f0e109547193c72864f290cd`. |
-| `8d9880e48534f4c9d8d2c87ba836c20e9c65f441` | 2023-05-22 13:49:11 +01:00 | Removed non-working Any CPU/x64 solution configurations and added the Visual Studio fallback path for `BoxWithTextures.fbx`. |
-| `4e04952a200e29040a68fc8648e835f9a7d608d1` | 2023-05-22 13:49:13 +01:00 | Stuart's surviving upstream tip. |
-| `53b10b083b59cfd7e72849c15bec8b608eaf8a23` | 2026-07-13 | Fork-only fix: rectangular DDS copy count changed from `height*height*4` to checked `width*height*4`; no parser change. |
+| Commit | Date | Effect | Changes a conclusion |
+| --- | --- | --- | --- |
+| `7c3d47c67c89c450850da7e1ac66a7ac043b161f` | 2023-05-22 12:03:43 +01:00 | Added repository support and a placeholder root MIT text. | No |
+| `801f3ba8166405a472f97f4909b5ee4ff3ed633e` | 2023-05-22 12:03:46 +01:00 | Added all source/projects, `BoxWithTextures.fbx`, and the seven release artifacts. Initial tree: `3dae0f60f8821b5240677f0f946dfd9c3ad4dba5`. | Yes |
+| `e4bf31d96f0281a394d03272353d1960098a8a1e` through `1e2459a8a7614c975cf37a93a8b7e3ed7a20bbd9` | 2023-05-22 | Added/expanded the README into an explicit source and limitations description. | No |
+| `e7c6f371c39331e1062dc09091fa95adc55457e6` | 2023-05-22 12:13:54 +01:00 | Removed the EXE, four DLLs, and two runtime JSON files. Removal tree: `9dc21993bd2464f6f0e109547193c72864f290cd`. | Yes |
+| `8d9880e48534f4c9d8d2c87ba836c20e9c65f441` | 2023-05-22 13:49:11 +01:00 | Removed non-working Any CPU/x64 solution configurations and added the Visual Studio fallback path for `BoxWithTextures.fbx`. | Yes |
+| `4e04952a200e29040a68fc8648e835f9a7d608d1` | 2023-05-22 13:49:13 +01:00 | Stuart's surviving AYA upstream tip. | No |
+| `53b10b083b59cfd7e72849c15bec8b608eaf8a23` | 2026-07-13 | Fork-only fix: rectangular DDS copy count changed from `height*height*4` to checked `width*height*4`; no parser change. | Yes |
 
 All first-party parser files were already present in `801f3ba`. After that
 initial publication, no CMSH parsing method changed. The only first-party
@@ -94,7 +93,7 @@ release binaries were removed 608 seconds (10 minutes 8 seconds) later.
 The tracked fork contains **73 files** and **28,842 physical text lines**; the
 binary FBX template contributes no line count. “Function” below means a lexical
 source function definition, not a one-target linker symbol count. The local
-function census used Tree-sitter C/C++ plus a C# declaration scan twice; both
+function census used Tree-sitter (a source-code parser library) for C/C++ plus a C# declaration scan twice; both
 normalized outputs had SHA-256
 `8c78dbfeb1083aef445a728407bb2f33df489cb14aa16a614b84e52bb627f065`.
 The tracked audit independently pins every first-party declaration and refuses
@@ -184,15 +183,15 @@ all 40 routines has a row; no row is unclassified.
 2. **CMSH root, tags, hierarchy, reference, rigid geometry, and six TEXR IDs are
    already stronger.** The current parser frames all 367 measured streams,
    emits 366, and byte-round-trips all 367 while retaining opaque bytes
-   ([`cmsh-mesh.md`](cmsh-mesh.md):17-103,141-159).
+   ([`cmsh-mesh.md`](cmsh-mesh.md):45-49,64-88,104-125).
 3. **Skinning has advanced beyond the extractor.** The three stride-48 words are
    matrix-palette slots (`BONE index * 3`), not unnamed “bone weighting”; the
    combination/weight and bind rule remain open
-   ([`cmsh-animation-usage.md`](cmsh-animation-usage.md):104-125).
+   ([`cmsh-animation-usage.md`](cmsh-animation-usage.md):136-148; [palette contract](cmsh-matrix-palette-skinning.md)).
 4. **CPOS/CORI are no longer generic unknowns.** They are bounded derived
    model-space caches indexed by virtual frame. Exact bitwise regeneration is
    not claimed.
-5. **Three extractor claims are contradicted.** The byte at `CMVB+264` is a
+5. **Three extractor claims are contradicted.** The i32 `piece_count` at `CMVB+264` ([cmsh-fields.md](cmsh-fields.md):341, 0 to 12 installed) is a
    material group count, not the independent CMSH root texture count. The
    README's DXT2-only storage statement also overgeneralizes: the measured
    800-file shelf has 212 DXT1 and 588 DXT2 DDS files. The September 30 retail
@@ -212,7 +211,7 @@ all 40 routines has a row; no row is unclassified.
    repeated BBOX is not proved an exporter bug; and the guncrab memory-saving
    story is an example, not universal ownership evidence.
 8. **Legacy texture lookup is incomplete.** The extractor tries only
-   `A1R5G5B5` then `A8R8G8B8`; the measured shelf has five source-format suffixes.
+   `A1R5G5B5` then `A8R8G8B8`; the measured shelf has five source-format suffixes ([aya-asset-format.md](aya-asset-format.md#path-convention)).
    Current shelf indexing is stronger than manufacturing two-name precedence.
 
 ## Removed release artifacts
@@ -255,8 +254,8 @@ semantically compare.
 | --- | --- | --- |
 | `AYAResourceExtractor.dll` | 19 type definitions; 67 method definitions; 67 release IL fingerprints; one 180-byte `AYAResourceExtractor.MainForm.resources` manifest with **zero entries**. | Fourteen application/source types match the C# tree by name/signature. `ApplicationConfiguration` is generated by the WinForms SDK; three nullable/embedded attribute types and `<Module>` are compiler artifacts. Constructors and property accessors account for binary methods beyond the 40 explicit source declarations. No extra public/internal named type or resource was found; body equivalence was not tested against a source build. |
 | `Fbx.dll` | 29 type definitions; 111 methods; 103 release IL fingerprints; eight no-body delegate methods; no resources. | All named `Fbx.*` types/methods map by name/signature to the 13 surviving source files. Remaining types are compiler-generated delegates, closures, attributes, and static-array details. No extra named FBX type/resource or embedded template was found; body equivalence was not tested against a source build. |
-| `DDSTextureUncompress.dll` | Mixed-mode PE/CLR: 462 type definitions, 274 methods, 244 IL fingerprints, 28 native/non-IL bodies, no resources. | The only application-facing managed type is `DDSTextureUncompress` with `Uncompress` and a constructor. The named metadata surface is C++/CLI/CRT/std machinery plus that wrapper, and the DLL predates the fork's rectangular-copy fix. The 28 native/non-IL bodies were not semantically compared, so hidden body-level differences cannot be excluded. |
-| `ZLibWrapper.dll` | Mixed-mode PE/CLR: 543 type definitions, 179 methods, 158 IL fingerprints, 19 native/non-IL bodies, no resources. | The only application-facing managed type is `UnCompressFile` with `Uncompress` and a constructor. The named metadata surface is zlib/C++/CLI/runtime machinery plus that wrapper. The 19 native/non-IL bodies were not semantically compared, so hidden body-level differences cannot be excluded. |
+| `DDSTextureUncompress.dll` | Mixed-mode PE/CLR: 462 type definitions, 274 methods, 244 IL fingerprints, 28 native/non-IL bodies (272 bodies; the other 2 methods are not classified here), no resources. | The only application-facing managed type is `DDSTextureUncompress` with `Uncompress` and a constructor. The named metadata surface is C++/CLI/CRT/std machinery plus that wrapper, and the DLL predates the fork's rectangular-copy fix. The 28 native/non-IL bodies were not semantically compared, so hidden body-level differences cannot be excluded. |
+| `ZLibWrapper.dll` | Mixed-mode PE/CLR: 543 type definitions, 179 methods, 158 IL fingerprints, 19 native/non-IL bodies (177 bodies; the other 2 methods are not classified here), no resources. | The only application-facing managed type is `UnCompressFile` with `Uncompress` and a constructor. The named metadata surface is zlib/C++/CLI/runtime machinery plus that wrapper. The 19 native/non-IL bodies were not semantically compared, so hidden body-level differences cannot be excluded. |
 
 The removed main DLL predates `8d9880e`; its string/IL surface has only the
 direct `BoxWithTextures.fbx` lookup and lacks the later
@@ -272,10 +271,9 @@ managed type/member/resource table and no AYA/CMSH token. The three other DLLs
 have no exports; the two mixed-mode wrappers import normal CLR/C++ runtime
 surfaces.
 
-The binaries do reveal deterministic/build-machine path strings such as
-`C:\dev\AYAResourceExtractor\Code\AyaResourceExtractor\obj\Release\net6.0-windows\AYAResourceExtractor.pdb`
-and corresponding Fbx/wrapper PDB paths. Those paths identify the build tree;
-no PDB was committed, and the strings add no format field or algorithm.
+The binaries contain build-path strings: the main assembly's PDB path and corresponding Fbx and
+wrapper PDB paths. The paths are not reproduced here. They identify the build tree; no PDB was
+committed, and the strings add no format field or algorithm.
 
 ## `BoxWithTextures.fbx` is generic exporter scaffolding
 
@@ -292,8 +290,8 @@ It contains:
 - 24 `Video` placeholders pointing to `default1.png` through `default24.png`;
 - eight cube vertices at ±1, six quad polygons, 24 polygon indices, generic UVs
   and normals;
-- Blender 3.5 stable FBX IO metadata, `/foobar.fbx`, and a build path to
-  `C:\dev\AYAResourceExtractor\Blender\24MaterialsOnBox.blend`.
+- Blender 3.5 stable FBX IO metadata, `/foobar.fbx`, and a build-path string naming a
+  Blender scene (not reproduced here).
 
 No `Battle Engine Aquila`, CMSH tag, `.aya`, `.msh`, `.tga`, `meshtex`, game
 resource name, retail payload, or extracted texture is present. The template is
@@ -374,11 +372,13 @@ extractor's pointer/bug guesses.
 
 ## Reproduction and gates
 
+The audit tool is `tools/aya_extractor_source_audit.py` in [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit [`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50). Run its commands from a checkout of that commit, with its `references/AYAResourceExtractor` (the public fork at `53b10b0`) and `references/Onslaught` (the public fork at `c3d8ac4`) submodules initialised; this repository does not contain those trees.
+
 Current deterministic audit (write a fresh output, preserving historical receipts):
 
 ```bash
 python ./tools/aya_extractor_source_audit.py \
-  --out <maintainer evidence>/test-runs/upstream-source-sync-20261014/aya-source-audit.json
+  --out <maintainer evidence>/aya-source-audit.json
 python ./tools/aya_extractor_source_audit_tests.py
 ```
 

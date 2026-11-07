@@ -3,7 +3,7 @@
 Status: active, bounded retail dispatcher vocabulary
 Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
 Summary: corrects tag roles from the retail dispatcher; recognition is not a complete payload schema.
-Evidence: MEASURED — September 27 literal-selected retail calls; SOURCE — pinned ResourceAccumulator.cpp with recorded platform differences.
+Evidence: MEASURED — September 27 retail calls that the dispatcher selects by comparing the chunk tag with a literal four-byte value; SOURCE — pinned ResourceAccumulator.cpp with recorded platform differences.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 The [chunk-reader and dispatcher contract](../engine/source/io/chunker-system.md)

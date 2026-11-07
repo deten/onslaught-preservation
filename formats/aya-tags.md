@@ -1,10 +1,10 @@
-Status: active quick reference
-Last updated: 2026-04-29
-Source: migrated from archived Onslaught skills during the skill clean-slate pass.
-Summary: AYA tag IDs and mesh/texture marker lookup.
 # AYA Tag Reference
 
-Complete reference for all known AYA binary format tags.
+Status: superseded for layouts by cmsh-fields.md and cmsh-mesh.md; kept for tag IDs — AYA tag quick reference
+Last updated: 2026-11-06 (layouts and roles checked against cmsh-fields.md, cmsh-mesh.md and the extractor audit)
+Summary: AYA tag IDs and mesh/texture marker lookup.
+
+Quick reference of the CMSH mesh tag IDs; layouts and open items are in [cmsh-fields.md](cmsh-fields.md) and the [extractor audit](aya-resource-extractor-source-audit.md).
 
 ## Contents
 
@@ -40,8 +40,8 @@ Texture file reference and UV properties.
 
 | Field | Size | Description |
 |-------|------|-------------|
-| UV region/scale | 20 | Texture mapping parameters |
-| Texture name | 128 | Filename (null-terminated) |
+| Lanes per frame | frames * 20 | Five f32 lanes per frame: blend, U/V offset, U/V scale |
+| Texture name | 128 | A NUL-terminated string in a fixed 128-byte field; nothing guarantees a terminator or UTF-8 (see [cmsh-fields.md](cmsh-fields.md)) |
 
 ---
 
@@ -96,7 +96,7 @@ Parent part reference.
 | Parent index | 4 | uint32 |
 
 ### NMIC - Next in Chain
-Links to next part in a chain (for segmented meshes).
+Index of the next part in a chain; purpose open (see [cmsh-fields.md](cmsh-fields.md)).
 
 | Field | Size | Description |
 |-------|------|-------------|
@@ -109,7 +109,7 @@ Links to next part in a chain (for segmented meshes).
 ### BBOX - Bounding Box
 Axis-aligned bounding box for culling.
 
-**Note**: This tag appears twice in sequence (possible format bug).
+**Note**: The tag appears twice: a wrapper, then the 40-byte record ([cmsh-fields.md](cmsh-fields.md), grammar). Why the writer repeats it is open ([cmsh-mesh.md](cmsh-mesh.md)).
 
 | Field | Size | Description |
 |-------|------|-------------|
@@ -122,12 +122,12 @@ Axis-aligned bounding box for culling.
 
 ## Animation Tags
 
-### VHFM - Vertex Frame Mask
-Frame visibility flags.
+### VHFM - Virtual-frame map
+One byte per virtual frame, each the index of a hierarchy pose (0 to hFrames-1); see [cmsh-fields.md](cmsh-fields.md).
 
 | Field | Size | Description |
 |-------|------|-------------|
-| Frame flags | numVFrames | byte array |
+| Pose index per virtual frame | numVFrames | byte array |
 
 ### HORI - Hierarchy Orientation
 Per-frame orientation matrices.
@@ -151,20 +151,21 @@ Per-frame FOV (for camera parts).
 | FOV values | numHFrames * 4 | float per frame |
 
 ### CPOS - Current Position
-Animation position keyframes.
+Derived model-space cache: one composed frame per virtual frame, or one static record; not an authoring source (see [cmsh-cpos-cori-identity.md](cmsh-cpos-cori-identity.md)).
 
 | Field | Size | Description |
 |-------|------|-------------|
-| Size | 4 | Data size (read from tag header) |
-| Position data | size | Keyframe data |
+| Payload | numCachedFrames * 16 | One vector per cached frame; the size comes from the tag header |
 
 ### CORI - Current Orientation
-Animation orientation keyframes.
+Derived model-space cache: one composed frame per virtual frame, or one static record; not an authoring source (see [cmsh-cpos-cori-identity.md](cmsh-cpos-cori-identity.md)).
 
 | Field | Size | Description |
 |-------|------|-------------|
-| Size | 4 | Data size (read from tag header) |
-| Orientation data | size | Keyframe data |
+| Payload | numCachedFrames * 48 | One 3x4 matrix per cached frame; the size comes from the tag header |
+
+### CAMD - Animation-mode table (mesh level)
+36-byte records (mode name, id, start, last, frame scaler, rate), one per animation mode. They follow the parts, so they do not end part parsing (see [cmsh-fields.md](cmsh-fields.md)).
 
 ---
 
@@ -185,11 +186,13 @@ Per-vertex bone weights.
 | Weights | numPVert * numBones * 4 | float array |
 
 ### BONS - Bone Skin
-Per-vertex bone skin matrices (position offsets per bone).
+Per-vertex bone-slot values; see [cmsh-fields.md](cmsh-fields.md).
 
 | Field | Size | Description |
 |-------|------|-------------|
-| Skin data | numPVert * numBones * 12 | float3 per vertex per bone |
+| Skin data | numPVert * 12 | three i32 values per vertex |
+
+**Note**: BONW and BONS do not occur in the 213-file corpus ([cmsh-matrix-palette-skinning.md](cmsh-matrix-palette-skinning.md)). The sizes shown are what the retail reader requests, not measured payloads.
 
 ---
 
@@ -204,15 +207,15 @@ Vertex buffer header.
 | Field | Size | Description |
 |-------|------|-------------|
 | Pointers | 8 | Runtime pointers (skip) |
-| Reserved | 256 | 64 x uint32 |
-| Num textures | 4 | Material count (byte at offset) |
+| Piece slots | 256 | 64 piece-pointer slots (replaced at load) |
+| Piece count | 4 | piece_count (i32, 0-12 installed) |
 | Pointers | 8 | Runtime pointers |
 | Vertex chunk size | 4 | 36 (standard) or 48 (skinned) |
 | FVF flags | 4 | D3D flexible vertex format |
-| Primitive type | 4 | 5 = triangle strip |
+| Primitive type | 4 | 4 = triangle strip in the game's numbering (5 = triangle fan); see [cmsh-fields.md](cmsh-fields.md), vertex-buffer record |
 | Reserved | 8 | Unknown |
 
-Followed by numTextures MMPT blocks.
+Followed by piece_count MMPT blocks.
 
 ### MMPT - Mesh Material Part
 Per-material vertex/index buffer section.
@@ -224,7 +227,7 @@ Per-material vertex/index buffer section.
 | Num indices | 4 | Index count |
 | Num vertices | 4 | Vertex count |
 | Num primitives | 4 | Primitive count |
-| Active | 4 | uint32 (1 = enabled) |
+| Built | 4 | i32, the sixth MMPT field (named *built* in [cmsh-fields.md](cmsh-fields.md)); meaning open |
 
 Followed by IBUF, VBUF, TEXR.
 
@@ -260,7 +263,7 @@ Slot 0 is the primary diffuse texture. Other slots for multi-texturing (rarely u
 ## Special Tags
 
 ### REFR - Reference Part
-Shares geometry from another part (memory optimization for symmetric models).
+Points at another part's geometry: reference parts (type 6) draw the part this index names (see [cmsh-fields.md](cmsh-fields.md)).
 
 | Field | Size | Description |
 |-------|------|-------------|
@@ -269,18 +272,14 @@ Shares geometry from another part (memory optimization for symmetric models).
 When encountered, copy vertex/index data from referenced part using current part's transform.
 
 ### PBKT - Part Bucket
-Collision/physics bucket data (skip).
+Wrapper of the part's collision grid, entered rather than read: the next header is the CPBT grid record (184 bytes), followed by the grid's arrays ([layout in cmsh-fields.md](cmsh-fields.md#collision-grid-cpbt-184-bytes-and-its-arrays)). The consumer join for the PB* payload is open (audit P2 item 3 in the [extractor audit](aya-resource-extractor-source-audit.md)).
 
 | Field | Size | Description |
 |-------|------|-------------|
-| Size | 4 | Data size |
-| Data | size | Bucket data |
+| Wrapper | header only | No payload of its own |
 
-### CCUS - Custom Camera
-Camera customization data (terminates part parsing).
-
-### CAMD - Camera Data
-Camera definition data (terminates part parsing).
+### CCUS - Camera customization (extractor-only)
+Extractor-only: the pinned extractor accepts it as a post-part marker, but it is not observed in the measured corpus, so its role is unknown (see the [extractor audit](aya-resource-extractor-source-audit.md)).
 
 ---
 
@@ -306,7 +305,7 @@ Tags within MESP appear in this order (all optional except CMSP):
 16. REFR
 17. PMVB (contains CMVB, MMPT, IBUF, VBUF, TEXR)
 
-Parsing terminates on MESP (next part), BBOX, CCUS, or CAMD.
+A part ends at the next MESP. After the last part, the mesh-level records follow: CAMD (if any), the mesh BBOX, CEMT (if any) and PMS2 (if any); see [cmsh-fields.md](cmsh-fields.md).
 
 ---
 

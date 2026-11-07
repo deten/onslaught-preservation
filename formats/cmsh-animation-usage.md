@@ -2,25 +2,15 @@
 
 Status: active bounded animation, position-skinning, and authored-usage contract
 Date: 2026-08-23
-Last updated: 2026-10-29 (the seven other `MESH` rows are in the base and front-end archives; the WRES join counts only records with no `dies_on` world; earlier: research-campaign records and decompiler-style code removed)
-Verdict: the 213 loose CMSH meshes contain 3,774 part tracks; 64 meshes and 659
-parts have non-trivial `VHFM` maps, exactly seven meshes carry one `BONE` array,
-and exactly 17 camera parts carry one `HFOV` value. Across the 66 numeric LVLR
-archives, 3,432 of 3,485 `MESH` rows join by authored name to 205 loose meshes;
-the other 53 rows each own an anonymous embedded CMSH. The WRES/physics join now
-connects 4,090 definition-bearing placements to exactly one named level row and
-one loose CMSH. The 733 loose MSL files contain 56 active `PlayAnimation*`
-calls in 15 files; 22 sites join through script strings on three WRES instances.
-The focused matrix-palette pass additionally closes the seven-file released
-position blend. These remain storage and authored-reference contracts, not proof
-that every named track is scheduled or rendered.
+Last updated: 2026-11-06 (names checked against onslaught-decomp; commands, flags and test counts checked against the Toolkit at commit 843c86e; earlier: the seven other `MESH` rows are in the base and front-end archives; the WRES join counts only records with no `dies_on` world)
+Verdict: the loose CMSH meshes store part tracks with pose tables, frame maps, bone arrays and camera field-of-view values, as the sections below measure. Most numeric LVLR `MESH` rows join by authored name to loose meshes, and the rest each own an anonymous embedded CMSH. The WRES/physics join connects each definition-bearing placement it covers to exactly one named level row and one loose CMSH. The loose MSL files contain active `PlayAnimation*` calls, and the calls that join to placements through script strings are described below. The focused matrix-palette pass additionally closes the released position blend. These remain storage and authored-reference contracts, not proof that every named track is scheduled or rendered.
 Evidence: MEASURED — `tools/cmsh_animation_usage_census.py` parsed and
 hash-verified 213 meshes, 66 numeric LVLR archives, 733 MSL files, and
 `default physics.dat` (1,013 inputs) against
-`<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`; the focused 17-test gate reproduces the
+`<maintainer evidence>/bea-asset-mirror/INDEX.jsonl`; the focused gate (see [Reproduce](#reproduce)) reproduces the
 counts, names, joins, and can-fail controls. Retail consumer VAs come from the
 cited pristine-binary notes and remain static evidence.
-Specimen: `<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`, SHA-256
+Specimen: `<maintainer evidence>/bea-asset-mirror/INDEX.jsonl`, SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`;
 retail VAs cite `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -89,10 +79,11 @@ all 129 all-closing placements are active, but so are 1,142 non-closing and
 2,758 static placements. Active state alone therefore does not generalize the
 Level 100 playback decision.
 
-`CMSP+0xB4` (`aFrames`) is the number of position sets of the older mesh format's
-per-vertex position array. The loader reads that array only when the part has positions of
-its own ([cmsh-fields.md](cmsh-fields.md#grammar)), and no installed PC part does. It is not
-a count of key poses or clips. Its value population here is **0=1,987, 1=1,760, 2=27**.
+`CMSP+0xB4` (`aFrames`) probably counts the position sets of the older mesh format's
+per-vertex position array: the grammar multiplies that array by it ([cmsh-fields.md](cmsh-fields.md#grammar)).
+That meaning is not established. The loader reads the array only when the part has positions of
+its own, and no installed PC part does. Its value population here is **0=1,987, 1=1,760, 2=27**,
+which refutes a simple visible-key-count label (see [Open questions](#open-questions-and-cheapest-falsifiers)).
 
 The format stores no frame rate as such. Each animation mode in the mesh's `CAMD` table
 stores a rate: the share of the mode played per game tick. The game ticks at 20 Hz, so a
@@ -110,9 +101,9 @@ contains one finite float:
 | `75.78888702392578` | 1 |
 | `34.70261001586914` | 1 |
 
-`CMeshPart__LoadFromStream @ 0x004B27A0` loads the positional
+`CMeshPart__Deserialize @ 0x004B27A0` loads the positional
 `HORI`/`HPOS`/`HFOV` sequence. The only proved post-load `HFOV` reader is in
-`CRTCutscene__BuildCurrentFrameOutputs`: it maps a virtual frame through `VHFM`
+`CRTCutscene__BuildCurrentFrameOutputs` (in the decompilation notes, not yet published): it maps a virtual frame through `VHFM`
 and returns that hierarchy pose's FOV parameter. The player cockpit does not use
 its `Camera01` `HFOV`; the complete bounded path is
 [player-camera-attach-and-mesh-hfov.md](../engine/render/player-camera-attach-and-mesh-hfov.md).
@@ -203,7 +194,7 @@ bytes; the retail name lookup itself uses `stricmp`.
 The two argument-word combinations are `(FALSE,FALSE)` 2, `(FALSE,TRUE)` 8,
 `(TRUE,FALSE)` 22, and `(TRUE,TRUE)` 24. Their friendly meanings remain open.
 `IScript__PlayAnimationWait @ 0x005351D0` proves only that both are byte-masked,
-that the name is resolved through `CMesh__FindAnimationIndexByName`, and that
+that the name is resolved through `CMesh__GetAnimModeByName`, and that
 completion resumes a saved VM snapshot. See
 `IScript__PlayAnimationWait.md` (in the decompilation notes, not yet published).
 
@@ -218,33 +209,35 @@ than being attached to the parent CMSH by guesswork.
 
 | VA | Static identity | Bounded contribution |
 | --- | --- | --- |
-| `0x004B27A0` | `CMeshPart__LoadFromStream` | positional `VHFM`/`HORI`/`HPOS`/`HFOV` and cache load |
-| `0x004AA630` | `CMesh__FindAnimationIndexByName` | case-insensitive search of count `+0x14`, table `+0x18`, stride `0x24`; returns the record's `+0x10` value or `-1` |
+| `0x004B27A0` | `CMeshPart__Deserialize` | positional `VHFM`/`HORI`/`HPOS`/`HFOV` and cache load |
+| `0x004AA630` | `CMesh__GetAnimModeByName` | case-insensitive search of count `+0x14`, table `+0x18`, stride `0x24`; returns the record's `+0x10` value or `-1` |
 | `0x00404790` | `CAnimation__Process` | advances animation state and calls owner vtable `+0xEC` on the observed completion path |
 | `0x00404860` | `CAnimation__SetAnimMode` | mode/reset/force-looped setup through the render-frame increment path |
 | `0x004F44A0` | `CComplexThing__SetAnimMode` | lazy `CAnimation` allocation and forwarding |
 | `0x005351D0` | `IScript__PlayAnimationWait` | name lookup, play dispatch, VM stop, completion-resume contract |
-| `0x0054C920` | `CDXMeshVB__BuildSkeletalVB` | skeletal vertex-buffer construction route |
+| `0x0054C920` | `CDXMeshVB__BuildSkinnedVB` | skeletal vertex-buffer construction route |
 | `0x00549570` | `CMeshRenderer__RenderMeshCore` | samples each BONE part at frame zero/current pose, constructs the palette, scales all 16 matrix elements by `[0x005D8608]`, and copies it to `0x009C69D4` |
-| `0x00502920` | `CVertexShader__ApplyCustomRenderStateShaderConstants` | uploads a separate c7-c9 one-third diagonal, then reads/transposes and uploads the already-scaled global palette to c10+ |
+| `0x00502920` | `CVertexShader__SetCustomConstants` | uploads a separate c7-c9 one-third diagonal, then reads/transposes and uploads the already-scaled global palette to c10+ |
 | `0x0049CC40` | `CMCTentacle__Init` | semantic part-name scan and controller-owned bone/spline buffers |
 
 These anchors demonstrate consumers and call shapes. They do not prove that the
 CMSH frame chunks themselves contain the runtime table of named clips. This pass
-found no bounded named-clip field in `VHFM`/`HORI`/`HPOS`; the origin and complete
-layout of the `CMesh+0x14/+0x18` table remain open.
+found no bounded named-clip field in `VHFM`/`HORI`/`HPOS`. The 36-byte `CAMD` record layout is in
+[cmsh-fields.md](cmsh-fields.md); how the runtime `CMesh+0x14/+0x18` table is populated remains open
+(see [Open questions](#open-questions-and-cheapest-falsifiers)).
 
 ## Reproduce
 
-The tracked scanner accepts an explicit user-supplied data root, verifies every
-selected file against the optional mirror index, and refuses to publish outside
-an ignored `local-lab` or `.artifacts` path:
+The scanner and its focused test are in [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit [843c86e](https://github.com/dlprentice/Onslaught-Career-Editor/tree/843c86e06810c8fce953226ccebd41bf2cf74473): `tools/cmsh_animation_usage_census.py` and `tools/cmsh_animation_usage_census_tests.py`. Run the commands below from that checkout. The scanner takes an explicit data root, checks every selected file against the mirror index when one is given, and refuses to write its report outside the checkout's ignored `local-lab/` or `.artifacts/` folder.
+
+- `<safe-copy>/data` is the `data` folder of your own copy of the game. The run needs it, and the shipped-data tests cannot run without it.
+- `<asset-mirror>/INDEX.jsonl` is the maintainer's private mirror index. Without it, leave out `--mirror-index`: the scan still runs, but it checks no file against an index.
 
 ```bash
 python ./tools/cmsh_animation_usage_census.py \
   --data-root "<safe-copy>/data" \
   --mirror-index "<asset-mirror>/INDEX.jsonl" \
-  --json-out "<maintainer evidence>/cmsh-animation-usage/census.json"
+  --json-out "local-lab/cmsh-animation-usage/census.json"
 ```
 
 Focused gate with the local corpus enabled:
@@ -255,8 +248,7 @@ export ONSLAUGHT_ASSET_INDEX="<asset-mirror>/INDEX.jsonl"
 python ./tools/cmsh_animation_usage_census_tests.py
 ```
 
-A clean clone runs seven synthetic can-fail tests and skips the nine
-specimen-bound tests when those two inputs are absent.
+The test file has 47 test methods at commit 843c86e. The 37 synthetic tests cover motion classification, MSL call counting, model metadata, world-instance parsing and the output-folder rule, and a clean clone runs them. The 10 specimen-bound tests in `ShippedAnimationUsageCensusTests` check the input hashes, the lane populations, bone arrays, camera values, LVLR membership, MSL calls and WRES joins; they are skipped unless both the data root and the mirror index are present.
 
 ## Open questions and cheapest falsifiers
 
@@ -264,7 +256,7 @@ specimen-bound tests when those two inputs are absent.
   during one mesh load, then join each 0x24-byte record to the frame interval the
   render-frame path selects. A name lookup alone does not locate the table's
   serialized owner.
-- **`aFrames`:** join `CMSP+0xB4` to the exact `CMeshPart__LoadFromStream` branch
+- **`aFrames`:** join `CMSP+0xB4` to the exact `CMeshPart__Deserialize` branch
   and one downstream reader; its current distribution refutes a simple visible-
   key-count label.
 - **Remaining skinning:** obtain a raw 48-byte runtime VB comparison and observe

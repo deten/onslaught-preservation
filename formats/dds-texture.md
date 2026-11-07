@@ -4,14 +4,14 @@ Status: active format contract — complete AYA/DDS header census, a complete
 stored mip-chain and alpha census, and a check of every lower mip level's pixels;
 render semantics remain bounded
 Date: 2026-08-22
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Verdict: all 847 AYA/DDS headers are accounted for, and every file's payload is
+Last updated: 2026-11-06 (function names taken from the public decompilation table; census tool named by commit; lower-level and alpha counts scoped; Verdict made count-free; earlier: research-campaign records and decompiler-style code removed)
+Verdict: all AYA/DDS headers in the installed tree are accounted for, and every file's payload is
 exactly the mip chain its header declares, in one of four pixel formats; font,
 upload, and render fidelity remain bounded or open.
 Evidence: MEASURED — all 847 texture rows in
-`<maintainer evidence>\bea-asset-mirror\INDEX.jsonl` were re-aggregated read-only. Retail VAs are
+`<maintainer evidence>/bea-asset-mirror/INDEX.jsonl` were re-aggregated read-only. Retail VAs are
 static routes from named pristine-binary notes.
-Specimen: `<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`, SHA-256
+Specimen: `<maintainer evidence>/bea-asset-mirror/INDEX.jsonl`, SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`;
 retail VAs cite `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -26,7 +26,7 @@ The installed tree contains **847** DDS payloads inside the PC AYA envelope:
 | `resources/textures` | 47 | 38 A1R5G5B5-shaped masks, 9 A8R8G8B8-shaped masks |
 
 Every file inflates to magic `DDS `. The 2026-08-22 index aggregate reports the
-combined mip-count field distribution: 0=593, 5=2, 6=14, 7=32, 8=40, 9=57,
+combined mip-count field distribution: 0=593 (mip-count field 0 = no mip chain), 5=2, 6=14, 7=32, 8=40, 9=57,
 10=105, 11=4. The most common combined dimensions are 512×512 (207),
 1024×1024 (152), 128×128 (146), 64×64 (102), and 256×256 (87).
 
@@ -51,9 +51,7 @@ catalog; that does not make later mip levels or rendered pixels proved.
 
 For the 800 compressed files, DXT1 uses 8-byte 4×4 blocks and DXT2 uses 16-byte
 blocks with explicit alpha and a premultiplied-alpha declaration. The current
-catalog intentionally stores compressed colour values without an automatic
-un-premultiply because prior project evidence eliminated that transform as a
-rendering fix. That is a project decode decision, not a universal DXT2 rule.
+catalog intentionally stores compressed colour values without an automatic un-premultiply; whether rendering needs that transform is an open question (see the open questions below). That is a project decode decision, not a universal DXT2 rule.
 
 ## Names are requests, not storage contracts
 
@@ -67,14 +65,14 @@ X8R8G8B8-suffixed names store DXT1. Read the DDS header.
 
 | VA | Static identity | Demonstrated boundary |
 | --- | --- | --- |
-| `0x00556CC0` | `CTexture__ctor` | Constructs a `CDXTexture`-RTTI object and installs vptr `0x005E59A0`. |
-| `0x00557060` | `CDXTexture__EnsureLoaded` | Vtable slot used by texture objects. |
-| `0x00557300` | `CDXTexture__LoadTextureFromFile` | File/load path with resource-handle validation. |
-| `0x005586E0` | `CDXTexture__DumpTextureToRGBA` | CPU-side RGBA dump helper. |
+| `0x00556CC0` | `CDXTexture__ctor` | Constructs a `CDXTexture`-RTTI object and installs vptr `0x005E59A0`. |
+| `0x00557060` | `CDXTexture__RestoreDeviceObjects` | Vtable slot used by texture objects. |
+| `0x00557300` | `CDXTexture__LoadFrame` | File/load path with resource-handle validation. |
+| `0x005586E0` | `CDXTexture__Dump` | CPU-side RGBA dump helper. |
 | `0x00559BE0` | `CDXTexture__Deserialize` | Tagged serialized texture reader using `CChunkReader`. |
-| `0x00574492` | `CDXTexture__UploadDecodedBufferToSurface` | Static decoded-buffer handoff to a texture surface. |
-| `0x0057BF1F` | `CDXTexture__BuildDdsSurfaceNodeTree` | Validates DDS magic/header and builds mip/depth nodes and extents. |
-| `0x0057CA6A` | `CDXTexture__DecodeFromMemory_WithFallbackCodecs` | Static fallback order BMP→PPM→DDS→JPEG→PNG→TGA→DIB. |
+| `0x00574492` | `CDXTexture__UploadDecodedBufferToSurface`, not in the public tree (private decompilation) | Static decoded-buffer handoff to a texture surface. |
+| `0x0057BF1F` | `CDXTexture__BuildDdsSurfaceNodeTree`, not in the public tree (private decompilation) | Validates DDS magic/header and builds mip/depth nodes and extents. |
+| `0x0057CA6A` | `CDXTexture__DecodeFromMemory_WithFallbackCodecs`, not in the public tree (private decompilation) | Static fallback order BMP→PPM→DDS→JPEG→PNG→TGA→DIB. |
 | `0x0053A040` | raw inherited trampoline | Jumps to `0x00557060`; not a separate decoder body. |
 
 See
@@ -89,7 +87,7 @@ Static routes show ownership and format dispatch, not decoded-pixel correctness.
 - `tools/BeaAssetExportHarness/Program.cs` in Onslaught-Career-Editor
   enumerates both texture shelves and calls the pinned AYAResourceExtractor and
   DDS decoder assemblies.
-- [`game-assets/aya-asset-format.md`](aya-asset-format.md)
+- [`aya-asset-format.md`](aya-asset-format.md)
   documents the external extractor's DXT/vertex assumptions and its corrected
   non-square output bug.
 - The mirror's `aya-dds-png/v1` detail rows preserve header fields and bounded
@@ -97,6 +95,8 @@ Static routes show ownership and format dispatch, not decoded-pixel correctness.
   tracked.
 
 ## Mip-chain and alpha census (2026-10-16)
+
+`GAME_FOLDER` is the installed game folder (the one that holds `data/resources/`); the tool only reads it, and `BEA_GAME` may name it instead of `--game`. The census tool is `tools/dds_census.py` in [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit [`6a49fbc`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/6a49fbc4ce4cfeff35bd43d9c061be5fe7997813), the commit that added its `--mips` pass.
 
 `python tools/dds_census.py --game GAME_FOLDER` re-read every installed texture
 (manifest digest over sorted `shelf/name sha256` lines:
@@ -108,7 +108,7 @@ file's DDS header against its stored bytes. All 847 pass with no exception:
   A1R5G5B5 and A8R8G8B8 pixels 2 and 4 bytes;
 - the header's linear size (or pitch) equals the top level's size, the mipmap
   cap agrees with the mip count, and no file is a cube map or volume;
-- every width and height is a power of two (739 square, 108 not);
+- every width and height is a power of two (739 files are square; 108 are not);
 - every mipmapped file carries the full chain down to one pixel along its longer
   side; 593 files have a single level.
 
@@ -121,11 +121,11 @@ file's DDS header against its stored bytes. All 847 pass with no exception:
 
 | Mip levels | Files |
 | --- | ---: |
-| 1 | 593 |
+| 1 (mip-count field 0 = no mip chain) | 593 |
 | 5 / 6 / 7 / 8 | 2 / 14 / 32 / 40 |
 | 9 / 10 / 11 | 57 / 105 / 4 |
 
-Alpha at the top level:
+Alpha at the top level, for all 847 textures:
 
 | Format | Opaque | On/off only | Graded |
 | --- | ---: | ---: | ---: |
@@ -161,9 +161,7 @@ moved: `meshtex\f_trooperd`'s 8×8 level, for example, or
 `meshtex\FB_hangertop01`'s 4×4 level. The colours are what a box filter followed by
 per-level compression would give; the exact filter is open.
 
-Alpha in lower levels is not averaged. Consider the 232 mipmapped textures whose
-alpha is only on or off: 19 with cut-outs such as `meshtex\Dead Tree 01_Branches`,
-and the fully opaque rest. In every level below the top of every one of them, a
+Alpha in lower levels is not averaged. Of the 254 mipmapped textures: 232 on/off or opaque, 22 graded. Consider the 232 mipmapped textures whose alpha is on/off or fully opaque: 19 with cut-outs such as `meshtex\Dead Tree 01_Branches`, and the fully opaque rest. In every level below the top of every one of them, a
 pixel is opaque exactly when at least two of its four parent pixels in the level
 above are opaque, and transparent otherwise:
 
@@ -178,16 +176,15 @@ above are opaque, and transparent otherwise:
 That is the parents' average alpha thresholded at one half, inclusive. So cut-outs
 stay solid as they shrink, and their opaque share grows toward the smallest level.
 `Dead Tree 01_Branches` goes from 10% opaque at 256×256 to 50% at 2×2 and fully
-opaque at 1×1. Lower levels of the 22 textures with graded alpha were measured for
-colour only.
+opaque at 1×1. Of the 254 mipmapped textures: 232 on/off or opaque, 22 graded. Lower levels of the 22 graded textures were measured for colour only.
 
 ## Fonts and text rendering
 
 The mirror contains no loose `.ttf`, `.otf`, or other standalone font-file
 family. The 47 uncompressed resource textures include nine font/frontend/system
 or HUD assets; font glyph pixels are therefore texture assets, not a separate
-installed font container. `CDXFont__CreateGDIFont @ 0x0053FB00` is a static font
-owner that also reaches `CDXTexture__GetAnimatedFrame`; it does not prove that a
+installed font container. `CDXBitmapFont__InitFromSysFont @ 0x0053FB00` is a static font
+owner that also reaches `CDXTexture__GetTexture`; it does not prove that a
 shipped external font file exists.
 
 ## Open questions and falsifiers
@@ -198,7 +195,7 @@ shipped external font file exists.
 - Establish exact colour-space, premultiplication, sampler, and upload behavior
   with a controlled render capture on copied assets.
 - Path flattening, the 65-character cut, the `mustbe_` prefix and the DXTn fallback
-  are now read from the matched loader (`CDXTexture::LoadFrame`, `0x00557300`;
+  are now read from the matched loader (`CDXTexture__LoadFrame`, `0x00557300`;
   [goodie-resources.md](goodie-resources.md)). Collision and case behaviour, and
   the precedence at run time, still want a file-I/O trace.
 - Identify which nine uncompressed assets feed font/HUD owners and map glyph

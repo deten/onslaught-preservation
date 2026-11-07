@@ -2,11 +2,10 @@
 
 Status: active format contract — the PC loader's complete chunk grammar and every stored record layout
 Date: 2026-10-16
-Last updated: 2026-10-29 (the `TEXB` name field: its terminator and the loader's suffix rule; the chained meshes counted as 15 meshes in seven files, not 15 files; earlier: links updated for the onslaught-preservation layout)
-Verdict: all 213 installed PC mesh files (228 meshes, counting 15 chained meshes) parse to their exact
-final byte under the grammar below, with exactly one tag in every grammar slot. Every stored record is the
-loader's in-memory object image: 372, 316, 296 and 184 bytes for the mesh, part, vertex-buffer and
-collision-grid records, matching their declared layouts.
+Last updated: 2026-11-06 (count-free Verdict and Specimen, the collision grid stated as parsed with its unpacking open, and the primitive-type numbering stated explicitly; earlier, 2026-10-29: the `TEXB` name field: its terminator and the loader's suffix rule; the chained meshes counted as meshes, not files; earlier: links updated for the onslaught-preservation layout)
+Verdict: every installed PC mesh file parses to its exact final byte under the grammar below, with exactly
+one tag in every grammar slot. Every stored record is the loader's in-memory object image, with the sizes
+given in the grammar and the Records section.
 Evidence: SOURCE + MEASURED. The grammar follows the retail loaders as reconstructed and byte-matched in
 the private decompilation; functions are cited by name and retail address. Record offsets come from the
 decompilation's class declarations, laid out with the 32-bit MSVC rules and checked against the stored
@@ -14,7 +13,7 @@ record sizes. The installed corpus was walked with
 `tools/cmsh_grammar_walk.py` in Onslaught-Career-Editor.
 Specimen: retail addresses cite `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`; the corpus is the installed
-`data/resources/meshes/*.aya`, 213 files, whose manifest digest (SHA-256 over sorted `name sha256` lines) is
+`data/resources/meshes/*.aya`, whose manifest digest (SHA-256 over sorted `name sha256` lines) is
 `27ada81470ff8919cb832f63e78e24ac6d33625b26be54247b70b05a76690ae1`.
 
 This document owns the PC mesh stream's field-level layout and its parse order: what a reader needs to
@@ -35,7 +34,7 @@ The grammar walk settles several tags that [cmsh-mesh.md](cmsh-mesh.md) left ope
 | `CEMT` | end metadata | the mesh's emitter table |
 | `NMIC` | chain metadata | a part's next-part-in-chain index |
 | `MMPT` | geometry/material array | one vertex-buffer piece's six counts |
-| `PB*`, `CPBT`, `SIZS`, `PLQT` | opaque | the part's collision polygon grid, fully laid out below |
+| `PB*`, `CPBT`, `SIZS`, `PLQT` | opaque | the part's collision polygon grid: parsed, but the packed-position unpacking is open (see [Open questions](#open-questions)) |
 | 48-byte vertex | position, normal, colour, UV, then three palette offsets | position, then the three palette offsets, then normal, colour and UV |
 
 The census in [cmsh-mesh.md](cmsh-mesh.md) counts each file's first mesh only. The counts below include the
@@ -351,8 +350,9 @@ Stride, vertex format and primitive type are meaningful only when `piece_count >
 part they are `(36, 0x152, 4)` (1,783 parts) or `(48, 0, 4)` (16 skeletal parts).
 
 The game maps its primitive numbering 0–5 to Direct3D's point list, line list, line strip, triangle list,
-triangle strip and triangle fan. So the stored 4 is a **triangle strip**. The buffer-building code stores Direct3D's
-triangle-list constant there, which is also 4, and the game draws strips.
+triangle strip and triangle fan. So the stored value is the game's index, 4 = **triangle strip**, and the game draws strips.
+The buffer-building code writes that same 4. Direct3D's triangle-list constant has the same number in its
+own 1-based enumeration; that is a different enumeration, and the constant is not the value used here.
 
 Each piece's index buffer is one stitched strip: `primitive_count = index_count − 2` in all 2,661
 installed pieces, and degenerate triangles join the runs (2,635 pieces contain some). A reader takes triangles from consecutive index triples, flips the winding of every

@@ -3,7 +3,7 @@
 Status: active format contract — all shipped text rows and retail token grammar
 accounted for; simulation/render behavior remains partial
 Date: 2026-08-22
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (live parser owners in onslaught-godot; five names set to the decompilation's)
 Verdict: the complete shipped token grammar, 1,479 descriptors, factory, and
 loader VAs are bounded; simulation/render semantics remain partial.
 Evidence: MEASURED — all three mirror-index rows, pristine retail parser tables,
@@ -78,16 +78,18 @@ but absent from all three files.
 
 | VA | Identity | Boundary |
 | --- | --- | --- |
-| `0x004F57B0` | `CTokenArchive__ReadNextToken` | 124-name lookup and seven-arm parse dispatch. |
-| `0x004F5BA0` | `CTokenArchive__ResolveReferences` | Case-insensitive deferred-reference resolution and cleanup. |
-| `0x004CC020` | `CParticleSet__CreateByType` | Thirteen-case factory/RTTI chain. |
-| `0x004CD7F0` | `CParticleSet__LoadFromArchive` | Validates header tokens, creates descriptors, dispatches loader, resolves references. |
-| `0x004CDA60` | `CParticleSet__LoadParticleSetFile` | Selects MainSet/Frontend, opens the buffer, calls archive loader. |
+| `0x004F57B0` | `CTokenArchive__ReadToken` | 124-name lookup and seven-arm parse dispatch. |
+| `0x004F5BA0` | `CTokenArchive__HandleRelocation` | Case-insensitive deferred-reference resolution and cleanup. |
+| `0x004CC020` | `CParticleSet__Create` | Thirteen-case factory/RTTI chain. |
+| `0x004CD7F0` | `CParticleSet__ReadData` | Validates header tokens, creates descriptors, dispatches loader, resolves references. |
+| `0x004CDA60` | `CParticleSet__LoadAllFromDisk` | Selects MainSet/Frontend, opens the buffer, calls archive loader. |
 
-The current owned parser is
-`rebuild/OnslaughtRebuild.Client/ParticleSetFile.cs` in Onslaught-Career-Editor
-with focused tests in
-`rebuild/OnslaughtRebuild.Client.Tests/ParticleSetTests.cs` in Onslaught-Career-Editor.
+The current owned parser is in onslaught-godot, where the rebuild is developed:
+[`ParticleSet.cs`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Parity/Particles/ParticleSet.cs)
+and [`TokenArchive.cs`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Parity/Particles/TokenArchive.cs),
+exercised by [`ParticleSystemTests.cs`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Parity.Tests/ParticleSystemTests.cs).
+The Onslaught-Career-Editor copy (`rebuild/OnslaughtRebuild.Client/ParticleSetFile.cs` and its test, at commit
+[`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50)) is a frozen reference only.
 This is a bounded reconstruction owner, not proof of complete visual parity.
 
 ## Known asymmetry

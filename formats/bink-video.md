@@ -3,14 +3,14 @@
 Status: active format contract — installed container/stream census and retail
 playback API routes bounded; language-stream mapping and decoded output open
 Date: 2026-08-22
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
+Last updated: 2026-11-06 (playback-anchor function names aligned with onslaught-decomp's function table; earlier: links updated for the onslaught-preservation layout)
 Verdict: all 66 Bink files have bounded container/media metadata and a static
 playback owner chain; packet/audio selection and runtime fidelity remain open.
 Evidence: MEASURED — all 66 mirror-index video heads were rechecked; the earlier
 `ffprobe` pass supplies duration/frame-rate/stream metadata.
-Specimen: `<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`, SHA-256
+Specimen: `<maintainer evidence>/bea-asset-mirror/INDEX.jsonl`, SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`;
-retail VAs cite `BEA.exe.original.backup`, SHA-256
+retail VAs (virtual addresses in the pristine executable) cite `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 ## Population
@@ -75,9 +75,9 @@ imports. Full PE identity and export table: [../platforms/pc/game-binaries.md](.
 | `0x00541430` | `CDXFrontEndVideo__InitVideo` | Reads the Bink handle, decodes the first frame, creates two texture buffers. |
 | `0x00541650` | `CDXFrontEndVideo__CloseVideo` | Waits for async open, releases textures, gets summary, calls BinkClose. |
 | `0x00541790` | `CDXFrontEndVideo__Render` | Decodes/advances, copies into a locked texture, draws a faded quad. |
-| `0x00541D30` | `CDXFrontEndVideo__Update` | Calls BinkWait/DoFrame/NextFrame and checks completion. |
+| `0x00541D30` | `CDXFrontEndVideo__NextFrame` | Calls BinkWait/DoFrame/NextFrame and checks completion. |
 | `0x00541120` | `CBinkOpenThread__ctor` | Constructs the asynchronous Bink-open worker owner. |
-| `0x0053F0F0` | `CDXFMV__ctor_base` | Embeds the front-end video object in the lower-level FMV wrapper. |
+| `0x0053F0F0` | `CDXFMV__ctor` | Embeds the front-end video object in the lower-level FMV wrapper. |
 
 Evidence:
 [`DXFrontEndVideo.md`](../engine/frontend/DXFrontEndVideo.md)

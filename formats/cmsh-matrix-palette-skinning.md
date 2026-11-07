@@ -5,8 +5,8 @@ palette roles, and the executed position blend are closed; typed matrix order
 and normal dataflow are closed by the focused
 [P2 successor](cmsh-matrix-normal-deformation.md)
 Date: 2026-08-23
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Verdict: **The seven shipped `BONE` carriers use one static 48-byte vertex form
+Last updated: 2026-11-06 (predecessor and Toolkit tool pins name the commit they were recorded at; reproduce block names the Toolkit commit and placeholders; runtime FVF stated; public names for the same addresses; earlier: research-campaign records and decompiler-style code removed)
+Verdict: **The shipped `BONE` carriers use one static 48-byte vertex form
 and GPU-side `vs_1_1` skinning. Each vertex stores three floating-point palette
 offsets, each exactly `3 * BONE-array index`; no per-vertex scalar weight is
 serialized. The retail linked shader computes the slot-0 transform and discards
@@ -20,9 +20,9 @@ copies it to the renderer global. The shader-constant owner later uploads that
 already-scaled palette.**
 Evidence: MEASURED — corpus-static, pristine-retail-static, and copied-runtime
 evidence converge: the
-tracked deterministic instrument hash-verifies all 213 loose CMSH files, the
-pristine executable, and three existing proxy logs; it emits a public-safe
-27-data-row receipt with zero unclassified tested field words.
+tracked deterministic instrument hash-verifies every loose CMSH file, the
+pristine executable, and the existing proxy logs; it emits a public-safe
+receipt with zero unclassified tested field words.
 Specimen: mirror index SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`;
 pristine `BEA.exe.original.backup` SHA-256
@@ -45,17 +45,19 @@ instance.
 
 | Disposition | Predecessor | SHA-256 / pin | What this pass did |
 | --- | --- | --- | --- |
-| **REUSED** | [`aya-resource-extractor-source-audit.md`](aya-resource-extractor-source-audit.md) + [92-row contract](aya-resource-extractor-contract.tsv) | audit commit `21fcd11bec3538fe24be61d92e5e6b4d76186adc`; files `b08368a114069eae78b7dc61b00a085588188af575c74bb672ec1d5598b98af0` / `0a4a58c68f8c9d91cac27fba89d7c49a25948ac4ef5616c10fb6b0ae300a024e` | Kept `CCUS`/`BONW`/`BONS` absent and refused the extractor's skipped-buffer guesses. |
-| **REUSED** | [`cmsh-mesh.md`](cmsh-mesh.md), [`cmsh-animation-usage.md`](cmsh-animation-usage.md), and [`wres-instance-join.md`](wres-instance-join.md) | `c3ff3bd118c6cf6d9905906b5a9bb0d207488bacfc02b0b497c89015d38202be`, `310f030dad3a21fda8105082fe6d32e943cb96e912f58f1ac02c8cb3d8b5dda0`, `b6845a82849eb17eb39c751e388eb803096426c51a02963ee7cd82f1974ba588` | Reused the seven-carrier denominator, BONE-to-part names, 9,609 scaled slots, and bounded world membership. |
-| **REUSED** | `rebuild/tools/cmsh_static_preview.py` in Onslaught-Career-Editor, `tools/cmsh_animation_usage_census.py` in Onslaught-Career-Editor, and [`cmsh-cpos-cori-identity.md`](cmsh-cpos-cori-identity.md) | `efd14ff88315408d656e5b3605e1b3dab4a3e323118f5997934cb936f48f1cc7`, `510e03e5066f71ba1a89d604eefccb126589fcc16d27f339b90007526b02ec6c`, `8cc27f8d467628d158b3595813ad5e0c98ef123da273ceb22b38f686daf85259` | Reused fail-closed parsing, mesh/part identity, and the proof that CPOS/CORI are derived caches rather than bind matrices. |
+| **REUSED** | [`aya-resource-extractor-source-audit.md`](aya-resource-extractor-source-audit.md) + [92-row contract](aya-resource-extractor-contract.tsv) | audit commit `21fcd11bec3538fe24be61d92e5e6b4d76186adc` in Onslaught-Career-Editor (on no branch, tag or pull-request ref); files at that commit `b08368a114069eae78b7dc61b00a085588188af575c74bb672ec1d5598b98af0` / `0a4a58c68f8c9d91cac27fba89d7c49a25948ac4ef5616c10fb6b0ae300a024e` (this repository's copies have changed since) | Kept `CCUS`/`BONW`/`BONS` absent and refused the extractor's skipped-buffer guesses. |
+| **REUSED** | [`cmsh-mesh.md`](cmsh-mesh.md), [`cmsh-animation-usage.md`](cmsh-animation-usage.md), and [`wres-instance-join.md`](wres-instance-join.md) | frozen copies at audit commit `21fcd11` in Onslaught-Career-Editor (`reverse-engineering/asset-formats/`): `c3ff3bd118c6cf6d9905906b5a9bb0d207488bacfc02b0b497c89015d38202be`, `310f030dad3a21fda8105082fe6d32e943cb96e912f58f1ac02c8cb3d8b5dda0`, `b6845a82849eb17eb39c751e388eb803096426c51a02963ee7cd82f1974ba588` (this repository's copies have changed since) | Reused the seven-carrier denominator, BONE-to-part names, 9,609 scaled slots, and bounded world membership. |
+| **REUSED** | `rebuild/tools/cmsh_static_preview.py` (frozen copy), `tools/cmsh_animation_usage_census.py`, and `reverse-engineering/binary-analysis/cmsh-cpos-cori-identity-2026-07-25.md` (frozen copy of [`cmsh-cpos-cori-identity.md`](cmsh-cpos-cori-identity.md)), all in Onslaught-Career-Editor at audit commit `21fcd11`; the live rebuild is in onslaught-godot | `efd14ff88315408d656e5b3605e1b3dab4a3e323118f5997934cb936f48f1cc7`, `510e03e5066f71ba1a89d604eefccb126589fcc16d27f339b90007526b02ec6c`, `8cc27f8d467628d158b3595813ad5e0c98ef123da273ceb22b38f686daf85259` | Reused fail-closed parsing, mesh/part identity, and the proof that CPOS/CORI are derived caches rather than bind matrices. |
 | **EXTENDED** | ignored `<maintainer evidence>/PUZZLE-SKIN-WEIGHTS-2026-07-31.md` | `f894982b2d2bc71a1eadcf0990ecb588170313a9637706035a818b6d339150c5` | Retained its corrected executed shader law, then added exact current file/hash verification, complete TSV accounting, focused tests, and explicit bind/current consumer boundaries. |
 | **NEW_MEASUREMENT** | `tools/cmsh_skinning_contract.py` in Onslaught-Career-Editor + focused tests | deterministic JSON `e6f70ecf12add31d7e5d6a5508cec4d93c4fa9c69de68d889d07e4bebcef54dd`; TSV `f98b2c7e501cf90702aba65481f3e879eadcc30a51f40dfa2d08c74b8b76a3af`, each reproduced twice | Re-read all 213 hash-pinned meshes, five raw pristine function ranges, the renderer scale/copy loop, six linked skinning shaders, 1,344 palette rows, and both exact Level-800 static VBs. |
 
-The ignored decompile predecessors were also pinned before use:
+Pins are SHA-256 values of the copies named in each row, at the commit each row names. Commit `21fcd11` is the audit commit whose snapshot holds the recorded values; it is in Onslaught-Career-Editor's history by SHA but on no branch, tag or pull-request ref. Commit `51129bab`, which the README uses as the default for Toolkit paths, holds different values for the static-preview, census and asset-format copies.
+
+The ignored decompile predecessors (named in the decompilation notes, not yet published) were also pinned before use:
 `CMeshPart__LoadVerticesWithBones` `47d2cae5254c2b82a92943a3b7e212d85f96108456a277380ed64473c69e5aa2`,
 `CMeshRenderer__RenderMeshCore`
 `1fef07d87011225eaf5edfd307eaf10c83f32d4008f46ede6cf8378f0f631c71`,
-and `CDXMeshVB__BuildSkeletalVB`
+and `CDXMeshVB__BuildSkinnedVB`
 `2737becbe0a7bf69182bb76f094b18bab3a84c99b47e6a892f83414403bad5db`.
 They are interpretation aids, not substitutes for the instrument's direct
 pristine-byte pins.
@@ -65,7 +67,9 @@ pristine-byte pins.
 The family denominator is **213 loose `resources/meshes/*.msh.aya` files**.
 Exactly seven have one `BONE` carrier; all other **206** are rigid controls.
 Every carrier is part 1, uses `CMVB` stride/FVF/topology **48 / 0 / 4**, and
-uses every declared BONE slot at least once.
+uses every declared BONE slot at least once. The stored FVF `0` marks the shader-driven
+vertex, and the captured draw rows of these parts carry runtime FVF `0x15A`, which the
+skinning contract tool at commit `51129bab` checks.
 
 | Serialized stride-48 word(s) | Role | Tested disposition |
 | --- | --- | --- |
@@ -151,7 +155,7 @@ vertex, `BONW`, or `BONS`. The runtime obtains the two transform roles from the
 indexed CMSP parts:
 
 1. `CMeshRenderer__RenderMeshCore @ 0x00549570` calls
-   `CMCMech__BuildInterpolatedPoseAndAnchor @ 0x004B0FB0` at `0x0054A74E`
+   `CMeshPart__GetWorldTransforms @ 0x004B0FB0` at `0x0054A74E`
    with the frame-zero path for each BONE part. This is the bind/rest sample.
 2. It calls the same pose builder again at `0x0054A786` with current frame,
    interpolation, and controller inputs. This is the current sample.
@@ -164,7 +168,7 @@ indexed CMSP parts:
    VA `0x005D8608` contains binary32 `0x3EAAAAAB`. The loop then copies the
    scaled 16-float matrix with `REP MOVSD @ 0x0054B217` to the palette rooted at
    global `0x009C69D4`.
-4. `CVertexShader__ApplyCustomRenderStateShaderConstants @ 0x00502920`
+4. `CVertexShader__SetCustomConstants @ 0x00502920`
    does **not** perform that palette scaling. Its four exact `0x3EAAAAAB`
    immediate stores at `0x00502ECF`, `0x00502F06`, `0x00502F3D`, and
    `0x00502F74` create a separate diagonal constant uploaded at `c7-c9`. The
@@ -182,21 +186,22 @@ caches before use.
 ## Exact consumers and call sites
 
 Raw range hashes below are over the named bytes in the pristine PE, not the
-relocation-normalized hashes in broader function ledgers.
+relocation-normalized hashes in broader function ledgers. Function names are onslaught-decomp's names for these addresses (the byte-matching decompilation); the decompilation notes that first named the pinned predecessors are not published.
 
 | Function | Range / raw SHA-256 | Contract contribution |
 | --- | --- | --- |
-| `CMeshPart__LoadVerticesWithBones` | `0x004AFBB0`, 3,139 bytes, `2e2541a66ff58b4e6fff4aced3fdbfb685c6628e641134d600fd395dd3a7b316` | Legacy/dev input path normalizes weights, greedily selects three influences by subtracting exact `1/3`, and establishes the exporter fingerprint; it is not the shipped CMSH VBUF consumer. |
-| `CMCMech__BuildInterpolatedPoseAndAnchor` | `0x004B0FB0`, 2,692 bytes, `54997c37d712cfcdb7ab8cb6980eb5c4624fa387a227ad442dd984d13ddf1d4c` | Shared frame-zero/current pose sampler used by the palette constructor. |
-| `CVertexShader__ApplyCustomRenderStateShaderConstants` | `0x00502920`, 4,512 bytes, `f5625793a5e4493280d3d380ec81488e9fb7e10f4d1a2b5ce8ab94c4b9bd5e34` | Builds/uploads the separate c7-c9 one-third diagonal, then reads/transposes and uploads the renderer's already-scaled global palette to c10+. |
+| `CMeshPart__Read204` | `0x004AFBB0`, 3,139 bytes, `2e2541a66ff58b4e6fff4aced3fdbfb685c6628e641134d600fd395dd3a7b316` | Legacy/dev input path normalizes weights, greedily selects three influences by subtracting exact `1/3`, and establishes the exporter fingerprint; it is not the shipped CMSH VBUF consumer. |
+| `CMeshPart__GetWorldTransforms` | `0x004B0FB0`, 2,692 bytes, `54997c37d712cfcdb7ab8cb6980eb5c4624fa387a227ad442dd984d13ddf1d4c` | Shared frame-zero/current pose sampler used by the palette constructor. |
+| `CVertexShader__SetCustomConstants` | `0x00502920`, 4,512 bytes, `f5625793a5e4493280d3d380ec81488e9fb7e10f4d1a2b5ce8ab94c4b9bd5e34` | Builds/uploads the separate c7-c9 one-third diagonal, then reads/transposes and uploads the renderer's already-scaled global palette to c10+. |
 | `CMeshRenderer__RenderMeshCore` | `0x00549570`, 8,844 bytes, `e1371a73aaa0da2f502b54d4eb830f50b6913662cce6416ac057a361b298d2fb` | Exact skeletal render consumer: samples bind/current poses, builds each palette matrix, scales all 16 elements through `0x005D8608`, copies it to `0x009C69D4`, and dispatches layer rendering. |
-| `CDXMeshVB__BuildSkeletalVB` | `0x0054C920`, 2,254 bytes, `fa71ca9eee533a891fbf1658145f70578546e7be43a4ef294d89db07a73ef8f0` | Builds the static 48-byte skeletal VB; exact `FILD` + multiply-by-`3.0f` emits the three palette offsets. |
+| `CDXMeshVB__BuildSkinnedVB` | `0x0054C920`, 2,254 bytes, `fa71ca9eee533a891fbf1658145f70578546e7be43a4ef294d89db07a73ef8f0` | Builds the static 48-byte skeletal VB; exact `FILD` + multiply-by-`3.0f` emits the three palette offsets. |
 
-`CDXMeshVB__VFunc_1_0054D210` dispatches to `BuildSkeletalVB` at
-`0x0054D3AC` when the part mode is 3 and the skeletal gate is enabled. The
-shipped serialized route is `CMeshPart__LoadFromStream` / `CDXMeshVB__Load` to
-that builder and renderer; the old `LoadVerticesWithBones` path explains source
-quantization but does not own the current VBUF bytes.
+`CDXMeshVB__InitDeviceObjects` at `0x0054D210` dispatches to
+`CDXMeshVB__BuildSkinnedVB` at `0x0054D3AC` when the part mode is 3 and the
+skeletal gate is enabled. The shipped serialized route is
+`CMeshPart__Deserialize` / `CDXMeshVB__Load` to that builder and renderer; the
+old `CMeshPart__Read204` path explains source quantization but does not own the
+current VBUF bytes.
 
 ## Runtime instance and controls
 
@@ -229,14 +234,26 @@ palette rows**.
 
 ## Reproduce
 
+The tool is `tools/cmsh_skinning_contract.py` in
+[Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit
+[`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50),
+with its focused tests in `tools/cmsh_skinning_contract_tests.py` at the same commit.
+A run needs your own installed copy of the game and your own capture logs; the
+maintainer's logs and asset-mirror index are not published. The placeholders are:
+
+- `<safe-copy>/data`: the `data` folder of a read-only copy of your installed game;
+- `<pristine-exe>`: your own pristine `BEA.exe`, whose SHA-256 must match the Specimen line above;
+- `<asset-mirror>/INDEX.jsonl`: the asset-mirror index this document pins (its SHA-256 is in the Specimen line); the maintainer's copy is not published;
+- `<maintainer evidence>/captures/<run>/d3d9-draws.log`: a D3D9 draw-capture log for each of the three runs (`lvl800-vsdump`, `lvl800-vskin` and `lvl611-vsdump` here); the logs are not published, and the TSV records their SHA-256 values.
+
 ```bash
 python ./tools/cmsh_skinning_contract.py \
   --data-root "<safe-copy>/data" \
   --mirror-index "<asset-mirror>/INDEX.jsonl" \
-  --pristine-exe "<safe-copy>/BEA.exe.original.backup" \
-  --capture-log "<d3d9-capture>/vsdump-lvl800-20260731-132614/d3d9-draws.log" \
-  --capture-log "<d3d9-capture>/vskin-lvl800-20260731-133529/d3d9-draws.log" \
-  --capture-log "<d3d9-capture>/vsdump-lvl611-20260731-134131/d3d9-draws.log" \
+  --pristine-exe "<pristine-exe>" \
+  --capture-log "<maintainer evidence>/captures/lvl800-vsdump/d3d9-draws.log" \
+  --capture-log "<maintainer evidence>/captures/lvl800-vskin/d3d9-draws.log" \
+  --capture-log "<maintainer evidence>/captures/lvl611-vsdump/d3d9-draws.log" \
   --json-out ".artifacts/cmsh-skinning/report.json" \
   --tsv-out ".artifacts/cmsh-skinning/report.tsv"
 

@@ -2,20 +2,21 @@
 
 Status: active contract set
 Date: 2026-08-23
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
+Last updated: 2026-11-06 (folder index lists every note and table)
 Summary: routes every measured retail data/root-binary family to a bounded
 format contract, count, decoder anchor, and explicit unknown ledger.
 Evidence: MEASURED — counts were recomputed from the read-only
-`<maintainer evidence>\bea-asset-mirror\INDEX.jsonl` manifest (SHA-256
+`<maintainer evidence>/bea-asset-mirror/INDEX.jsonl` manifest (SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`).
-The header declares schema `onslaught.asset-mirror-index.v1`, generated
-2026-07-31, and 5,464 source files; this pass parsed exactly 5,464 data rows.
 
 ## Scope and safety boundary
 
-[../platforms/pc/game-binaries.md](../platforms/pc/game-binaries.md) is the companion document for the executables. `<maintainer evidence>\bea-asset-mirror`, the installed game, and the pristine safe copy
+[../platforms/pc/game-binaries.md](../platforms/pc/game-binaries.md) is the companion document for the executables. `<maintainer evidence>/bea-asset-mirror`, the installed game, and the pristine safe copy
 were read only. No binary was executed and no asset, decoded image, audio,
 video, or extracted payload is tracked here.
+
+The manifest's header declares schema `onslaught.asset-mirror-index.v1`, generated
+2026-07-31, and 5,464 source files; this pass parsed exactly 5,464 data rows.
 
 The mirror's `_interpreted` and derived PNG/output paths are decoder products,
 not specimen evidence. Static VAs are routes from named pristine-binary notes;
@@ -64,7 +65,7 @@ non-additive.
 | Root DLLs/helper EXE | [../platforms/pc/game-binaries.md](../platforms/pc/game-binaries.md) | 5 | static PE identity/ABI census |
 
 MSL scripts are counted here but remain owned by
-[`game-assets/msl-scripting.md`](../levels/scripting/msl-scripting.md) and the
+[`levels/scripting/msl-scripting.md`](../levels/scripting/msl-scripting.md) and the
 MissionScript VM contracts. There is no standalone `.anim` family: animation
 is embedded in CMSH (`VHFM`/`HORI`/`HPOS`/`HFOV`/bone lanes); the
 [focused contract](cmsh-animation-usage.md) separates those stored lanes from
@@ -81,6 +82,32 @@ retail image also has a GDI/texture font owner.
 
 The complete four-DLL ordinal/RVA export appendix is
 [../platforms/pc/game-binary-exports.md](../platforms/pc/game-binary-exports.md); `Message.exe` has no exports.
+
+## Other format notes
+
+These notes and tables are not named in the contract table above. The state column gives each one's own status
+and marks the superseded parts.
+
+| Note | What it holds | Contract state |
+| --- | --- | --- |
+| [aya-asset-format.md](aya-asset-format.md) | Overview of the AYA format from the AYAResourceExtractor analysis: compression, tag catalog, vertex and texture layouts | Older overview without a status header; the outer envelope is in [aya-container.md](aya-container.md) |
+| [aya-resource-chunks.md](aya-resource-chunks.md) | Chunk IDs and the top-level chunk lookup for `.aya` resource files | Active quick reference, migrated from archived skill notes |
+| [aya-resource-extractor-contract.tsv](aya-resource-extractor-contract.tsv) | One row per AYAResourceExtractor claim (92 rows), each classified against current evidence | Machine-readable owner of the source audit's claim table |
+| [aya-resource-extractor-source-audit.md](aya-resource-extractor-source-audit.md) | Audit of the AYAResourceExtractor source and its removed release, with historical comparisons | Active audit; behavior equivalence is not established |
+| [aya-resource-tag-family-static-contract.md](aya-resource-tag-family-static-contract.md) | Tag families of the retail resource dispatcher, with their routing and remaining boundaries | Active and bounded; recognition is not a complete payload schema |
+| [aya-tags.md](aya-tags.md) | AYA tag reference: texture, mesh, hierarchy, bounding, animation, bone, vertex-buffer and special tags | Quick reference migrated from archived skill notes; its `CPOS` and `CORI` entries are corrected in [cmsh-cpos-cori-identity.md](cmsh-cpos-cori-identity.md) |
+| [battle-engine-config-layout.tsv](battle-engine-config-layout.tsv) | Byte-span layout of the battle-engine config file: its header and six named records (7 rows) | Machine-readable companion to [config-dat.md](config-dat.md) |
+| [cmsh-animation-keys.md](cmsh-animation-keys.md) | How a PC mesh part's keys are evaluated: key convention, frame selection, interpolation and mode timing | Active format contract |
+| [cmsh-cpos-cori-identity.md](cmsh-cpos-cori-identity.md) | Identity of the CMSH `CPOS` and `CORI` data | Settled by measurement: a derived composition cache, not an animation track |
+| [cmsh-matrix-normal-deformation.tsv](cmsh-matrix-normal-deformation.tsv) | Typed rows (33) for the matrix and normal deformation contract: matrix operations, retail ranges, normal and linked-shader checks, prior-contract and control rows, and unknowns | Machine-readable companion to [cmsh-matrix-normal-deformation.md](cmsh-matrix-normal-deformation.md) |
+| [cmsh-matrix-palette-skinning.tsv](cmsh-matrix-palette-skinning.tsv) | Typed rows (27) for the palette skinning contract: family, per-mesh, bind-current, formula, retail-function, runtime and unknown rows | Machine-readable companion to [cmsh-matrix-palette-skinning.md](cmsh-matrix-palette-skinning.md) |
+| [game-assets-index.md](game-assets-index.md) | Index of the asset-format, extraction and mission-data notes, marking the historical ones | Active index |
+| [game-folder-analysis.md](game-folder-analysis.md) | Steam release file structure, generated December 2025 | Historical; its level table is superseded by [level-inventory.md](../levels/level-inventory.md) |
+| [physics-round-value-ids.md](physics-round-value-ids.md) | Which record offset each PhysicsScript round, weapon-mode, explosion and weapon value id writes, and the tutorial-round damage chain | Active static contract; the open items are listed in the note |
+| [physics-script-static-contract.md](physics-script-static-contract.md) | PhysicsScript default records by family, and the manager contract | Bounded static and copied-corpus evidence; not runtime proof |
+| [public-assets-and-modding.md](public-assets-and-modding.md) | What public changes may contain, with two controlled copied-game findings | Public-safe overview |
+| [texture-resource-decode-static-contract.md](texture-resource-decode-static-contract.md) | Routes texture and resource decode work to its retail evidence | Active static map; static names are not promoted to runtime or pixel-fidelity claims |
+| [tokenarchive-semantics.md](tokenarchive-semantics.md) | `CTokenArchive` particle token grammar, parser dispatch and reference semantics | Bounded semantic recovery; malformed-file behavior, allocation failure and rebuild-wide parity are unknown |
 
 ## Evidence vocabulary
 

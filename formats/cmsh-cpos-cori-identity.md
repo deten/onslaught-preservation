@@ -1,15 +1,15 @@
 # CMSH `CPOS` / `CORI` identity — settled from the bytes
 
-> Status: settled by exhaustive measurement over the released mesh corpus.
-> Last updated: 2026-10-22 (research-campaign records removed)
-> Summary: `CPOS` and `CORI` are a derived model-space composition cache, not an independent animation track.
-> Evidence class: static byte decode of user-supplied retail `.msh.aya` inputs.
-> Nothing was launched. No retail file was modified.
+Status: settled for the CPOS/CORI cache identity; the fields under Not decoded remain open
+Last updated: 2026-11-06 (PBKT entry aligned with cmsh-fields.md; offsets, citations, commands and the loss and status wording corrected to the current tree; earlier: research-campaign records removed)
+Summary: `CPOS` and `CORI` are a derived model-space composition cache, not an independent animation track.
+Evidence class: static byte decode of user-supplied retail `.msh.aya` inputs.
+Nothing was launched. No retail file was modified.
 
 ## Verdict
 
 **`CPOS` and `CORI` are a derived model-space composition cache. They are not an
-independent animation track and they contain no data that `HORI` / `HPOS` /
+independent animation track and, in the orientation and position fields measured below, they contain no data that `HORI` / `HPOS` /
 `VHFM` / `PRNT` do not already carry.**
 
 For every part *p* and every virtual frame *v*:
@@ -23,13 +23,13 @@ where `M` / `T` are the same quantities composed root-to-leaf along the `PRNT`
 chain, with the root's local pose as the base case. Storage is row-major and the
 matrices act on column vectors.
 
-Discarding `CPOS` / `CORI` on import loses nothing. Two existing importers that
-skip them — `RetailAquilaWalkerAsset.cs:523-528` and the static-preview profile
+Discarding `CPOS` / `CORI` on import loses no measured orientation or position data; the fourth float of each `CORI` row is undecoded (see [Not decoded](#not-decoded)). Two existing importers that
+skip them — [`RetailAquilaWalkerAsset.cs`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Godot/RetailAquilaWalkerAsset.cs#L600-L605) (onslaught-godot at commit `f44e31e`, lines 600-605) and the static-preview profile
 parser — are correct to do so.
 
 ## Measurement
 
-`tools/cmsh_cpos_cori_verify.py` decodes each `MESP` part, composes the local
+[`tools/cmsh_cpos_cori_verify.py`](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/tools/cmsh_cpos_cori_verify.py) in Onslaught-Career-Editor decodes each `MESP` part, composes the local
 `HORI` / `HPOS` track along `PRNT` for every virtual frame, and reports the
 maximum absolute element error against the stored `CPOS` / `CORI` records.
 
@@ -72,7 +72,7 @@ Two further byte facts fix the interpretation:
   `CORI` "Animation position/orientation keyframes". That is misleading: they
   are not keyframes and are not an authoring source. They are a per-virtual-frame
   composed cache.
-- [`aya-asset-format.md`](aya-asset-format.md) (lines 77-78) calls them
+- [`aya-asset-format.md`](aya-asset-format.md) (lines 113-115) calls them
   "Unknown (skipped)". Skipping is correct; "unknown" is now resolved.
 - The same file describes `VHFM` as "Vertex frame data". It is the
   virtual-frame → hierarchy-frame map: one byte per virtual frame, valued in
@@ -90,7 +90,7 @@ Two further byte facts fix the interpretation:
 
 On `m_FB_radar_station.msh.aya` part 10 `spinner01`, the 48-byte `HORI` records
 have their pad float at exactly `0.0`. Other meshes carry non-zero values in
-those four positions; they are not a translation column (translation is `HPOS`)
+those three positions; they are not a translation column (translation is `HPOS`)
 and their meaning is **not established** — see "Not decoded" below.
 
 ## Worked example — the radar dish
@@ -111,20 +111,19 @@ offset from the part origin.
 - The fourth float in each `HORI` / `CORI` row. Zero on the meshes inspected
   closely, non-zero elsewhere; no consumer identified.
 - The fourth float in each `HPOS` / `CPOS` record.
-- `aFrames` (`CMSP+0xA8`), which takes values 0, 1 and 2 across the 3,774 parts
+- `aFrames` (`CMSP+0xB4`), which takes values 0, 1 and 2 across the 3,774 parts
   of the corpus with no chunk confidently associated with it.
-- `PBKT`. Retained opaque.
+- `PBKT`, the collision-grid wrapper. Its layout is in [`cmsh-fields.md`](cmsh-fields.md); the consumer join for the PB* payload is open (audit P2 item 3, in [`aya-resource-extractor-source-audit.md`](aya-resource-extractor-source-audit.md)).
 - Whether the released engine *plays* any given static-object track
   automatically or only on script trigger. This document establishes what the
   bytes contain, not what schedules them.
-- The format stores **no frame rate**. The 20 Hz figure used downstream is the
-  released base update rate established elsewhere in this repository
-  (`OnslaughtRebuild.Core/SimulationConstants.cs`,
-  `FirstFlightWorldView.RetailAquilaAnimationHz`), not a value read from a mesh.
+- The format stores **no frame rate**. The 20 Hz figure used downstream is the released base update rate, not a value read from a mesh. In onslaught-godot it is `RetailTicksPerSecond` in [`SimulationConstants.cs`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Core/SimulationConstants.cs#L28), and the animation constant `RetailAquilaAnimationHz` is defined in [`FirstFlightWorldView.cs`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Godot/FirstFlightWorldView.cs#L56); both are at commit `f44e31e`.
 
 ## Reproduce
 
-```powershell
-py -3 .\tools\cmsh_track_probe.py "<install>\data\resources\meshes\m_FB_radar_station.msh.aya"
-py -3 .\tools\cmsh_cpos_cori_verify.py "<install>\data\resources\meshes\m_FB_radar_station.msh.aya" --part 10
+Run these from a checkout of [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit [`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50), the commit that holds both tools (this repository does not). `<install>` is the folder of your own installed copy of the game, the one that holds `data/`. On Windows, use `py -3` in place of `python3`.
+
+```bash
+python3 tools/cmsh_track_probe.py "<install>/data/resources/meshes/m_FB_radar_station.msh.aya"
+python3 tools/cmsh_cpos_cori_verify.py "<install>/data/resources/meshes/m_FB_radar_station.msh.aya" --part 10
 ```

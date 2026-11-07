@@ -1,10 +1,14 @@
 # AYA Asset Format
 
+Status: active — AYA asset format notes (PC and Xbox envelopes and payloads); partly superseded for record layouts, which cmsh-fields.md and cmsh-mesh.md own
+Last updated: 2026-11-06 (citations added or marked unverified; CPOS, CORI, CAMD and CCUS labels aligned with the settled notes; tag catalog marked partial, with the collision-grid tags added; BONS size corrected to the retail reader's request, with its absence from the corpus stated)
+Summary: how AYA asset files are framed (PC chunked zlib, Xbox raw tagged stream), the tagged payload vocabulary for meshes and textures, and the known extractor bugs; current record layouts are in cmsh-fields.md.
+
 ## Overview
 
 From deep analysis of `AYAResourceExtractor` (Stuart's extraction tool):
 
-**Key Insight**: NO shift-16 encoding in asset files. Also note: the historical “shift-16” appearance in retail `.bes` saves is a **misaligned view** caused by the 16-bit version word and the CCareer dump beginning at `file+2` (true dword boundaries are `file_offset % 4 == 2`).
+**Key Insight**: NO shift-16 encoding in asset files. Also note: the historical “shift-16” appearance in retail `.bes` saves is a **misaligned view** caused by the 16-bit version word and the CCareer dump beginning at `file+2` (true dword boundaries are `file_offset % 4 == 2`; see the [save format](../saves/save-format.md)).
 
 **Pipeline provenance note (desimbr, February 15, 2026):** parts of `.aya` content were used as a runtime performance path where many `.msh`-derived C++ structures (and related texture data) were dumped from memory and loaded back, instead of always loading large loose `.msh`/`.tga` sets during startup.
 
@@ -47,12 +51,12 @@ AYA File Structure:
 +-------------------------------------+
 | [N bytes] zlib compressed data      |
 +-------------------------------------+
-(Repeat until EOF - 1MB decompression limit per chunk)
+(Repeat until EOF)
 ```
 
-- **Compression**: zlib 1.2.x with default window bits (15)
-- **Chunk limit**: 1MB uncompressed **(AYAResourceExtractor buffer limit; not confirmed as a format rule)**
-- **Total buffer**: 4MB maximum **(extractor output buffer limit)**
+- **Compression**: zlib, RFC 1950 wrapper (see the envelope above). Unverified: the writer's zlib version and window size. The extractor's reader inflates with the default window of 15 bits (`references/AYAResourceExtractor/Code/ZLib/uncompr.c:55`, `Code/ZLib/zutil.h:68`) and bundles zlib 1.2.13 (`Code/ZLib/zlib.h:40`). The shipped `zlib.dll`, whose version resource reads 1.1.4, supplies the `uncompress` behind BEA's thunks ([game binaries](../platforms/pc/game-binaries.md)). Cheapest falsifier for the window size: the first byte of one measured member's zlib header, after its four-byte length prefix (CMF; 120 means a 15-bit window).
+- **Chunk limit**: 1MB uncompressed **(AYAResourceExtractor buffer limit; not confirmed as a format rule)** (`references/AYAResourceExtractor/Code/AyaResourceExtractor/AyaFileUncompressor.cs:64`)
+- **Total buffer**: 4MB maximum **(extractor output buffer limit)** (`references/AYAResourceExtractor/Code/AyaResourceExtractor/AyaFileUncompressor.cs:36`)
 - **Format**: Standard zlib wrapper (not raw deflate, not gzip)
 
 All 302 measured Xbox AYA members begin directly with the tagged stream,
@@ -90,7 +94,9 @@ All data sections use 8-byte headers:
 [N bytes] chunk data
 ```
 
-### Complete Tag Catalog
+### Tag catalog (partial)
+
+This catalog is partial: [cmsh-fields.md](cmsh-fields.md) reads more mesh-stream tags, and its field layouts are the reference for the collision-grid and emitter tags at the end of this table.
 
 | Tag | Purpose | Data Structure |
 |-----|---------|----------------|
@@ -109,10 +115,10 @@ All data sections use 8-byte headers:
 | `HFOV` | FOV frames | `numHFrames x 4 bytes` (floats) |
 | `BONE` | Bone indices | `numBones x 4 bytes` |
 | `BONW` | Bone weights | `numPVert x 4 x numBones bytes` |
-| `BONS` | Bone skinning | `numPVert x 12 x numBones bytes` |
+| `BONS` | Bone skinning | `numPVert x 12 bytes` (three i32 per vertex; absent from the 213-file corpus) |
 | `PBKT` | Unknown (skipped) | Variable size |
-| `CPOS` | Unknown (skipped) | Variable size |
-| `CORI` | Unknown (skipped) | Variable size |
+| `CPOS` | Derived model-space composition cache, not an independent animation track ([cmsh-cpos-cori-identity.md](cmsh-cpos-cori-identity.md)) | Variable size |
+| `CORI` | Derived model-space composition cache, not an independent animation track ([cmsh-cpos-cori-identity.md](cmsh-cpos-cori-identity.md)) | Variable size |
 | `REFR` | Part reference | 4 bytes - enables mesh instancing |
 | `PMVB` | Part mesh vertex buffer | Container for CMVB |
 | `CMVB` | Vertex buffer header | Texture counts, FVF flags, primitive type |
@@ -120,8 +126,19 @@ All data sections use 8-byte headers:
 | `IBUF` | Index buffer | `numIndices x 2 bytes` (ushort array) |
 | `VBUF` | Vertex buffer | `numVertices x vertexChunkSize bytes` |
 | `TEXR` | Texture reference | 6 x uint32 texture IDs |
-| `CCUS` | Custom/end marker | Variable |
-| `CAMD` | Camera data | Variable |
+| `CCUS` | Meaning unresolved | Variable |
+| `CAMD` | Animation-mode table ([cmsh-fields.md](cmsh-fields.md)) | 36-byte records |
+| `PMS2` | Header of a chained mesh; the next mesh in the file belongs to the same file | See cmsh-fields.md |
+| `CEMT` | Emitter table | 336-byte record |
+| `CPBT` | Collision grid record: origin, packing, width, height, cell size, triangle count | 184-byte record |
+| `SIZS` | Collision grid list and index counts | Two i32 values |
+| `PLQT` | Collision triangle count | i32 |
+| `PBFK` | Collision triangle-table header | Header only |
+| `PBCS` | Collision grid cell present flag | i32 per cell |
+| `PBSQ` | Triangle-index list of one grid cell | i32 count, then i16 indices |
+| `PBKE` | Collision triangle: three vertex indices, search stamp, height mask | i16 × 3 indices, i16 stamp, u32 mask |
+| `PBPN` | Collision vertex count | i32 |
+| `PBPP` | Collision vertex: three packed signed 16-bit values | i16 × 3 |
 
 **BBOX Bug Note**: Stuart marked this in code as "bug? BBOX tag stored twice!" - the tag appears consecutively, likely a bug in original export tool that was never fixed.
 
@@ -141,7 +158,7 @@ All data sections use 8-byte headers:
 
 ### Extended Vertex (48 bytes)
 
-Same but with 12 extra bytes at 0x0C (bone weights - Stuart's comment: "not sure what this is. Bone weighting or something maybe....")
+Same, with 12 extra bytes right after the position: three float matrix-palette offsets, placed before the normal ([cmsh-mesh.md](cmsh-mesh.md); [cmsh-fields.md](cmsh-fields.md#vertex-formats)).
 
 ---
 
@@ -181,9 +198,8 @@ uint refpart = ReadUint(fileBytes, ref index);
 
 ## Coordinate System
 
-- **Convention**: Left-handed Y-up (DirectX standard)
-- **FBX Export**: Z and V coordinates are negated for right-handed conversion
-- This matches DirectX conventions used throughout BEA
+- **Convention**: INFERRED, not measured here. A left-handed, Y-up frame (the DirectX convention) is an assumption; no capture or source line in this repository establishes it. Cheapest falsifier: the runtime position of one known vertex in a controlled capture, compared with the same vertex in the exporter's output.
+- **FBX Export**: the extractor negates Z for positions and normals and V for texture coordinates (`references/AYAResourceExtractor/Code/AyaResourceExtractor/FbxModelExporter.cs:36, 62, 68`). Its source does not say which frame it converts from.
 
 ---
 
@@ -195,7 +211,7 @@ uint refpart = ReadUint(fileBytes, ref index);
 | Texture name | 128 bytes | Material reference |
 | Part name | 32 bytes | Part identifier |
 
-This pattern parallels save file structures (CCareerNode = 64 bytes fixed).
+This pattern parallels save file structures (CCareerNode = 64 bytes fixed, per the [save format](../saves/save-format.md#ccareernode-64-bytes)).
 
 ---
 
@@ -210,7 +226,7 @@ dxtntextures\meshtex%{name}(0){format}.aya
 Across the measured retail shelf, `{format}` is a source-format request suffix:
 `A1R5G5B5`, `A4R4G4B4`, `X8R8G8B8`, `A8R8G8B8`, or `R5G6B5`. It is not the
 stored DDS layout. For example, PC `CTEX` source code 2 requests `A4R4G4B4`
-but the selected loose file can carry a DXT2 DDS FourCC.
+but the selected loose file can carry a DXT2 DDS FourCC ([texture-fidelity census](../platforms/console/pc-xbox-aya-texture-fidelity.md#measured-population)).
 
 ### Serialized texture ownership
 
@@ -221,7 +237,7 @@ at payload offset `0x18`, width at `0xbc`, height at `0xc0`, frame count at
 the loose DDS owns its bytes. Xbox `TFRM` stores that count followed by one
 `TMIP` per level. Measured Xbox codes 3/4 have four-byte-per-pixel extents,
 code 6 has eight-byte DXT-block extents, and code 7 has 16-byte DXT-compatible
-block extents. The exact enum spelling of Xbox code 7 remains open.
+block extents. The exact enum spelling of Xbox code 7 remains open ([texture-fidelity census](../platforms/console/pc-xbox-aya-texture-fidelity.md#complete-nested-geometry)).
 
 ### DDS Compression
 
@@ -246,16 +262,16 @@ suffix.
 | Floats | Raw IEEE-754 | Raw IEEE-754 |
 | Booleans | Raw 0/1 | Raw 0/1 (true view; legacy aligned view can look like `0x00010000`) |
 | Byte Order | Little-endian | Little-endian |
-| Compression | zlib; measured Xbox Level 612 is a raw tagged stream | None |
+| Compression | zlib; measured Xbox Level 612 is a raw tagged stream ([census](../platforms/console/pc-xbox-aya-census.md)) | None |
 | Structure | Tagged chunks | Fixed offsets |
 
-This helps avoid a common pitfall: the retail `.bes` “shift-16” look is primarily a **misaligned view** problem (CCareer begins at `file+2` after a 16-bit version word), not a universal fixed-point convention.
+This helps avoid a common pitfall: the retail `.bes` “shift-16” look is primarily a **misaligned view** problem (CCareer begins at `file+2` after a 16-bit version word; see the [save format](../saves/save-format.md)), not a universal fixed-point convention.
 
 ---
 
 ## Known Bugs in Extractor
 
-1. **Memory leak**: Native zlib wrapper allocates 2MB per call, never freed
+1. **Memory leak**: the native zlib wrapper allocates two 1 MiB buffers (2 MB) per call and never frees them (`references/AYAResourceExtractor/Code/ZLibWrapper/UnCompressFile.cpp:21-22`; the function has no `delete`)
 2. **Non-square texture bug** (Stuart upstream): `height x height x 4` instead of
    `width x height x 4` in `DDSTextureUncompress.cpp`. The pinned
    `dlprentice/AYAResourceExtractor` commit `53b10b0` corrects that narrow

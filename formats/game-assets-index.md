@@ -1,7 +1,7 @@
 # Game Assets And Mission Data
 
 Status: active index
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (the installed file count stated with its source and the walker record's differing count; the historical entry's counts marked superseded; earlier: retired AppCore/WinUI tools in the past tense)
 Summary: where the asset-format, extraction and mission-data documents are, and which of them are historical.
 
 These documents describe formats and relationships observed from user-supplied
@@ -10,14 +10,11 @@ packages do not bundle retail asset payloads; see
 [`../history/attribution.md`](../history/attribution.md) for the
 project's attribution and distribution boundary.
 
-The specimen-bounded narrative census for the measured 5,515-file installation
-snapshot is `../installed-corpus-census.md` (archived research record, not published). It is a dated synthesis, not a
-replacement for the installed bytes or the narrower format findings below.
+The specimen-bounded narrative census of the installation is `../installed-corpus-census.md` (archived research record, not published). The measured count is 5,464 source files in the mirror index census ([README.md](README.md)); the integrity block of the [walker timing record](../mechanics/battleengine/walker-transform-morph-timing-v1.json) counts 5,515 installed files hashed, and the public tree does not explain the 51-file difference. The narrative census is a dated synthesis, not a replacement for the installed bytes or the narrower format findings below.
 
 ## Asset formats and extraction
 
-- [Historical game folder structure](game-folder-analysis.md) (December 2025; its level table is superseded by
-  the [level inventory](../levels/level-inventory.md))
+- [Historical game folder structure](game-folder-analysis.md) (December 2025; historical, so its counts are superseded by the [level inventory](../levels/level-inventory.md) and the format contracts listed here)
 - [AYA asset format](aya-asset-format.md)
 - [AYA resource tag contract](aya-resource-tag-family-static-contract.md)
 - Guarded extraction pipeline (archived research record, not published)
