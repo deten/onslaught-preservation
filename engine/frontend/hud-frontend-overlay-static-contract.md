@@ -171,7 +171,7 @@ At `0x0042cd4b`–`0x0042cd67`, the loading-screen renderer reads the byte at
 `0x0066e8c0`. Zero selects text ID `0x003848a7`; any nonzero byte selects
 `0x07dea02c`. The authored text-name table identifies these as `IG_LOADING2`
 and `FETX_PRESS_START`. The maintainer's private working tree (not public) had mistyped the second ID
-as `0x07dae02c` and now uses the retail value. onslaught-decomp's public export (76e277d) carries the corrected ID in its loading-screen source; the mistyped value does not appear in it.
+as `0x07dae02c` and now uses the retail value. onslaught-decomp's public export (76e277d) selects the string by its name in `src/FrontEndText.cpp`, which holds no numeric ID; the mistyped value appears only in `notes/compiler-findings.md`.
 
 All six inspected version-three language tables contain the correct ID at record
 327 and loading ID at record 1897; none contains the mistyped ID. English resolves

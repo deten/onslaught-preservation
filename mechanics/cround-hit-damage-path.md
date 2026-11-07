@@ -1,7 +1,7 @@
 # `CRound::Hit`, configured explosion creation, and `CExplosion::Hit`
 
 Status: active, bounded semantic contract
-Last updated: 2026-11-06 (earlier Core references labelled, byte runs removed, the Medium Pulse record named once, the 734-byte range half-open; earlier: the binary64 constant given by value only; earlier: research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (earlier Core references labelled, byte runs removed, the Medium Pulse record named once, the 734-byte range kept inclusive; earlier: the binary64 constant given by value only; earlier: research-campaign records and decompiler-style code removed)
 Evidence: MEASURED — pristine retail bytes, strict RTTI/vtables, exact data
 records, dated static exports, replicated runtime carriers, and independent
 PC-demo normalized bodies; SOURCE — pinned `CThing`/init layouts and virtual
@@ -24,7 +24,7 @@ that takes the other thing (`CThing *otherThing`) and the collision report
 (`CCollisionReport *collisionReport`) and returns nothing.
 
 The name and ABI are a joined result, not a decompiler guess. The exact
-`734`-byte body (`[0x004D8AE0,0x004D8DBE)`) has SHA-256
+`734`-byte body (`0x004D8AE0..0x004D8DBD`) has SHA-256
 `9a2fe166433abc1836ff6e628b89ae88f6475f10582a2e1117659afba2205393`
 and decodes gaplessly to 228 x86 instructions. Strict RTTI places it at slot
 39 in both `CRound` and `CMissile`; the inheritance census proves

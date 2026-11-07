@@ -436,7 +436,7 @@ However, understanding the platform system explains:
 
 ### Stuart's Internal Build vs Steam Release
 
-The provided source code is from the **internal PC build** used during development. The Steam release is a later retail build (console-port lineage) where Encore was the **publisher**; per Stuart (Discord, December 2025; see [the frontend notes](../frontend/fep-systems.md)), the Windows retail release work was done **in-house at Lost Toys** by Jan and possibly others. Jan's identity is unconfirmed ([history/attribution.md](../../../history/attribution.md)). Compared to the internal build it has:
+The provided source code is from the **internal PC build** used during development. The Steam release is a later retail build (console-port lineage) where Encore was the **publisher**; the identity of the Windows retail release developer is unconfirmed ([history/attribution.md](../../../history/attribution.md)). Compared to the internal build it has:
 
 - Different on-disk save layout (CCareer dump begins at `file+2` after a 16-bit version word; legacy aligned views can look “shift-16”)
 - Stubbed PC-specific features

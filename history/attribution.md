@@ -123,12 +123,11 @@ and tables only ([`CONTRIBUTING.md`](../CONTRIBUTING.md)).
 
 ## Lead on the PC port developer's surname
 
-The discipline in it is exemplary and the audience is not: a reader
-wants to know who made the game, and a contributor needs to know why one plausible
-name must not be written in as fact.
+A reader wants to know who made the PC port, and a contributor needs to know why one plausible
+name must not be written in as fact; this section keeps the one lead that exists and marks it as unconfirmed.
 
 **Lead on Jan's surname — INFERRED, NOT CONFIRMED (recorded 2026-07-28).**
-"Surname unknown" above is still accurate: nothing establishes who this Jan was.
+The surname is still unknown: nothing establishes who this Jan was.
 It is recorded here only so the strongest available lead is visible rather than
 buried in the RE corpus.
 

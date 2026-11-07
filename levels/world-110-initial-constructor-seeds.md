@@ -742,7 +742,7 @@ four Units, 64 segments, eight empty effect nodes and ten occupancy members**.
 Named and Unit lists contain only the first four actors. Big-list tail order
 is factory, then BSWD Features 4/5/6/8. Actor draw count is ten after the 1,481
 tree draws. SAT's events are collision, Actor, fire-control 4001, Unit 4003, animation, AI;
-the pending-event total includes SAT's event 4001, which the 2026-09-25 correction added to the earlier total of 1,513.
+the pending-event total includes SAT's event 4001, which the 2026-09-25 correction added to the earlier total of 1,513. The draw count in the sentences above predates that correction and omits that event's shared draw; it is not recomputed here.
 Features append collision then Actor events to the same immediate FIFO bucket.
 
 The six `RetailWorld110CannonFeatureConstructionTests` (retired 2026-09-26; archived research record, not published) checked these connected states and rejected legacy damage, restore, hashing and premature frame delivery.

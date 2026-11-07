@@ -22,8 +22,7 @@ counts and names of their own time; read them as history.
 - Agreement with a rebuild does not re-prove retail behaviour.
 - This repository holds no executables, copies of the game's data files, saves, debugger logs or decompiler output;
   short quoted strings appear only where a finding needs them. Retail inputs stay with whoever owns the game.
-- The `Evidence:` labels `MEASURED`, `SOURCE`, `INFERRED` and `UNKNOWN` are defined in the README's
-  [How to read a finding](README.md#how-to-read-a-finding). Three other terms recur in the notes: a *copied runtime* is a
+- Three terms recur in the notes: a *copied runtime* is a
   controlled run of a copy of the game, not of the installed files; a *pinned v2 collector* is the version-2 tool that reads
   a run's trace into the rows a note compares, pinned to that version so that a replay repeats; a *receipt* is the record of
   a run (a capture, probe output or readback), held privately under a `<maintainer evidence>/…` placeholder when it holds
@@ -63,7 +62,7 @@ tool applies them. The patch catalogue of the retired AppCore editor (Onslaught-
 [`4ac3c9ae`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/4ac3c9ae32d97c1293858c49bf9cc485eb814f28), `patches/`) was removed, and the companion app no longer patches executables.
 
 **Two documents carry a withdrawn claim.** The 2026-07-28 guard-byte correction struck a hex-edit recipe out of both
-the windowed-mode and the widescreen analyses. Both keep the withdrawn text visible and struck through. Read the
+the windowed-mode and the widescreen analyses. Each page keeps a one-sentence record of the withdrawn claim under a struck-through heading and does not repeat the recipe. Read the
 correction before acting on either.
 
 ### The widescreen patch
@@ -120,7 +119,7 @@ explained in the [render glossary](engine/render/README.md#glossary).
 Per-function contracts sit beside their subsystem: [Battle Engine](mechanics/battleengine/contracts/README.md),
 [world](engine/world/contracts/README.md), [unit AI](mechanics/ai/README.md), [career](mechanics/career/README.md)
 and [save functions](saves/by-function/README.md). Function-level notes that were mostly records of the research
-process were removed from this repository; their per-function notes are not yet published. [DECOMP-BOUND.md](DECOMP-BOUND.md) lists them.
+process were removed from this repository; the decompilation's own per-function notes are not published, and earlier copies of most remain in the Toolkit's frozen `reverse-engineering/` tree. [DECOMP-BOUND.md](DECOMP-BOUND.md) lists them.
 
 Machine-readable tables:
 
