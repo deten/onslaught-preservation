@@ -1,7 +1,7 @@
 # PC demo versus PC retail
 
-Status: active, measured cross-build evidence over the dated 2026-08-12 census
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Status: active, measured cross-build evidence over the dated 2026-08-11 census
+Last updated: 2026-11-06 (the census date corrected to 2026-08-11, the placeholder path replaced, the resource 201 header written as header id and mode field; earlier: research-campaign records and decompiler-style code removed)
 Evidence: MEASURED — exact executable/archive hashes, independently recounted
 MSVC RTTI/vtables, a 2,127-target virtual census, a conservative 8,086-row
 cross-build function-address map, and exact multi-range, opcode-factory, and
@@ -40,7 +40,7 @@ PC demo `BEA.exe`, SHA-256
 | Demo `All.gip` | 75,388,730 | `90b16dc8df5669bb1ed2dbd09b450c30864047c9a536ecc31bfc6aa55cb66975` |
 
 The demo executable came from the read-only archive
-`<maintainer archive>\battleengine - 2003 PC DEMO.zip`. The retail
+`<maintainer evidence>/battleengine - 2003 PC DEMO.zip`. The retail
 executable is the pristine project baseline and is also reproduced exactly by
 the canonical PC disc image. The different executable and data-package hashes
 prove that this is not merely the retail build repackaged with fewer files.
@@ -71,7 +71,7 @@ and every one of the 232 retail `goodie_*_res_PC.aya` archives.
 
 The four shared files have no stored-byte, inflated-byte, zlib-partition,
 prefix, FourCC-order, or occurrence-count divergence. Resource 201 retains the
-retail identity `Aquila Prototype`, RLWD version 50, world header `(201,0)`, and
+retail identity `Aquila Prototype`, RLWD version 50, header id 201, mode field 0, and
 13 compiled scripts. Archive presence does not by itself prove that released
 demo control flow opens every member.
 
@@ -354,7 +354,7 @@ English.
 The concentration in debriefing, intro, and FMV/frontend code is a useful
 build-lineage signal. It is not evidence that gameplay is globally identical.
 
-## What this changes for the RE campaign
+## What this changes for reverse-engineering work
 
 The demo is now an independent refuter and address-translation oracle for most
 of the executable, not only the virtual surface. A retail interpretation that

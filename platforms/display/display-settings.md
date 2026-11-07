@@ -1,14 +1,14 @@
 # Display Settings & Screen Mode Analysis
 
 Status: mixed — retained display evidence with scoped parser and options-callback corrections
-Last updated: 2026-10-22 (VALIDATION citations pinned to sections)
+Last updated: 2026-11-06 (function names checked against onslaught-decomp; unverified claims marked; source citations in full form)
 Summary: display/settings reference; bounded options/device execution remains distinct from real driver and full-menu acceptance.
-Source File: pinned `references/Onslaught/d3dapp.cpp` and `CLIParams.cpp`; Binary: pristine
-`BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+Source File: pinned `references/Onslaught/d3dapp.cpp` and `references/Onslaught/CLIParams.cpp`
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > **Source**: static analysis of BEA.exe (Steam release)
 > **Date**: December 2025
-> **Related**: See `../windowed-mode-analysis.md` for windowed mode investigation
+> **Related**: See [windowed-mode-analysis.md](windowed-mode-analysis.md) for windowed mode investigation
 
 ## Overview
 
@@ -18,7 +18,7 @@ Battle Engine Aquila retail imports `d3d9.dll` for rendering, but parts of its a
 
 | Address | Function | Purpose |
 |---------|----------|---------|
-| 0x005286e0 | `CD3DApplication__LoadCardIdAndApplyVendorTweaks` | Retail `cardid.txt` tweak loader; opens the supplied path, parses adapter/range/tweak rows, scans `0x0089c018` CVar entries, and applies matching tweak values |
+| 0x005286e0 | `LoadCardId` | Retail `cardid.txt` tweak loader; opens the supplied path, parses adapter/range/tweak rows, scans `0x0089c018` CVar entries, and applies matching tweak values |
 | 0x00528f80 | `CD3DApplication__ctor` | Constructor/init; seeds global app pointer, defaults, and 640x480 creation dimensions |
 | 0x005290a0 | `CD3DApplication__Create` | D3D app create path; Direct3DCreate9, device-list build, window create, environment init, timer start |
 | 0x00529350 | `CD3DApplication__BuildDeviceList` | Adapter/device/mode enumeration and HAL/REF/depth/texture/MSAA probes |
@@ -30,9 +30,9 @@ Battle Engine Aquila retail imports `d3d9.dll` for rendering, but parts of its a
 | 0x0052bc80 | `CD3DApplication__SelectDeviceProc` | Stdcall device-selection dialog callback (adapter/device/mode/MSAA) |
 | 0x0052c430 | `CD3DApplication__Cleanup3DEnvironment` | D3D cleanup/refcount logging path |
 | 0x0052c4f0 | `CD3DApplication__DisplayErrorMsg` | Retail fatal/error dispatch for D3D init/reset failures |
-| 0x0052c8d0 | `CD3DApplication__SetDeviceCursorFromIcon` | Icon mask/color to D3D cursor surface converter |
+| 0x0052c8d0 | `D3DUtil_SetDeviceCursor` | Icon mask/color to D3D cursor surface converter |
 | 0x0052c730 | `CD3DApplication__SetResolution` | Stores requested width/height; no in-function clamp |
-| 0x0052c780 | `ScreenShape_UpdateAspectScale` | Applies 4:3 vs 16:9 scaling based on `g_ScreenShape` |
+| 0x0052c780 | `CD3DApplication__UpdateScreenShape` | Applies 4:3 vs 16:9 scaling based on `g_ScreenShape` |
 | 0x005be622 | `Direct3DCreate9` | `d3d9.dll` import thunk |
 | 0x005be628 | `_DXGetErrorString9A` | HRESULT-to-C-string mapper |
 
@@ -49,32 +49,31 @@ open.
 
 ### cardid.txt and CVar tweak loader (0x005286e0-0x00528b00)
 
-- `CD3DApplication__LoadCardIdAndApplyVendorTweaks` takes the path of `cardid.txt`, parses its
+- `LoadCardId` takes the path of `cardid.txt`, parses its
   Version/Vendor/Device/range/tweak rows against the current adapter record, scans the global CVar list
   at `0x0089c018`, logs `Setting tweak`, and calls the matched CVar's setter.
-- `CVar__Init` links a CVar record into the list at `0x0089c018`; it takes the name and the initial value
+- An unnamed routine links a CVar record into the list at `0x0089c018`; it takes the name and the initial value
   (`RET 0x8`).
-- `CVar__SetValueRounded` rounds its float argument and stores the integer at `this+0x0c` (`RET 0x4`).
-- `CEngine__InvokeCallbackIfStateMinusOne` takes one argument and calls the receiver's first virtual only
+- An unnamed routine rounds its float argument and stores the integer at `this+0x0c` (`RET 0x4`).
+- An unnamed routine takes one argument and calls the receiver's first virtual only
   when `this+0x0c == -1`.
 
 The exact `cardid.txt` grammar, the CVar layout and runtime Direct3D behaviour remain open.
 
 ### Options detail and tweak path
 
-`LandscapeDetail_SetLevel`, `LandscapeDetail_GetLevel`, `CTreeDetail__SetQualityLevel`,
-`CMultiSample__GetSampleCountLabel`, `CReconnectInterface__VFunc_07_00527d00` and the `CTweak`
+Four unnamed routines (their names are not in [onslaught-decomp](https://github.com/dlprentice/onslaught-decomp)), the unnamed function at `0x00527d00` and the `CTweak`
 constructor and destructors form one static display/options path: the landscape detail globals
 `0x009c7c54`/`0x009c7c56`, tree quality forwarded to `CRTMesh__SetQualityLevel`, the MSAA label fallback
 `0xd4`, and the `-landscape0/-landscape1/-landscape2` command-line setters. Runtime options-menu, tweak and
-device behaviour remain open.
+device behaviour remain open. The function at `0x00527d00` is not attributed to a class here: onslaught-decomp names that address `CRenderMethod__Set`, so whether it is a `CReconnectInterface` virtual is an open question.
 
 ### Direct3D application shell (0x00528f80-0x0052cd20)
 
 The `CD3DApplication` vtable is at `0x005e4ad0` and includes `CD3DApplication__Create` and
 `CD3DApplication__MsgProc`.
 
-- `CD3DApplication__Init` (`0x00528f80`) sets the global application pointer `0x0089c0f4`, initialises ten
+- `CD3DApplication__ctor` (`0x00528f80`) sets the global application pointer `0x0089c0f4`, initialises ten
   adapter-info blocks, installs the vtable, clears the device, window, ready and timer fields, and sets
   640x480 creation dimensions.
 - `CD3DApplication__Create` (`0x005290a0`) takes the instance handle, calls `Direct3DCreate9(0x1f)`, builds
@@ -98,23 +97,23 @@ The `CD3DApplication` vtable is at `0x005e4ad0` and includes `CD3DApplication__C
   and returns the input error code.
 - `CD3DApplication__SetResolution` stores the width at `this+0x330bc` and the height at `this+0x330c0`;
   it does not clamp.
-- `ScreenShape_UpdateAspectScale` writes `this+0x32e90` from the back-buffer dimensions and
+- `CD3DApplication__UpdateScreenShape` writes `this+0x32e90` from the back-buffer dimensions and
   `g_ScreenShape`.
-- `CD3DApplication__SetDeviceCursorFromIcon` converts a Win32 icon's mask and colour bitmaps into a
+- `D3DUtil_SetDeviceCursor` converts a Win32 icon's mask and colour bitmaps into a
   Direct3D cursor surface.
-- `CD3DApplication__PerfTimerCommand` returns timer values as `double` through `QueryPerformanceCounter`,
+- An unnamed routine returns timer values as `double` through `QueryPerformanceCounter`,
   falling back to `timeGetTime`.
 
 Runtime Direct3D behaviour and the exact application, dialog and object layouts remain open.
 
-### CD3DApplication::Init (0x00528f80)
+### CD3DApplication__ctor (0x00528f80)
 
 Sets default values:
 - Default resolution: 640x480
 - Default mode: Fullscreen
 - Initializes D3D object pointers to NULL
 
-### CD3DApplication::BuildDeviceList (0x00529350)
+### CD3DApplication__BuildDeviceList (0x00529350)
 
 Enumerates display adapters and modes:
 - Queries available resolutions from D3D
@@ -122,7 +121,7 @@ Enumerates display adapters and modes:
 - Checks for widescreen mode support via `ALLOW_WIDESCREEN_MODES` config
 - Populates internal mode list for Video Options menu
 
-### CD3DApplication::Initialize3DEnvironment (0x0052af00)
+### CD3DApplication__Initialize3DEnvironment (0x0052af00)
 
 Critical function for display mode setup:
 - Checks `m_bWindowed` flag to determine fullscreen vs windowed
@@ -137,7 +136,7 @@ it on the next iteration. Failed initialization invalidates, deletes, then reloa
 current device while preserving the original failure code. These observations correct the
 compatibility contract; they do not establish real driver behavior or a complete byte match.
 
-### CD3DApplication::SetResolution (0x0052c730)
+### CD3DApplication__SetResolution (0x0052c730)
 
 Stores the requested width and height as the creation dimensions and does nothing else: there is no
 clamp in this setter. Minimum and default handling happens in mode enumeration and the command-line and
@@ -185,7 +184,7 @@ Sets custom resolution:
 BEA.exe -res 1920 1080
 ```
 
-Parsed in `CCLIParams::GetParams(char *text)`, stored at offsets 0x164/0x168. Minimum enforced: 640x480.
+Parsed in `CCLIParams__GetParams(char *text)`, stored at offsets 0x164/0x168. Minimum enforced: 640x480.
 
 ### -forcewindowed
 
@@ -223,19 +222,19 @@ Widescreen modes are gated by the `ALLOW_WIDESCREEN_MODES` configuration option,
 
 ## Localization (0x00524830)
 
-`0x00524830` is **not** the Video Options handler in this build; it is `Localization__GetStringById` (string lookup by id and `g_LanguageIndex`).
+`0x00524830` is **not** the Video Options handler in this build; it is `Localization_GetStringById` (string lookup by id and `g_LanguageIndex`).
 
 The retail Video Options surface is now mapped through
-the page-processing callback at `0x0051f600`, `CFEPOptions__Update`,
+the page-processing callback at `0x0051f600`, `CFEPOptions__Process`,
 `CFEPOptions__SaveDefaultOptions`,
 `CFEPOptions__WriteDefaultOptionsFile`, and
 `CFEPOptions__TransitionNotification @ 0x0051F7E0`.
 The last identity corrects the older `CFEPOptions__EnsureOptionsContext` label:
-two calls in the trace-hashed, replayable manual Options TTD trace receive the
+two calls in the replayable manual Options time-travel debugging (TTD) trace, which is identified by its hash, receive the
 transition-from page id, return to `CFrontEnd__SetPage`, reuse the same frontend
 options context, and reset its session; this matches Stuart's timed
 `CFrontEnd::SetPage -> TransitionNotification(mTransitionFrom)` call. The
-missing producer receipt leaves the capture-time executable hash unbound.
+missing producer receipt, the maintainer's private record of that trace (receipts are described in the [README](../../README.md)), leaves the capture-time executable hash unbound.
 Individual sub-item behavior below those mapped handlers remains open.
 
 ## September 27 options-processing recheck
@@ -244,7 +243,7 @@ The complete callback `[0x0051f600,0x0051f666)` is 102 bytes, SHA-256
 `fecdbd8d9e28c4f63d197af85582e19191bc7267d12e2202580b12b81c15febc`.
 The common frontend caller at `0x00466dc4` dispatches slot 2 with one DWORD
 state argument: active 0, inactive 3, transitioning-from 2, transitioning-to 1.
-The surviving `FEPGoodies.h:56` and `FrontEnd.cpp:677–694` bind this interface
+The surviving `references/Onslaught/FEPGoodies.h:56` and `references/Onslaught/FrontEnd.cpp:677–694` bind this interface
 to `Process`, replacing the earlier `ProcessInput` interpretation. The pinned
 source lacks the Options implementation and base-page header; this does not
 recover an original field name or its complete implementation.
@@ -281,14 +280,14 @@ acceptance. Exact records and limitations are in
 
 ## Known Issues
 
-1. **Windowed mode is multi-gate**: the parser gate `0x00662f3e` is closed at load in every build (BSS) and is opened only by `-testeur`; beyond it, startup fullscreen flow can still force fullscreen. *(Corrected 2026-07-28; previously read "Canonical Steam hash `74154bfa...` already has `0x00662f3e = 0x01`; inconsistent windowed startup is primarily startup-flow behavior unless a variant binary has this byte at `0x00`.")*
+1. **Windowed mode is multi-gate**: the parser gate `0x00662f3e` is closed at load in the pristine specimen (BSS) and is opened only by `-testeur`; beyond it, startup fullscreen flow can still force fullscreen. *(Corrected 2026-07-28; previously read "Canonical Steam hash `74154bfa...` already has `0x00662f3e = 0x01`; inconsistent windowed startup is primarily startup-flow behavior unless a variant binary has this byte at `0x00`.")*
 
 2. **Widescreen requires config**: 16:9 modes may not appear in Video Options without enabling `ALLOW_WIDESCREEN_MODES`.
 
-3. **Resolution changes may require restart**: Some resolution changes may not take effect until game restart.
+3. **Resolution changes may require restart** (unverified; no capture or test in this repository shows it): some resolution changes may not take effect until game restart.
 
 ## Related Documentation
 
-- `../windowed-mode-analysis.md` - Detailed investigation of windowed mode failure
-- `../widescreen-patch-analysis.md` - Analysis of community widescreen patches
-- `CLIParams.cpp/_index.md` - Full CLI parameter documentation
+- [windowed-mode-analysis.md](windowed-mode-analysis.md) - Detailed investigation of windowed mode failure
+- [widescreen-patch-analysis.md](../patches/widescreen-patch-analysis.md) - Analysis of community widescreen patches
+- [cli-parameters.md](../command-line/cli-parameters.md) - Full CLI parameter documentation

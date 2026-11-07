@@ -1,7 +1,7 @@
 # Executable patches
 
 Status: active — folder index
-Last updated: 2026-10-22 (summaries filled, titles in sentence case)
+Last updated: 2026-11-06 (windowed-mode analysis row added; earlier: summaries filled, titles in sentence case)
 Summary: Documented patches to the retail executable (widescreen, free camera, graphics gate and others): what each changes and what was observed.
 
 ## Documents
@@ -16,3 +16,4 @@ Summary: Documented patches to the retail executable (widescreen, free camera, g
 | [Version overlay patch](version-overlay-patch.md) | The paired rows that show `V1.00 - PATCHED` in the version overlay. |
 | [widescreen-diff-regions-28.tsv](widescreen-diff-regions-28.tsv) | Per-region table of the 28 widescreen-patch regions: offsets, bytes, owning function and role. |
 | [Widescreen patch analysis](widescreen-patch-analysis.md) | The 28-region `BEA_Widescreen.exe` diff and what each region does. |
+| [Windowed-mode analysis](../display/windowed-mode-analysis.md) | The startup-flow windowed row (`force_windowed`), which the analysis gives as the primary stable route to windowed launch; the resolution-gate row is optional. |

@@ -1,6 +1,10 @@
 # Goodies gallery display override
 
 Status: byte-verified copied-executable patch with bounded Goodies-wall and one selected-entry observation.
+Last updated: 2026-11-06 (header completed; specimen line added)
+Summary: forcing the Goodies gallery display flag in a copied executable; save progression is unchanged.
+Evidence: MEASURED — byte-verified patch site and controlled copied-profile comparisons, as the Status line states; the Boundary section limits the claim.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 `goodies_gallery_display_unlock` forces the existing MALLOY display flag inside `CFEPGoodies__Process`; it does not alter save progression.
 

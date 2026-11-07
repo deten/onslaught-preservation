@@ -1,9 +1,11 @@
 # Frontend clear-screen color patches
 
 Status: historical copied-executable presets with bounded title-screen and navigated-menu observations.
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (evidence and specimen lines added; earlier: retired AppCore/WinUI tools in the past tense)
 Summary: three mutually exclusive immediates that change the front end's clear-screen colour, and what controlled
 copied runs showed.
+Evidence: MEASURED — controlled copied-profile runs on the title screen and a navigated Goodies menu; the byte rows are the retired catalogue's definitions.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 These mutually exclusive rows change the immediate passed to the DirectX frontend clear-screen path. The exact byte definitions were rows of the patch catalogue of the retired AppCore editor (Onslaught-Career-Editor [`4ac3c9ae`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/4ac3c9ae32d97c1293858c49bf9cc485eb814f28), the last commit that has it); the table below records them.
 

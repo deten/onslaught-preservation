@@ -1,5 +1,11 @@
 # Modding Reference
 
+Status: mixed — community modding notes and reference tables; launch options follow cli-parameters.md
+Last updated: 2026-11-06 (launch-option rows checked against cli-parameters.md; stale banner, dangling references and unsourced statements corrected)
+Summary: launch options from community testing and the retail parser, the cardid.txt graphics tweaks, the widescreen patch and developers' modding notes as reported.
+Evidence: mixed — the two patch sites are MEASURED in [the patch document](../patches/extra-graphics-feature-gate-patch.md); the community reports and recollections here are UNKNOWN and were not re-tested.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+
 ## Launch Options (PC Version)
 
 From Dominating David (Discord #media, April 1, 2025):
@@ -8,63 +14,44 @@ From Dominating David (Discord #media, April 1, 2025):
 
 | Option | Effect |
 |--------|--------|
+| `-nomusic` | Disables background music ([runtime record](cli-parameters.md#supported-launch-surface)) |
+| `-nosound` | Disables all audio ([runtime record](cli-parameters.md#supported-launch-surface)) |
+| `-skipfmv` | Skips startup and level-intro FMV playback; click-to-start remains ([runtime record](cli-parameters.md#supported-launch-surface)) |
+
+### Reported working (community note, April 2025; not reproduced here)
+
+| Option | Effect (as reported) |
+|--------|--------|
 | `-playabledemo` | Launches game as playable demo with 1 mission |
-| `-nomusic` | Disables background music |
-| `-nosound` | Disables all audio |
-| `-skipfmv` | Skips startup and level-intro FMV playback; click-to-start remains |
 
-### Discovered (Effect Unknown/Untested)
+### Discovered (April 2025 community table)
 
-> **SUPERSEDED IN PART 2026-07-28 — one row only.** The table below is April 2025
-> community testing and is left intact as the historical record, correctly
-> attributed and dated. The authority for what the *shipped* Steam parser accepts
-> is [`cli-parameters.md`](cli-parameters.md)
-> (last updated 2026-07-18, sourced from the canonical unpatched Steam `BEA.exe`
-> parser, specimen SHA-256 `74154bfa…7750`).
->
-> - **`-level` is resolved.** `cli-parameters.md` lists `-level N` as a supported
->   launch parameter ("The retail parser accepts a numeric level id"), and it is
->   used routinely by this repository's controlled workflows. It is no longer
->   "effect unknown".
-> - **`-forcewindowed` is NOT resolved, and the April 2025 note is still
->   consistent with current evidence.** `cli-parameters.md` establishes only that
->   the canonical parser *contains* the guarded branch and that the guard byte is
->   enabled — and in the same row it records that Toolkit safe copies "also carry
->   the verified force-windowed compatibility patch". Parser reachability is not
->   the same as an unpatched retail executable launching windowed:
->   [`../display/windowed-mode-analysis.md`](../display/windowed-mode-analysis.md):123
->   is explicit that "`-forcewindowed` parsing and startup fullscreen toggles are
->   separate gates. Even when parsing is reachable, startup flow can still force
->   fullscreen without additional display-flow patches." So "didn't work in
->   testing" on a stock install remains a fair description.
-> - **`-showdebugtrace` is NOT resolved.** `cli-parameters.md` says the parser
->   accepts the flag but that "visible output is not promised" — which is
->   precisely "effect untested", the column this row is already in.
+The table below is April 2025 community testing, kept as reported. Linked rows follow [`cli-parameters.md`](cli-parameters.md), the authority for what the shipped Steam parser accepts and what each option does; where any other row disagrees with that page, follow the page.
 
-| Option | Suspected Purpose |
+| Option | Purpose (suspected unless linked) |
 |--------|-------------------|
 | `-32bittextures` | Force 32-bit texture mode |
 | `-autoconfigtest` | Auto-configuration testing |
 | `-backbuffer2` | Alternate backbuffer config |
 | `-cardid` | Graphics card ID override |
 | `-defaultoptionsname` | Default options file |
-| `-dxtntextures` | Force DXT texture compression |
-| `-findbadwater` | Debug: find problematic water |
-| `-findgoodwater` | Debug: find working water |
-| `-forcewindowed` | Force windowed mode (didn't work in testing) |
+| `-dxtntextures` | Already the default; undoes `-32bittextures` ([cli-parameters.md](cli-parameters.md)) |
+| `-findbadwater` | Developer trap: freezes where the water check fails ([cli-parameters.md](cli-parameters.md)) |
+| `-findgoodwater` | Developer trap: freezes the game on working hardware; do not use ([cli-parameters.md](cli-parameters.md)) |
+| `-forcewindowed` | Force windowed mode (didn't work in testing; parsing the flag does not by itself give a windowed start, see [windowed-mode analysis](../display/windowed-mode-analysis.md)) |
 | `-getversion` | Display version info |
 | `-landscape0/1/2` | Landscape quality levels |
-| `-level` | Jump directly to level (dev use) |
-| `-showdebugtrace` | Show debug trace output |
+| `-level` | Jump directly to level (dev use); the retail parser accepts it ([cli-parameters.md](cli-parameters.md)) |
+| `-showdebugtrace` | No effect: stored, never read ([cli-parameters.md](cli-parameters.md)) |
 | `-soundbuffers` | Sound buffer configuration |
-| `-testeur` | Test EUR (European?) build |
-| `-timeout` | Connection/load timeout |
-| `-traceconsole` | Enable trace console |
+| `-testeur` | Guard for `-forcewindowed` (see the [parser contract](CLIParams__ParseCommandLine.md#windowed-guard-and-logger-boundaries)) |
+| `-timeout` | Inactivity timeout, only with `-e3` or `-playabledemo` ([cli-parameters.md](cli-parameters.md)) |
+| `-traceconsole` | No effect: stored, never read ([cli-parameters.md](cli-parameters.md)) |
 
 Stuart noted: "These must of been used to help development. The --level one was important, because when you're coding and testing a particular level, you just want the game to start straight into the action and not keep going through the menus. I suspect many of these options won't work on the released version."
 
 Historical context from preserved Discord extracts:
-- `-forcewindowed` behavior discussions referenced a dev/release class split context (`CD3DApplication` vs `CEditorD3DApp`), which aligns with the two-gate startup behavior documented in [`../display/windowed-mode-analysis.md`](../display/windowed-mode-analysis.md). (Path repaired 2026-07-28 — this was a bare filename that resolved nowhere.)
+- `-forcewindowed` behavior discussions referenced a dev/release class split context (`CD3DApplication` vs `CEditorD3DApp`), which aligns with the two-gate startup behavior documented in [`../display/windowed-mode-analysis.md`](../display/windowed-mode-analysis.md).
 - `cardid` handling in retail-era startup flow appears to post-date Stuart’s currently available source snapshot; treat retail binary evidence as authoritative when source and behavior differ.
 
 ---
@@ -77,7 +64,7 @@ Historical context from preserved Discord extracts:
 
 ### How It Works
 
-The game reads `cardid.txt` on startup and applies tweaks based on your GPU's vendor/device ID. Modern GPUs aren't in the database, so the game uses conservative defaults that disable advanced features. By adding your GPU with the right tweaks, you can unlock all graphical options.
+The game reads `cardid.txt` on startup and applies tweaks based on your GPU's vendor/device ID ([extra graphics gate patch](../patches/extra-graphics-feature-gate-patch.md) describes the retail flow). Modern GPUs aren't in the database, so the game uses conservative defaults that disable advanced features. By adding your GPU with the right tweaks, you can unlock all graphical options.
 
 ### Finding Your GPU IDs
 
@@ -110,6 +97,8 @@ python3 tools/cardid_preset_manager.py --input game/cardid.txt --restore
 The equivalent executable patches (documented in [the patches folder](../patches/README.md)):
 - `GEFORCE_FX_POWER` default-on patch (`0x0CDD40`)
 - Optional cardid override-load bypass patch (`0x12AF3F`) to ignore `cardid.txt` tweak overrides entirely.
+
+Back up `cardid.txt` before you edit it by hand. The companion's preset manager (in Onslaught-Career-Editor, commands above) copies the file to `cardid.txt.original.backup` before its first write, and its `--restore` option copies that backup back.
 
 Add this block to the END of `cardid.txt` for modern NVIDIA GPUs:
 
@@ -192,14 +181,14 @@ Tweak:LANDSCAPE_LIGHTING 1
 
 ## Widescreen Patch
 
-**Location:** `media/patches/battleengineaqulawidescreenfix.zip`
-**Source:** ModDB (2018)
+**Location:** not in this repository; `battleengineaqulawidescreenfix.zip` is a community download
+**Source:** ModDB (2018). No URL or SHA-256 is recorded here, so this page cannot confirm the archive's contents.
 **Effect:** Enables 1920x1080 and other widescreen resolutions
 
 ### Installation
 
 1. Extract `battleengineaqulawidescreenfix.zip`
-2. Replace `BEA.exe` with the patched version
+2. Before replacing `BEA.exe`, check your original with a SHA-256 tool against the Steam hash in the [retail specimen baseline](../pc/retail-specimen-baseline.md) and keep a copy of it. Then replace `BEA.exe` with the patched version; no hash is recorded here for the patched file.
 3. Run the game - new resolutions appear in options
 
 ### Best Results: Widescreen + Binary Patch Gate Unlock
@@ -208,7 +197,6 @@ For the best visual experience on modern hardware:
 1. Apply the widescreen patch (1080p support)
 2. Apply the stable extra-graphics gate binary patch (`GEFORCE_FX_POWER` default-on)
 3. Optionally layer `cardid.txt` tweaks for per-vendor experimentation
-4. Enjoy 2003 graphics that still look surprisingly good!
 
 ---
 
@@ -240,7 +228,7 @@ From Stuart (May 2023):
 **Location**: `Battle Engine Aquila\data\MissionScripts\`
 **Format**: Text-readable custom scripting language
 **Authors**: Level designers (not programmers)
-**Note**: Modifying these files does nothing - they're compiled into the AYA files
+**Note**: Modifying these files does nothing - they're compiled into the AYA files; the game does not read these folders ([level inventory](../../levels/level-inventory.md)).
 
 ---
 
@@ -344,7 +332,7 @@ Glenn called out three specific systems he remembers working on:
 
 ### AYAResourceExtractor
 - **Repo**: https://github.com/stuart73/AYAResourceExtractor
-- **Author**: Stuart Gillam (desimbr)
+- **Author**: Stuart Gillam
 - **Purpose**: Extract 3D models, textures from .aya files
 - **Output**: FBX (binary and ASCII)
 - **Note**: Animations not yet extractable
@@ -363,7 +351,7 @@ Glenn called out three specific systems he remembers working on:
 
 ## Open Questions for Modding
 
-1. ~~**EndLevelData structure**~~ - **SOLVED Dec 2025**: EndLevelData is runtime-only, never saved to file. It's consumed by `CCareer::Update()` after level completion and discarded.
+1. ~~**EndLevelData structure**~~ - **SOLVED Dec 2025**: EndLevelData is runtime-only, never saved to file. It's consumed by `CCareer::Update()` after level completion and discarded ([game system notes](../../engine/source/gameplay/game-system.md): source analysis, not a retail measurement).
 2. **Exact offset of objective mask bits** in mBaseThingsExists for S-rank requirements
 3. **Tech slot bit mapping** - Which bits enable which features? (Known: slots 61-62 control Mission 500 path choice)
-4. ~~**PC cheat codes**~~ - **SOLVED Dec 2025**: Cheats use `strstr()` substring matching on save NAME. See `cheat-codes.md` (to be published here after review)
+4. ~~**PC cheat codes**~~ - **SOLVED Dec 2025**: Cheats use `strstr()` substring matching on save NAME. See [`IsCheatActive`](../../mechanics/cheats/IsCheatActive.md) and [god mode](../../mechanics/cheats/god-mode.md).

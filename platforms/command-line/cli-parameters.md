@@ -1,5 +1,7 @@
-Status: active quick reference
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+# Steam Launch Contract
+
+Status: active — quick reference for the Steam launch surface and the retail command-line options
+Last updated: 2026-11-06 (title first; drive-letter paths removed; -showdebugtrace out of the supported table; trace options stated as bounded; examples split into launch-options and command-line forms; earlier: retired AppCore/WinUI tools in the past tense)
 Source: pristine retail command-line parser, each option's readers, and the separately dated copied-runtime observations.
 Summary: the Steam launch surface, and what each of the retail parser's 25 options does in the game.
 Evidence: MEASURED — fresh parser/initializer guard instructions and, on 2026-09-30, every retail instruction that reads
@@ -8,11 +10,9 @@ retail address where that function does not match yet. Runtime claims are dated 
 Specimen: `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
-# Steam Launch Contract
-
 The first table is the small launch surface that controlled Steam-copy runs used. The
 [second](#what-every-retail-option-does) says what every option the retail parser
-accepts does in the game. Stuart's in-house PC source has a broader parser; those
+accepts does in the game. Stuart Gillam's published Onslaught source has a broader parser; those
 switches are not Steam contracts unless the canonical retail parser independently
 contains them.
 
@@ -20,19 +20,28 @@ contains them.
 
 | Parameter | Evidence-bounded behavior |
 |-----------|---------------------------|
-| `-res W H` | The retail parser accepts width and height. The copied-game workflow of the retired AppCore editor exercised `1600 900`. |
+| `-res W H` | The retail parser accepts width and height. The copied-game workflow of the [retired AppCore editor](../../README.md#how-to-read-a-finding) exercised `1600 900`. |
 | `-skipfmv` | Controlled retail launches skip startup and level-intro FMV playback; click-to-start remains. |
 | `-level N` | The retail parser accepts a numeric level id. Controlled copied-game runs used this for bounded level probes. |
 | `-forcewindowed` | The pristine startup initializer clears its guard. On the canonical receiver, preceding it with `-testeur` enables this parser branch; reversing the order does not. Actual window behavior and compatibility patches are separate evidence. |
 | `-nomusic` | Controlled retail use disables background music. |
 | `-nosound` | Controlled retail use disables game audio. |
-| `-showdebugtrace` | The retail parser accepts the flag. The retired AppCore editor exposed it only as a copied-profile diagnostic; visible output was not promised. |
 
 Controller configuration, sensitivity, inversion, and bindings are not launch
 arguments in the supported Steam workflow; they live in `defaultoptions.bea`
 (see [control bindings](../../saves/options-control-bindings.md)).
 
 ## Supported examples
+
+Steam Launch Options text, as typed into the Launch Options box (see below for how Steam passes them):
+
+```text
+-res 1600 900 -skipfmv
+-skipfmv -level 850
+-testeur -forcewindowed -res 1600 900
+```
+
+Command line, run from the game folder:
 
 ```text
 BEA.exe -res 1600 900 -skipfmv
@@ -63,8 +72,8 @@ row is a static reading, and nothing was launched for it.
 | `-e3` | The one runtime switch left from the E3 show build. After the startup films it asks for a `vectorlosttoyssplash.tga` splash instead of `splash.tga` (`CSystem::Init` 004efb10, match), and it locks one multiplayer cell, 859 (0051d28c..0051d2a2). It also lets `-timeout` work (below). | Not the E3 build: that build's compiled-in differences are absent. The E3 splash is not in the install. Its built-in two-minute timeout never takes effect, because the constructor that sets it (004239f0, match) runs before the command line is read. |
 | `-timeout N` | After `N` milliseconds without input the game drops back to its intro films, from the menus or from a level (`CController::InactivityMeansQuitGame` 0042d810, match). | Only with `-e3` or `-playabledemo`; otherwise ignored. |
 | `-playabledemo` | Turns the front end into the 2003 demo's: a demo main menu whose first choice plays level 201, no story cutscenes, and the controls screen during loading (`CFEPDemoMain::DoAction` 00457ee0 and about 30 other reads, most match). | Static reading; not run on the full install. |
-| `-autoconfigtest [DIR]` | An unattended configuration test: it clicks through the menus and a level by itself, takes screen dumps on fixed frames, changes a setting in the pause menu and restarts (`CGame` 0046e921 and the front-end pages). It writes the dumps and `setuphistory.txt` to `DIR`, default `C:\beaautoconfigtest\`, creating the folder. While it runs every cheat counts as on, the mouse is ignored and the music is track 8. After 20,100 frames it switches itself off and turns on every cheat for the rest of the session (0046e921). | `C:\` is the Wine prefix's drive under Proton. With every cheat on the game does not autosave after a level (`CFrontEnd::Init` 004662a0). |
-| `-cardid` | Reads the graphics-card list from `C:\cardid.txt` instead of the game folder's `cardid.txt` (0052af2a, near miss). | Without a copy there, the list is not found. No player benefit. |
+| `-autoconfigtest [DIR]` | An unattended configuration test: it clicks through the menus and a level by itself, takes screen dumps on fixed frames, changes a setting in the pause menu and restarts (`CGame` 0046e921 and the front-end pages). It writes the dumps and `setuphistory.txt` to `DIR`, which defaults to a folder named `beaautoconfigtest` at the root of the drive (under Proton, the Wine prefix's drive), creating the folder. While it runs every cheat counts as on, the mouse is ignored and the music is track 8. After 20,100 frames it switches itself off and turns on every cheat for the rest of the session (0046e921). | With every cheat on the game does not autosave after a level (`CFrontEnd::Init` 004662a0). |
+| `-cardid` | Reads the graphics-card list from `cardid.txt` at the root of the drive (under Proton, the Wine prefix's drive), not from the game folder's `cardid.txt` (0052af2a, near miss). | Without a copy there, the list is not found. No player benefit. |
 | `-backbuffer2` | Two back buffers (triple buffering) instead of one (0052b05e, near miss). | Untested. |
 | `-32bittextures` | Asks for uncompressed copies of the compressible textures in `data\resources\textures` (`CDXTexture` 00557300, near miss). | Only 8 of the 800 compressed textures have such a copy; for the rest the loader falls back to the compressed file after a failed open. Little or no visible gain. |
 | `-dxtntextures` | Compressed textures, which is already the default. | Only undoes an earlier `-32bittextures`. |
@@ -74,8 +83,8 @@ row is a static reading, and nothing was launched for it.
 | `-getversion` | Prints `Version 1.00.00` (from the executable's version resource) and quits with exit code 10000 before starting. | A Windows program has no visible console, so only the exit code shows. |
 | `-findgoodwater` | A developer trap: when the device accepts the water setup, the water pass sleeps in a loop and the game freezes (0055c33c..0055c36a, `Sleep(100)`). | Freezes on working hardware as soon as water is drawn. Do not use. |
 | `-findbadwater` | A developer trap: the water method is re-checked every frame (0055c1ad), and while the device rejects the water setup the water pass sleeps in a loop (0055c36c..0055c398). | On hardware that accepts the water it only re-checks; where the check fails, the game freezes. |
-| `-traceconsole` | Stored, never read (no retail instruction touches the field). | No effect. |
-| `-showdebugtrace` | Stored, never read (no retail instruction touches the field). | No effect. |
+| `-traceconsole` | Stored; no reader found in the retail code (bounded search; see the [parser contract](CLIParams__ParseCommandLine.md#developer-selector-and-trace-consumers--september-19)). | No effect found. |
+| `-showdebugtrace` | Stored; no reader found in the retail code (bounded search; see the [parser contract](CLIParams__ParseCommandLine.md#developer-selector-and-trace-consumers--september-19)). | No effect found. |
 
 ## Source/retail boundary
 
@@ -92,7 +101,7 @@ The canonical unpatched Steam executable with SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 does not contain parser literals for `-configuration`, `-norumble`,
 `-nostaticshadows`, `-hidetail`, or `-textureramlimit`. Those names occur in
-Stuart's different in-house PC source, and the Steam executable ignores them.
+Stuart Gillam's published Onslaught source, which is a different build, and the Steam executable ignores them.
 
 See
 [`CCLIParams__GetParams`](CLIParams__ParseCommandLine.md)

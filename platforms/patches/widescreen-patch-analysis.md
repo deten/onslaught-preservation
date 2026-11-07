@@ -1,11 +1,12 @@
 # Widescreen Patch Analysis
 
 Status: historical external-patch analysis; guard-byte section withdrawn 2026-07-28
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (measurement scope narrowed, bypass claim marked INFERRED, withdrawn recipe reduced to one sentence, region address spaces labelled, tool basis stated)
 Summary: the 28-region `BEA_Widescreen.exe` diff and what each region does.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Analysis of BEA_Widescreen.exe modifications to understand resolution/aspect ratio patching
-> Generated: December 2025
+> Written: December 2025
 
 Status note: this is historical external widescreen-patch analysis and attribution evidence. It is not the patch contract of the retired WinUI/AppCore catalogue, and it does not by itself prove that catalogue's `resolution_gate`/`force_windowed` copied-game flow, runtime FOV parity, or no-noticeable-difference rendering.
 
@@ -38,30 +39,30 @@ The widescreen patch uses a classic **code cave** technique:
 ## Patch Regions
 
 ### Region 1: 0x0001B087 (3 bytes)
-- **VA**: 0x0041B087
+- **Heading address**: file offset. **VA**: 0x0041B087
 - **Change**: `C4 8B 5D` → `F0 4F 9D`
 - **Purpose**: Data reference update (points to new aspect ratio constant)
 
 ### Region 2: 0x000506CE (5 bytes) - MAIN HOOK
-- **VA**: 0x004506CE
+- **Heading address**: file offset. **VA**: 0x004506CE
 - **Original**: `68 00 00 40 3F` (PUSH 0x3F400000 = 0.75f)
 - **Patched**: `E9 5F 78 18 00` (JMP 0x005D7F32)
 - **Purpose**: Hook into resolution setup, jumps to code cave
 - **Note**: 0.75f is 3:4 aspect ratio (4:3 inverted)
 
 ### Region 3: 0x00129696 (1 byte)
-- **VA**: 0x00529696
+- **Heading address**: file offset. **VA**: 0x00529696
 - **Change**: `CC` → `00`
 - **Purpose**: Neutralizes the non-4:3 reject gate in `BuildDeviceList` (functional behavior patch; this byte was formerly INT3 padding).
 
 ### Region 4: 0x0012B156 (6 bytes)
-- **VA**: 0x0052B156
+- **Heading address**: file offset. **VA**: 0x0052B156
 - **Original**: `D9 05 F0 4A 5E 00` (FLD dword ptr [0x5E4AF0])
 - **Patched**: `E9 07 CD 0A 00 90` (JMP + NOP)
 - **Purpose**: Hook aspect ratio loading
 
 ### Region 5: 0x0012B200 (5 bytes)
-- **VA**: 0x0052B200
+- **Heading address**: file offset. **VA**: 0x0052B200
 - **Original**: `E8 3B 65 F1 FF` (CALL)
 - **Patched**: `E9 98 CD 0A 00` (JMP)
 - **Purpose**: Another aspect ratio hook
@@ -72,21 +73,21 @@ The widescreen patch uses a classic **code cave** technique:
 - **Purpose**: Update pointers from old aspect constant to new
 
 ### Regions 8-11: FPU Instruction Hooks
-- **Region 8 (0x0053E32F)**: replaces `mov edx,[ecx]; call [edx+0x10]` with `jmp 0x005D7FD1`.
+- **Region 8 (virtual address 0x0053E32F)**: replaces `mov edx,[ecx]; call [edx+0x10]` with `jmp 0x005D7FD1`.
   - Cave `0x005D7FD1` replays the original vcall, applies `fmul [0x009D4FF4]`, then jumps back to `0x0053E334`.
-- **Region 9 (0x0053F3B7)**: replaces `fld [0x00888A40]` with `jmp 0x005A3955`.
+- **Region 9 (virtual address 0x0053F3B7)**: replaces `fld [0x00888A40]` with `jmp 0x005A3955`.
   - Cave `0x005A3955` executes `fld [0x005DB398]; fdiv [0x009D4FF8]`, then jumps back to `0x0053F3BD`.
-- **Region 10 (0x00541B59)**: replaces `fld [esp+0xC4]` start with `jmp 0x005D7FE1`.
+- **Region 10 (virtual address 0x00541B59)**: replaces `fld [esp+0xC4]` start with `jmp 0x005D7FE1`.
   - Cave `0x005D7FE1` computes an adjusted value with ratio globals and rejoins via `0x005D7DB5 -> 0x005D7DE6 -> 0x00541B60`.
-- **Region 11 (0x00541B5E)**: companion NOP packing for region 10 trampoline (`0x90 0x90`).
+- **Region 11 (virtual address 0x00541B5E)**: companion NOP packing for region 10 trampoline (`0x90 0x90`).
 
 ### Region 12: Code Cave Block (0x001A3955 - 0x001A3965)
-- **VA**: 0x005A3955 - 0x005A3965
+- **Heading address**: file offset. **VA**: 0x005A3955 - 0x005A3965
 - **Size**: 17 bytes
 - **Location**: Former INT3 padding block used as FPU cave bridge for widescreen path
 
 ### Regions 13-28: Code Cave Cluster (0x001D7DB5 - 0x001D7FFD)
-- **VA**: 0x005D7DB5 - 0x005D7FFD
+- **Heading addresses**: file offsets. **VA**: 0x005D7DB5 - 0x005D7FFD
 - **Size**: ~600 bytes of new code
 - **Location**: Padding area after .text section code
 - **Contains**:
@@ -137,8 +138,9 @@ that at `0x009D4FF4`, followed by further FPU work for the FOV correction.
 > belongs to `.rsrc` (raw `0x261000`–`0x264000`), so a hex editor at that offset
 > reads and writes a **resource** byte. Measured on
 > `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
-> `74154bfa…`, 2,506,752 bytes: `tools/pe_read_va.py` refuses the VA, and
-> `tools/operand_scan.py` finds two absolute reads (`0x00424150`, `0x004714f0`)
+> `74154bfa…`, 2,506,752 bytes: `tools/pe_read_va.py` (in the public Onslaught Toolkit
+> repository) refuses the VA, and an archived private record, whose scan tool is not in
+> the public Toolkit repository, finds two absolute reads (`0x00424150`, `0x004714f0`)
 > and **zero** absolute writes. The guard is `CCLIParams` member `this+0x186`
 > (`0x00662DB8 + 0x186`), written only by `mov byte ptr [ebx+0x186], 1` at
 > `0x00423c7d` on the `-testeur` path. Full derivation in
@@ -146,7 +148,7 @@ that at `0x009D4FF4`, followed by further FPU work for the FOV correction.
 
 - **Address**: `0x00662f3e` (VA `0x00662F3E`, RVA `0x262F3E`) — **BSS; there is
   no corresponding file offset.** It is `CCLIParams+0x186`.
-- **Value at image load, all builds**: `0x00`.
+- **Value at image load in the pristine specimen**: `0x00`.
 - **Set to `0x01` at runtime** by `-testeur`, and only when `-testeur` precedes
   `-forcewindowed` in the same argument sweep (`jl 0x423c6b` at `0x0042418d`
   makes the comparisons one pass per token).
@@ -163,29 +165,20 @@ It loads the guard byte `[0x662F3E]` into `AL`, tests it, and skips the
 `-forcewindowed` handling when it is zero (`MOV AL,[0x00662f3e]; TEST AL,AL; JE +0x15`
 at `0x00424150`).
 
-When the flag is `0x00`, the JZ (jump if zero) is taken and `-forcewindowed` is not processed. *(Corrected 2026-07-28. The sentence that followed here previously read: "In current repo binaries (`0x01`), that guard no longer blocks CLI parsing." That is false — the guard is zero at load in **every** build, so it blocks CLI parsing on every stock command line until `-testeur` opens it.)*
+When the flag is `0x00`, the JZ (jump if zero) is taken and `-forcewindowed` is not processed. *(Corrected 2026-07-28. The sentence that followed here previously read: "In current repo binaries (`0x01`), that guard no longer blocks CLI parsing." That is false — the guard is zero at load in the pristine specimen, the only build measured here, so on the inspected route it blocks `-forcewindowed` handling until `-testeur` opens it.)*
 
 ### ~~Guard-Byte Normalization for Variants Where 0x262F3E == 0x00~~ — WITHDRAWN 2026-07-28
 
-> **Corrected 2026-07-28.** This subsection previously read:
->
-> > Quick summary:
-> > - If guard byte `0x262F3E` is `0x00`, set it to `0x01` to allow `-forcewindowed` parsing.
-> > - Optional branch tweak at `0x24157` (`74 15` pathway) can bypass the guard gate but does not by itself guarantee forced windowed behavior in every environment.
-> > - Wrapper fallback (`DxWnd` / `dgVoodoo2`) can still be needed on some setups.
->
-> The first bullet is a **harmful instruction**: file offset `0x262F3E` is in
-> `.rsrc`, so following it corrupts a resource and leaves the gate shut. It is
-> quoted rather than deleted so a reader who saw the old text can tell it was
-> withdrawn, not lost.
+> **Withdrawn 2026-07-28.** The recipe that stood here is withdrawn, because its first step addressed a byte in `.rsrc` rather than the guard; the parts that survive are listed below.
 
 Canonical operational guidance is maintained in [../display/windowed-mode-analysis.md](../display/windowed-mode-analysis.md) to avoid drift.
 
 What survives of the old summary:
 - The **branch tweak at file offset `0x24157`** (VA `0x00424157`, `74 15`) is a
-  real `.text` byte and does bypass the guard gate — but it does not by itself
-  guarantee forced windowed behavior in every environment. Not re-verified by
-  this correction pass; treat as INFERRED from the disassembly above.
+  real `.text` byte. It is reported in the earlier summary to bypass the guard gate;
+  that is INFERRED from the disassembly above and was not re-verified by this
+  correction pass. It does not by itself guarantee forced windowed behavior in every
+  environment.
 - **Wrapper fallback** (`DxWnd` / `dgVoodoo2`) can still be needed on some setups.
 - The unpatched route is **`-testeur -forcewindowed`**, in that order.
 
@@ -201,7 +194,7 @@ What survives of the old summary:
 
 - [CLI parameter parsing](../command-line/CLIParams__ParseCommandLine.md) - Command-line parameter handling
 - [../pc/executable-analysis.md](../pc/executable-analysis.md) - PE structure details
-- `cheat-codes.md` (to be published here after review) - Other hidden features
+- [Cheats](../../mechanics/cheats/README.md) - cheat rules and god mode (other hidden features)
 
 ---
 

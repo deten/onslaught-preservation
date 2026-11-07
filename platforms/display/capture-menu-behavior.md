@@ -1,8 +1,12 @@
 # Capture/Menu Behavior Analysis
 
 Status: active dated finding (2026-03-01)
-Last updated: 2026-10-22 (research-campaign records removed)
+Last updated: 2026-11-06 (a relayed chat recollection removed; Evidence and Specimen lines added; function name aligned with the naming table)
 Summary: why the windowed build's File and Capture menu entries usually appear to do nothing.
+Evidence: INFERRED overall: MEASURED for the import-table and symbol lines, SOURCE for the menu routing;
+the no-op explanation is inference, and the open questions below say what would settle it.
+Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
+`74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Scope: explain the windowed-app menu entries (`File`, `Capture`) observed during runtime and why they often appear to do nothing.
 > Date: 2026-03-01
@@ -44,7 +48,7 @@ Editor parity exists in `references/Onslaught/EditorD3DApp.cpp:758-803` with the
 
 - `AVIFIL32.dll` is imported by `BEA.exe`.
 - `AVIStreamWrite` import is present in `BEA.exe` import table.
-- Existing RE symbol evidence includes `CDXEngine__CaptureAviFrame` (`0x005140e0`) and `AVIStreamWrite` references.
+- Existing RE symbol evidence includes `CCapture__Capture` (`0x005140e0`) and `AVIStreamWrite` references.
 
 These anchors support that at least part of AVI capture plumbing exists in the retail binary.
 
@@ -56,16 +60,6 @@ High-confidence contributors:
 2. **Missing source implementation in provided drop**: no `Capture.cpp`/`Capture.h` available in current `references/Onslaught` tree, limiting source parity and suggesting optional/conditional capture code paths.
 3. **Runtime preconditions**: capture start/options typically require valid compressor/configuration/output state; if unmet, commands may return without visible UI side effects.
 
-## External Corroboration (Stuart / desimbr)
-
-Operator-supplied Discord notes from 2026-02-25 align with the binary/source evidence:
-
-- The window menu structure looks like default DirectX 8 framework menu wiring.
-- Capture behavior likely relied on Win32 AVI APIs (specifically `AVIMakeCompressedStream` was recalled).
-- Source parity gap remains expected: retail `.map/.pdb` were not available, and current source drop is `.cpp/.h` only.
-
-These statements are treated as corroborating context, not sole proof; command routing and import evidence above remain the primary anchors.
-
 ## Confidence and Open Questions
 
 - Command dispatch mapping: **high**.
@@ -74,7 +68,7 @@ These statements are treated as corroborating context, not sole proof; command r
 
 Open questions for next pass:
 
-1. Resolve exact function-level chain from WM_COMMAND IDs to `CDXEngine__CaptureAviFrame` and any gate flags.
+1. Resolve exact function-level chain from WM_COMMAND IDs to `CCapture__Capture` and any gate flags.
 2. Determine whether options dialog path is disabled by build flags, runtime checks, or missing codec/compressor path.
 3. Identify if capture commands are compiled as stubs in this retail variant.
 

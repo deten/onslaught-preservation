@@ -1,9 +1,11 @@
 # Version Overlay Patch
 
 Status: historical patch note
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (evidence and specimen lines added; earlier: retired AppCore/WinUI tools in the past tense)
 Summary: the paired pointer and cave-string rows that show `V1.00 - PATCHED` in the version overlay, and the one
 copied-game run that confirmed it.
+Evidence: MEASURED — byte-verified patch sites recorded by the retired editor, and one bounded copied-game title/menu run.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Patch note for the opt-in `V1.00 - PATCHED` marker bytes
 

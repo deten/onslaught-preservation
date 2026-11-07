@@ -3,7 +3,7 @@
 Status: active measured texture-layout and stored-block finding
 Date: 2026-08-14
 Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Verdict: GO for the bounded PC/USA-Xbox `TEXT` population. Every one of the
+Verdict: the bounded PC/USA-Xbox `TEXT` population is validated. Every one of the
 18,612 paired occurrences passed complete nested geometry validation and joined
 to an installed PC DDS frame. Those occurrences contain 18,669 frame rows.
 Xbox keeps PC dimensions and mip topology for 18,579 texture occurrences,
@@ -14,7 +14,7 @@ one top mip. Xbox also stores 25 measured sky-cube faces uncompressed and has
 that exact count to 11,762. These are stored-byte findings, not decoded-pixel
 or visual-quality claims.
 Evidence: MEASURED -- final retained `run-e` and `run-f` are byte-identical
-complete replays through `tools/aya_texture_fidelity_census.py`. The bounded profile
+complete replays through `tools/aya_texture_fidelity_census.py` in Onslaught-Career-Editor (commit `51129bab`). The bounded profile
 pins the frozen geometry, whole Xbox ZIP, both PC DDS shelf manifests,
 `ResourceAccumulator.cpp`, PC archive count, and load-bearing metrics. It
 reopens the 68 of 301 PC resources that own paired `TEXT`, requires their
