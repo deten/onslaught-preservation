@@ -1,7 +1,7 @@
 # The Mission script-command registry, recovered from shipped data
 
 Status: active, bounded static registry recovery; boundary and metadata disposition updated
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (retraction history removed, Git keeps it; renaming state stated once; tiers defined)
 Evidence: MEASURED — abstract interpretation of the stores in
 `ScriptCommandRegistry__InitBuiltins` against the pristine specimen,
 reconstructing the record array at `0x0064CE20` and reading its name/handler
@@ -16,8 +16,7 @@ Specimen: pristine PC retail `BEA.exe`, SHA-256
 
 ## Prior art — corrected 2026-08-12, this recovery was less novel than first written
 
-**This document originally presented the registry as a new recovery. That was
-wrong, and the error was mine.** The registry was already tracked:
+**This document originally presented the registry as a new recovery. That was wrong.** The registry was already tracked:
 
 - The earlier function catalogue (archived research record, not published) carries
   **Appendix A: complete 144-entry MissionScript native registry**, with 144
@@ -28,8 +27,8 @@ wrong, and the error was mine.** The registry was already tracked:
   descriptor slots at base `0x0064CE20`, already binds the `Pause` row to
   `0x00537C70` from direct stores, and already declines to promote that name.
 
-I checked `<maintainer evidence>/msl/natives.json` for prior art and found it, but did not
-check the earlier catalogue before writing.
+The prior-art check found `<maintainer evidence>/msl/natives.json`, but the earlier catalogue
+was not checked before the first write.
 
 What this document still contributes, and what the earlier work did not have:
 
@@ -37,7 +36,7 @@ What this document still contributes, and what the earlier work did not have:
   which identifies the original 54 slots whose handlers carried default names;
 - the refutation and alignment checks below;
 - the 23-row adjudication, which finds that five handlers documented as
-  `IScript__PlaySound*` in `functions/IScript.cpp.md` queue localized messages;
+  `IScript__PlaySound*` in `functions/IScript.cpp.md` (in the decompilation notes, not yet published) queue localized messages;
   the downstream message-box path can then start voice or fall back to text.
 
 Read the structure section below as reproduction and extension of tracked
@@ -62,11 +61,13 @@ stores left on an untracked register**.
 | Handlers resolving to a saved function entry | 144 |
 | Callable handler entries absent from the current function census | 0 |
 | Handlers without a descriptive name | 0 |
-| Handlers on the shared no-op | 1 |
+| Handlers on SetSpeed's no-op handler | 1 |
 
 The 144 count independently matches the 144-slot native table reached from the
-opposite direction by the compiled-script work, which indexes this table with a
+opposite direction by the compiled-script work (unpublished, not in this repository), which indexes this table with a
 `CALL` operand masked to `& 0xff`.
+
+The `isFunctionEntry` column in the TSV is undated and reads `False` for 34 rows, the number that the Boundary section below says was added to the function inventory later. Read that column as the state before that addition; the table above is the current census.
 
 ## Two independent channels agree on three names
 
@@ -85,10 +86,10 @@ debug-allocator arguments, the other reads a registrar's stores.
 
 Three checks were run before any renaming was contemplated.
 
-**Independent implementation — passed, 143/143.** An earlier independent read of the same
-table, by a different author and method, agrees on every index/name pair. It
-shares this recovery's source so it is not independent evidence, but it validates
-the stride and name-offset arithmetic.
+**Second read agrees on 143 of 144 rows — passed.** An earlier read of the same
+table, by a different author and method, agrees on every index/name pair it covers. It
+shares this recovery's source, so it is not independent evidence, but it validates
+the stride and name-offset arithmetic. The row it leaves out is not named here; the open question is which row that is and why it was left out, and the cheapest check is to diff the second read's index list against the 144 TSV rows.
 
 **Table alignment — passed.** This is the check able to detect a wrong base or
 stride. Commands `GetX`, `GetY`, `GetZ` occupy consecutive indices 57, 58, 59 and
@@ -113,12 +114,14 @@ apparent conflict: `GetVariable` is the script-facing wrapper vocabulary, while
 the narrower world-timer name remains the visible callee mechanism.
 
 **Posture: the recovered pairing and all 23 disagreements are adjudicated.** The
-54 unnamed handlers and 21 superseded names were then renamed. That changes the
-names, not the evidence grade of any handler.
+54 unnamed handlers and 21 superseded names are renamed, and the two pan-camera rows
+keep their Tier-1 names. Renaming changes the names, not the evidence grade of any handler.
 
 ## The 23 adjudications, resolved
 
 They fall into three classes, and only one is a rename candidate.
+
+Two kinds of name are compared. A **Tier-1** name is a self-identity that the shipped binary carries for a function, here the C++ name in the game's own error text. A **Tier-2** name is the script-facing command name that the shipped registry carries for a slot. Under the naming convention used for the renames, a Tier-1 name is kept, and a Tier-2 command name replaces a descriptive placeholder.
 
 **Class 1 — the existing name is the real C++ identity; do not rename (2).**
 Indices 114 and 115 are registered `Goto3PointPanCamera` and
@@ -131,77 +134,20 @@ and adopting the registry string here would destroy a shipped-symbol identity.
 This proves from the binary — not from caution — that a registry string is a
 script-facing command name rather than a C++ symbol.
 
-> **Class 2 CORRECTED 2026-08-12, later the same day — my claim was too strong.**
-> This section originally asserted that these five handlers "play no sound". That
-> is **false**, and one more level of call-graph would have shown it. The queued
-> message does reach audio:
-> `Insert…SortedAndMaybeAdvance` → `CMessageBox__VFunc_0_004B81D0` →
-> `CMessageBox__StartVoiceOrFallbackTextReveal` → `CText__GetAudioNameById` and
-> `CBinkOpenThread__StartAsync`. A message carries a voice line and the message
-> box starts it when the queue advances, so `PlaySound` is a defensible
-> description of the **effect**.
->
-> What survives is narrower and still worth fixing: the **suffixes are wrong**.
-> `WithCallback`, `WithFade` and `WithPriority` name mechanisms that are not
-> there. The registry's actual distinctions are `AddMessage` versus
-> `PlayCharMessage` versus `PlayPCharMessage`, and plain versus `Wait` — and the
-> `Wait` variants are the two that schedule through
-> `CEventManager__GetNextFreeEvent` and `CScheduledEvent__Set`, which is exactly
-> the behaviour `WithFade` was invented to describe.
->
-> Read the paragraph below as evidence about the immediate call layer only.
-> `CUnit__ApplyDamage` and `CUnit__TriggerEffect` also insert queued messages, so
-> the queue is not script-only.
->
-> **WITHDRAWN, same day — the refinement below is wrong; read this first.**
-> The paragraph beneath claims `[vtable+0x30]` carries a parameter that
-> `PlayPCharMessage` takes from the script and the others fix at ten. That is a
-> misreading. `[vtable+0x30]` is a **no-argument getter on a boxed script value**:
-> `PlayCharMessage` does `mov ecx,[esi]; mov eax,[ecx]; call [eax+0x30]` at
-> `0x00537539` and again at `0x0053754E` for `[esi+4]`, unboxing each script
-> argument before passing it to `CText__GetStringById`; `[esi+8]` uses a different
-> getter at `[vtable+0x34]`. The `push 0xa` is a literal argument to
-> `CMessage__ctor_base` itself.
->
-> The error was method, not arithmetic: I printed the eleven instructions
-> preceding the constructor call and read them as that call's argument setup, when
-> they spanned several unrelated calls. **Do not attribute pushes to a call
-> without checking where the preceding call boundaries are.**
->
-> So `WithPriority` is **not** rehabilitated — it is back to unsupported, along
-> with `WithCallback`, and `WithFade` remains wrong. What actually distinguishes
-> the five is still unestablished, and identifying it needs the
-> `CMessage__ctor_base` signature rather than any inference from call windows.
->
-> **Superseded refinement, retained so the reasoning chain is visible:**
-> Comparing the argument setup at each `CMessage__ctor_base` call site:
-> `AddMessage` passes a fixed global `0x0089C328` where the two `…CharMessage`
-> forms pass a script-supplied value, so `AddMessage` is the fixed-source form.
-> More usefully, the virtual at `[vtable+0x30]` that builds the message text takes
-> a parameter which `AddMessage` and `PlayCharMessage` **hardcode to `0xA`** and
-> which `PlayPCharMessage` takes **from the script**. So the `P` prefix marks a
-> script-supplied value for something the others fix at ten — and *priority* is a
-> natural reading of that, which means `IScript__PlaySoundWithPriority` may be
-> **accurate about the mechanism** even though the registry calls the command
-> `PlayPCharMessage`.
->
-> Status of the five suffixes on current evidence: `WithFade` is **wrong** — the
-> two variants it names are the `Wait` forms that schedule through
-> `CEventManager__GetNextFreeEvent`. `WithCallback` remains **unsupported** —
-> nothing in `PlayCharMessage` registers a callback. `WithPriority` is
-> **plausibly right**. That is a smaller correction than the one this section
-> originally claimed, and the parameter at `[vtable+0x30]` should be identified
-> before the five handlers are renamed. That renaming is now done;
-> this paragraph remains the reasoning record from before it.
-
 **Class 2 — the registry vocabulary superseded five descriptive names (5).**
 Before the renaming, five handlers named `IScript__PlaySound*` called no sound
-routine directly. Their
-callees are
-`CText__GetStringById`, `CMessage__ctor_base` and
+routine directly. Their callees are `CText__GetStringById`, `CMessage__ctor_base` and
 `CMessageBox__InsertQueuedMessageSortedAndMaybeAdvance`: they build a localized
-message and queue it. The two `…Wait` variants add
-`CEventManager__GetNextFreeEvent` and `CScheduledEvent__Set`.
+message and queue it. The two `…Wait` variants add `CEventManager__GetNextFreeEvent`
+and `CScheduledEvent__Set`.
+
+The queued message does reach audio. `Insert…SortedAndMaybeAdvance` calls
+`CMessageBox__VFunc_0_004B81D0`, which calls `CMessageBox__StartVoiceOrFallbackTextReveal`,
+which calls `CText__GetAudioNameById` and `CBinkOpenThread__StartAsync`. A message
+carries a voice line, and the message box starts it when the queue advances, so
+`PlaySound` is a defensible description of the **effect**. The queue is not script-only:
+`CUnit__ApplyDamage` and `CUnit__TriggerEffect` also insert queued messages. The
+paragraphs in this class cover the immediate call layer only.
 
 | Idx | Registry command | Earlier name (2026-08-12) |
 | ---: | --- | --- |
@@ -211,14 +157,16 @@ message and queue it. The two `…Wait` variants add
 | 90 | `PlayPCharMessage` | `IScript__PlaySoundWithPriority` |
 | 91 | `PlayPCharMessageWait` | `IScript__PlaySoundWithFadeAndPriority` |
 
-`WithCallback` is unsupported by these bodies, and `WithFade` is contradicted by
-the scheduling path used by the two registry `Wait` forms. The later seven-slot
-map below shows that `WithPriority` is a plausible mechanism-facing description
-of argument seven; it is not a recovered C++ name and still loses to the shipped
-Tier-2 command names under the adopted naming convention. The firm correction
-is therefore the five-row replacement with the registry's script-facing
-vocabulary, not the broader withdrawn claim that every old suffix described an
-absent mechanism.
+The suffixes on current evidence:
+
+| Suffix | Status | Evidence |
+| --- | --- | --- |
+| `WithCallback` | unsupported | nothing in `PlayCharMessage` registers a callback |
+| `WithFade` | wrong | the two variants it names are the `Wait` forms, which schedule through `CEventManager__GetNextFreeEvent` |
+| `WithPriority` | plausibly right | argument seven (`this+0x2C`) is caller-varied on the `PChar` forms and fixed at ten on the others; see the seven-slot map below |
+| `WithFadeAndPriority` | split | its `Fade` part is wrong, as for `WithFade`; its `Priority` part is plausibly right, as for `WithPriority` |
+
+The correction is therefore the five-row replacement with the registry's script-facing vocabulary. It does not claim that every old suffix described an absent mechanism. Under the naming convention, `WithPriority` still loses to the shipped Tier-2 command names.
 
 ### `CMessage__ctor_base` recovered — and it settles the voice question
 
@@ -235,14 +183,13 @@ Each is stored to a fixed field, and two are decisive:
 | `[esp+0x38]` | `this+0x28` | — |
 | `[esp+0x3C]` | `this+0x2C` | — |
 
-Two facts follow, and unlike the three withdrawn readings above these rest on
-stores rather than on inferred call windows:
+Two facts follow, and both rest on stores rather than on inferred call windows:
 
 1. **A message carries an optional voice stream directly.** Argument five is a
    reader handle; when supplied, the constructor installs it and raises a
    has-voice flag at `this+0x38`. This is the concrete mechanism behind the
-   corrected Class 2 note — the audio is attached at construction, not looked up
-   later.
+   Class 2 audio reach described above: the audio is attached at construction,
+   not looked up later.
 2. **Display duration is computed from text length.**
    `this+0x14 = WcsLen(text) * [0x005DC6AC] + [0x005D8604]` — a linear reveal
    time. Those two shipped floats are the cheapest next measurement.
@@ -265,8 +212,8 @@ Three things follow. `AddMessage` alone passes a **fixed global** as argument
 one where every `…CharMessage` form passes a register — the clearest structural
 distinction found so far. The plain and `Wait` forms have visibly different
 argument shapes. And **`Char` and `PChar` are indistinguishable across all three
-resolved arguments**, which independently supports withdrawing `WithPriority`:
-whatever separates them lies in arguments four to seven, unreached.
+resolved arguments**, so whatever separates them lies in arguments four to seven,
+which were not reached.
 
 That partial map was the state until the indirect targets were resolved rather
 than assumed. Reading the boxed-value vtables directly:
@@ -281,8 +228,7 @@ than assumed. Reading the boxed-value vtables directly:
 
 **Every one takes zero stack arguments**, so the indirect `call [reg+0x30]` that
 halted the walk consumes nothing and the backward scan can safely pass it. The
-blocker was arity, and the arity is zero — established by reading the vtables
-rather than by assuming, which is what the earlier withdrawal required.
+blocker was arity, and the arity is zero, as read from the vtables.
 
 It also identifies the boxed type: vtable `0x005E4EA4` is **`CFloatDataType`**,
 and it is the vtable the three characterized health natives install at `+0x00` of
@@ -320,17 +266,16 @@ Three axes fall out, each on a single slot:
 slot — so all five can carry a voice line, which closes the Class 2 question from
 the store side.
 
-Consequences for the three suffixes. `WithPriority` names a real mechanism after
-all: a caller-varied numeric at `this+0x2C` against a fixed ten, which is what a
-priority would look like — the earlier withdrawal was right to reject the
-*reasoning*, and the conclusion survives on better evidence. `WithFade` remains
-**wrong**: that axis is argument six's scheduling handle, which is `Wait`.
-`WithCallback` remains **unsupported**: what distinguishes `PlayCharMessage` from
+Consequences for the three suffixes. `WithPriority` marks a real difference in the call: a
+caller-varied numeric at `this+0x2C` against a fixed ten, which is what a priority would
+look like. That it is a priority is a reading, so its status stays plausible rather than
+measured. `WithFade` is **wrong**: that axis is argument six's scheduling handle, which is
+`Wait`. `WithCallback` is **unsupported**: what distinguishes `PlayCharMessage` from
 `AddMessage` is argument one's source, not any callback.
 
-Renaming is now evidence-complete for the mechanism and blocked only on choosing
-between the registry's script-facing vocabulary and the existing mechanism-facing
-names — a convention decision, not a measurement.
+The mechanism evidence is complete for all five handlers. Their names are the registry's
+script-facing vocabulary under the naming convention defined above; that choice is a
+convention, not a measurement.
 
 **Class 3 — descriptive placeholder the registry supersedes (16).** `GetX/GetY/
 GetZ` over `GetVectorX/Y/Z`, `Magnitude` over `GetVectorLength`,
@@ -347,10 +292,10 @@ names distinct from recovered C++ identities.
 
 ## A named dormant capability
 
-Exactly one handler is the shared no-op, and its command is **`SetSpeed`**. The
-mission language can call it, and this build accepts the call and does nothing.
-The cheapest falsifier is a mission script that calls `SetSpeed` and observes no
-effect.
+Exactly one handler is SetSpeed's no-op handler, and its command is **`SetSpeed`**. The
+mission language can call it. The handler body does nothing in the static reading; its
+runtime effect has not been measured. The cheapest falsifier is a mission script that
+calls `SetSpeed` and observes no effect.
 
 ## Boundary
 

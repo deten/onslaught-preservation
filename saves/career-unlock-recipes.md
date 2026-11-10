@@ -1,8 +1,14 @@
 # Career Unlock Recipes (Steam)
 
+Status: active — editor design guidance for world unlocks; its patch paths are unverified
+Last updated: 2026-11-06 (header, Evidence and Specimen lines added; patch paths labelled unverified)
+Summary: for each campaign world, the link edits and natural mission conditions that make the world available on the career map.
+Evidence: SOURCE — `references/Onslaught/Career.cpp` (`level_structure`, `CCareer::ReCalcLinks`); UNKNOWN — whether any listed patch path yields its unlock in a game; no runtime capture is cited.
+Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+
 Deterministic unlock guidance for each campaign world (`NUM_LEVELS=43`), derived from `references/Onslaught/Career.cpp` `level_structure` and retail `CCareer::ReCalcLinks` behavior.
 
-This page is for **editor behavior design** and recovery planning, not live mutation instructions.
+This page is for **editor behavior design** and recovery planning. The patch paths are unverified edits; test them only on a copy of a real baseline (see [save-format.md](save-format.md#product-rules), Product rules).
 
 Legend:
 - **Manual patch path**: minimal direct link-state edit to make the world available on the career map.

@@ -2,7 +2,7 @@
 
 Status: active bounded world-instance and resource-linkage contract
 Date: 2026-08-28
-Last updated: 2026-10-29 (the records the join leaves out: a `dies_on` world, squads and spawners; earlier: private evidence paths generalised for the onslaught-preservation layout)
+Last updated: 2026-11-06 (gate pinned to Toolkit commit 51129bab, reproduction steps, consumer names from the decompilation; earlier: the records the join leaves out: a `dies_on` world, squads and spawners; earlier: private evidence paths generalised for the onslaught-preservation layout)
 Verdict: across all 66 numeric LVLR archives, 4,090 definition-bearing WRES
 records join without ambiguity through `default physics.dat` to exactly one named
 LVLR `MESH` row and one loose CMSH file in the same level. The join covers 2,731
@@ -13,7 +13,7 @@ component, named animation range, or render schedule understood.
 Evidence: MEASURED — `tools/cmsh_animation_usage_census.py` hash-verified 213
 loose CMSH archives, 66 numeric LVLR archives, 733 loose MSL files, and
 `default physics.dat` (1,013 inputs) against `<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`.
-The focused 17-test gate reproduces every count and the synthetic can-fail
+The focused 17-test gate at Onslaught-Career-Editor commit [`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50) (seven synthetic and ten specimen-bound tests) reproduces every count and the synthetic can-fail
 controls. Static consumer identities come from the cited pristine-binary notes.
 Specimen: `<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`, SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`;
@@ -72,7 +72,7 @@ the definition registry instead:
 | WRES type | Physics record | Mesh field | Static/corpus basis |
 | ---: | ---: | ---: | --- |
 | `8` | `1` (Unit) | field id `9` | `CUnitMesh` RTTI vocabulary plus 3,578 exact same-level/loose joins |
-| `35` | `8` (Feature) | field id `2` | `CFeatureMesh__ApplyToFeatureByName @ 0x0043BE10` plus 512 exact joins |
+| `35` | `8` (Feature) | field id `2` | `CFeatureMesh__Apply @ 0x0043BE10` plus 512 exact joins |
 
 Every accepted record has finite position/orientation values, a matching
 physics owner, exactly one same-level named `MESH` row, and exactly one loose
@@ -260,24 +260,32 @@ families, and dormant assets remain possible.
 | --- | --- | --- |
 | `0x0050B9C0` | `CWorld__LoadWorld` | version-gated world read; named mesh load and Unit/Feature creation fan-out |
 | `0x0050D9E0` | `CWorldMeshList__Add` | named mesh-list insertion path reached by world loading |
-| `0x0043BE10` | `CFeatureMesh__ApplyToFeatureByName` | resolves a feature definition by name and replaces its owned mesh string |
-| `0x004AA630` | `CMesh__FindAnimationIndexByName` | runtime case-insensitive animation-name lookup; serialized owner/ranges remain open |
+| `0x0043BE10` | `CFeatureMesh__Apply` | resolves a feature definition by name and replaces its owned mesh string (identity open; see Open questions) |
+| `0x004AA630` | `CMesh__GetAnimModeByName` | runtime case-insensitive animation-name lookup (identity open; see Open questions); serialized owner/ranges remain open |
 | `0x005351D0` | `IScript__PlayAnimationWait` | dispatches a resolved animation and resumes saved VM state on completion |
 
 `CWorld__LoadWorld` also calls `CEngine__LoadAllNamedMeshes` and
-`CWorldPhysicsManager__CreateThingByType`; see its function note for the bounded
+`CWorldPhysicsManager__CreateThingByType`; see its function note (in the decompilation notes, not yet published) for the bounded
 call chain. These are static consumer anchors. They do not prove that all 4,090
 records execute in one playthrough, that every active object renders, or that a
 specific animation token reaches pixels.
 
 ## Reproduce
 
+The tools are in [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit [`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50). Clone it, check that commit out, and run the commands from the clone's root:
+
 ```bash
+git clone https://github.com/dlprentice/Onslaught-Career-Editor
+cd Onslaught-Career-Editor
+git checkout 51129bab45489e5e45ee1c047cbcd8072bf4cc50
+mkdir -p .artifacts/wres-instance-join
 python ./tools/cmsh_animation_usage_census.py \
   --data-root "<safe-copy>/data" \
   --mirror-index "<asset-mirror>/INDEX.jsonl" \
-  --json-out "<maintainer evidence>/wres-instance-join/census.json"
+  --json-out ".artifacts/wres-instance-join/census.json"
 ```
+
+`<safe-copy>` is the folder of your own installed game, the folder that contains `data/`; the census only reads it. `<asset-mirror>/INDEX.jsonl` is the maintainer's asset-mirror index, which is not published. Without it, omit `--mirror-index`: the census then runs without its hash check, and the specimen-bound tests below are skipped.
 
 Focused gate with the local corpus enabled:
 
@@ -287,8 +295,7 @@ export ONSLAUGHT_ASSET_INDEX="<asset-mirror>/INDEX.jsonl"
 python ./tools/cmsh_animation_usage_census_tests.py
 ```
 
-A clean clone runs seven synthetic can-fail tests and skips the nine
-specimen-bound tests when the two external inputs are absent.
+Without the two external inputs, the gate runs the seven synthetic can-fail tests and skips the ten specimen-bound tests.
 
 ## Open questions and cheapest falsifiers
 
@@ -312,6 +319,7 @@ specimen-bound tests when the two external inputs are absent.
   disposable copied runtime.
 - **Orientation semantics:** prove the three-float order on one non-yaw record
   before naming it a universal Euler convention.
+- **Consumer identities:** the two anchors above carry the decompilation's names; their descriptions were written under the earlier names and still need an identity check. Falsifier: in a copied runtime, read one feature's owned mesh string before and after its apply path, and read the value one animation name returns through the lookup.
 
 ## Claim boundary
 

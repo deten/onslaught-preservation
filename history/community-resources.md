@@ -1,10 +1,14 @@
 # Community Resources
 
+Status: active — speedrun, community and tool links, with their sources
+Last updated: 2026-11-06 (private conversation partners and unsourced quotations removed; dated record and reference links corrected)
+Summary: speedrun records and techniques, community research, similar games, external archives and tools, and the sources this page draws on.
+
 ## Speedrun Resources
 
 - **Speedrun.com**: https://www.speedrun.com/battle_engine_aquila#Any
 - **BermudaMaster's Twitch**: https://www.twitch.tv/bermudamaster
-- **Current WR**: Sub-56 minutes (BermudaMaster, Nov 2025)
+- **World record as of Nov 2025**: Sub-56 minutes (BermudaMaster). Check the board above for newer times.
 
 ---
 
@@ -14,7 +18,7 @@
 
 **Victory Screen Glitch**: Opening the menu during the victory screen shows both simultaneously. Can exit level to reach results screen slightly faster.
 
-**Death from Above Issues**: Something about the "Red Map issue" causes problems. BermudaMaster: "I really need to look over this footage."
+**Death from Above Issues**: Something about the "Red Map issue" causes problems.
 
 **Hitbox Issues**: Some objects' hitboxes don't exist - attacks can phase through them. Discovered after hours of optimizing single levels.
 
@@ -37,7 +41,7 @@
 - **Gun Metal** (Steam) - similar mech combat
 - **AirMech** - closest modern equivalent to BEA
 - **Supreme Commander** - unit designs similar (Aeon = Forseti, Cybran = Muspell)
-- **AEROMACHINA** (upcoming) - ground/flight combat, demo on Steam
+- **AEROMACHINA** - ground/flight combat, demo on Steam
 
 ---
 
@@ -72,7 +76,7 @@
 - **Note**: Animations not yet extractable
 - **Blender import**: Turn off extra import options to avoid crash
 - **Model scale**: Battle Engine is ~7.6m tall based on model calculations (April 2023)
-- **Model quirks**: Models are asymmetrical - min473 noted "NOTHING is symmetrical in this model" when 3D printing
+- **Model quirks**: Models are asymmetrical, which shows up when they are 3D printed
 - **Use cases**: Gmod SNPCs, C&C Generals mods, 3D printing (thin parts break during support removal)
 
 ### Onslaught Source Reference
@@ -84,10 +88,12 @@
 
 ## Sources
 
+The `references/Onslaught/` paths cite Stuart's published source at the pinned commit [`c3d8ac4`](https://github.com/dlprentice/Onslaught/tree/c3d8ac464259942b83fa8aa7f867c856e77b734d) of the public reference fork; this repository has no `references/` folder (see the [README](../README.md#how-to-read-a-finding)).
+
 - `references/Onslaught/Career.cpp` - Stuart's internal PC build source
 - `references/Onslaught/Career.h` - Struct definitions
 - `game/` - Optional local ignored overlay for a user-owned BEA installation or
   copied runtime files used during local analysis
 - Community hex-diffing of retail saves
-- Discord conversations (#general, #game-dev, #greetings, #media, #story-and-lore, #bugs, #bulletin, #who-joined, #muspell-block) parsed Dec 2025
-- LinkedIn conversations with Stuart, Alex Trowers
+- Community Discord conversations, parsed Dec 2025; the raw dumps are not published (see [community-history.md](community-history.md))
+- Private LinkedIn conversations with people who worked on the game; not reproduced here

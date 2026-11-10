@@ -1,5 +1,12 @@
 # Career System
 
+Status: active — source analysis of the Career system, with bounded retail save corrections
+Last updated: 2026-11-06 (god-flag persistence, version-stamp provenance, campaign row and pending Goodies corrected; header and specimen added)
+Summary: the Career constants, campaign graph, version-stamp formula and per-player settings as written in Stuart's pinned source; the retail .bes layout is owned by save-format.md.
+Evidence: MEASURED — the retail stamp, offsets and startup-default address, read from the pristine specimen named below and recorded in save-format.md; SOURCE — the pinned Career.cpp, Career.h, Array.h and Controller.cpp, cited by name and line.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256
+`74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+
 > Analysis from Career.cpp/h, Array.h, and Controller.cpp - December 2025
 
 ## Overview
@@ -17,7 +24,7 @@ Key constants that define the structure of career save files:
 | `MAX_NODES` | 100 | Career node slots |
 | `MAX_LINKS` | 200 | MAX_NODES × 2 |
 | `MAX_NUM_GOODIES` | 300 | Goodie slots |
-| `MAX_CAREER_SLOTS` | 32 | Tech slots (bitmap) |
+| `MAX_CAREER_SLOTS` | 32 | Tech slots: 32 dwords (1,024 bits; slot ids 0-255 addressable) |
 | `NUM_LEVELS` | 43 | Actual campaign missions |
 | `BASE_THINGS_EXISTS_SIZE` | 288 | Bits for objective tracking |
 | `BASE_THINGS_EXISTS_MEM_REQ` | 9 | 288>>5 = 9 ints (36 bytes) |
@@ -36,13 +43,13 @@ The version stamp saved to `.bes` files is calculated using this formula:
 static SWORD current_version_stamp() {
     return SWORD(CAREER_VERSION + (sizeof(CCareer) << 4));
 }
-// With CAREER_VERSION=9, this creates the 16-bit version word 0x4BD1
+// With CAREER_VERSION=9, this formula does not yield the retail version word 0x4BD1 (see source-key-functions.md)
 // (the first 4 bytes often *look* like 0x00004BD1 in hex dumps if the next 16 bits are zero).
 ```
 
-**Notes (Feb 2026):**
+**Notes:**
 - The retail/Steam `.bes` validates only the first **2 bytes** as the version word (`0x4BD1`).
-- The source formula explains the provenance of the value, but the retail build effectively treats it as a 16-bit stamp.
+- The source formula's provenance is inferred, not established: with `CAREER_VERSION` 9 it does not yield the retail stamp (see [source-key-functions.md](../source-key-functions.md)). The retail build effectively treats the value as a 16-bit stamp.
 - The retail save layout is not a simple `[stamp][sizeof(CCareer)]` blob: `CCareer` bytes start at `file+2` and the file tail includes persisted options entries plus a fixed 0x56-byte snapshot block.
 
 ---
@@ -102,7 +109,7 @@ No array length prefix, no padding - just contiguous struct data within the CCar
 |-------|-------|-------------|--------------|-------|
 | 0 | 100 | 1 | -1 | Training |
 | 1 | 110 | 2 | -1 | Tutorial |
-| 2 | 200 | 3, 4 | - | Episode 2 start |
+| 2 | 200 | 3 | 4 | Episode 2 start |
 | ... | ... | ... | ... | ... |
 | 42 | 800 | -1 | -1 | Final level |
 
@@ -180,11 +187,11 @@ CSArray<BOOL, 2> mVibration;                // 8 bytes
 CSArray<int, 2> mControllerConfigurationNum; // 8 bytes
 ```
 
-**Retail/Steam note (Feb 2026):**
-- Current Steam-build evidence identifies `mCareerInProgress`, `mSoundVolume`, `mMusicVolume`, `g_bGodModeEnabled`, per-player invert-Y toggles (flight/jet + walker), `mVibration[2]`, and `mControllerConfigurationNum[2]` in the fixed CCareer region of retail/Steam `.bes` files (true view offsets `0x248A..0x24BA`).
+**Retail/Steam note:**
+- The fixed CCareer region of retail/Steam `.bes` files holds `mCareerInProgress`, the sound and music volumes, the per-player god flags (`mIsGod[0..1]`), the per-player flight and walker invert-Y settings, `mVibration[2]` and `mControllerConfigurationNum[2]` (true view offsets `0x248A..0x24BA`; the rows are in [save-format.md](../../../saves/save-format.md)).
 - Retail startup defaults for these fields are set by `CCareer__StaticInitDefaults` (`0x0041b6a0`, `g_InitFuncTable[3]`): sound/music `0.8/0.9`, vibration/config `1`, invert-Y `0`. These values align with Stuart’s `CCareer::CCareer()` defaults.
-- Stuart’s internal build includes `mPendingExtraGoodies`, but we have **not** found a standalone persisted dword for it in the Steam build’s fixed CCareer region; earlier docs incorrectly labeled `0x24BA` as pending extra goodies (it is used as Player 2 controller config in retail).
-- `mIsGod[2]` exists in the internal build source, but the Steam build does **not** appear to persist per-player god flags in the save; older writeups that labeled file offsets `0x249A/0x249E` as `mIsGod[]` were incorrect (those dwords are used for invert-Y settings in the retail binary/UI).
+- Stuart’s internal build includes `mPendingExtraGoodies`. In the retail file, the first dword after the version word holds the pending extra Goodies, not an accumulated count ([save-format.md](../../../saves/save-format.md) row `0x0002`; recheck in [save-options-startup-compatibility.md](../../../saves/save-options-startup-compatibility.md)).
+- `mIsGod[2]` exists in the internal build source, and the Steam save persists the per-player god flags (player 1 and player 2; see [god-mode.md](../../../mechanics/cheats/god-mode.md) and [save-format.md](../../../saves/save-format.md)).
 - Separate from CCareer, the retail `.bes` also contains a fixed-size options entries block (16 slots; active/used count can vary) and a fixed 0x56-byte tail snapshot holding additional global settings.
 - Do not assume any “shift-16 encoding” in retail `.bes`; that behavior came from interpreting the file at 4-byte aligned offsets even though the `CCareer` blob begins at `file + 2`. Use the true view mapping: `file_off = 0x0002 + career_off`.
 
@@ -201,7 +208,7 @@ Authoritative retail offsets and the current “known/unknown” map live in:
 Understanding the Career system is critical because:
 
 1. **Save File Layout**: CSArray explains contiguous layout in the core `CCareer` region (retail adds options/tail data outside that core)
-2. **Version Detection**: The version stamp formula explains the 16-bit version word `0x4BD1` at offset `0x0000` (the first 4 bytes often *look* like `0x00004BD1` if the next 16 bits are zero)
+2. **Version Detection**: The 16-bit version word `0x4BD1` at offset `0x0000` is measured, and the source formula does not explain it (the first 4 bytes often *look* like `0x00004BD1` if the next 16 bits are zero)
 3. **Tech Slots**: World 500 branching explains why slots 61/62 matter
 4. **Link States**: CN_COMPLETE_BROKEN explains value 2 in link data
 5. **Per-Player Settings**: Explains which settings exist in the internal build (retail persistence may differ)
@@ -228,7 +235,3 @@ Understanding the Career system is critical because:
 - [../../../mechanics/cheats/god-mode.md](../../../mechanics/cheats/god-mode.md) - God mode flag analysis
 - [../../../saves/save-format.md](../../../saves/save-format.md) - Save file offset reference
 - [../io/storage-system.md](../io/storage-system.md) - Save/load implementation
-
----
-
-*Last updated: February 2026*

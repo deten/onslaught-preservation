@@ -1,7 +1,7 @@
 # Attribution & Preservation Contributors
 
 Status: active — attribution, preservation credits and licence boundaries
-Last updated: 2026-11-06 (deten credited for the runtime time-dependence findings; earlier: research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (deten credited for the runtime time-dependence findings; earlier: two unsourced status lines and a change-history sentence removed; research-campaign records and decompiler-style code removed)
 Summary: who contributed what, and the licence boundaries of this documentation and the reference material it quotes.
 Evidence: SOURCE — contributors' public credits and published repositories
 
@@ -18,7 +18,6 @@ Evidence: SOURCE — contributors' public credits and published repositories
     - https://github.com/stuart73/Onslaught
     - https://github.com/stuart73/AYAResourceExtractor
   - confirmed several retail/internal differences and save/display implementation details
-- Status: active preservation contact through public community channels.
 
 ### Alex Trowers
 - Role: lead designer / concept creator.
@@ -37,7 +36,6 @@ Evidence: SOURCE — contributors' public credits and published repositories
 - Role: technical director.
 - Contribution reflected here:
   - terrain/landscape, impostor, shadow, and related rendering/system context referenced in preservation notes.
-- Status: historical contributor with limited modern engagement.
 
 ### Other Lost Toys contributors
 - Jez Elford: art direction / concept-art context.
@@ -131,13 +129,11 @@ and tables only ([`CONTRIBUTING.md`](../CONTRIBUTING.md)).
 
 ## Lead on the PC port developer's surname
 
-Moved here 2026-08-01 from `lore/team-roster.md`, where it sat in a document a
-player reads. The discipline in it is exemplary and the audience is not: a reader
-wants to know who made the game, and a contributor needs to know why one plausible
-name must not be written in as fact.
+A reader wants to know who made the PC port, and a contributor needs to know why one plausible
+name must not be written in as fact; this section keeps the one lead that exists and marks it as unconfirmed.
 
 **Lead on Jan's surname — INFERRED, NOT CONFIRMED (recorded 2026-07-28).**
-"Surname unknown" above is still accurate: nothing establishes who this Jan was.
+The surname is still unknown: nothing establishes who this Jan was.
 It is recorded here only so the strongest available lead is visible rather than
 buried in the RE corpus.
 
@@ -147,7 +143,7 @@ Svarovsky and Tom Forsyth**, "originally from StarTopia at Mucky Foot" —
 [modding-reference.md](../platforms/command-line/modding-reference.md)
 and
 [game-folder-analysis.md](../formats/game-folder-analysis.md).
-First name, former studio and named title all match this row.
+First name, former studio and named title all match the description above.
 
 **Why that is weaker than it looks, and must not be written in as fact:**
 

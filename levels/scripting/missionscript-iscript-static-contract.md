@@ -1,7 +1,10 @@
 # MissionScript / IScript static contract
 
-Status: bounded static evidence; not runtime script proof
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Status: active — bounded static contract; not runtime script proof
+Last updated: 2026-11-06 (Summary, Evidence and Specimen lines added; function-level note labels aligned)
+Summary: The implementation-facing static contract for the retail MissionScript and IScript interpreter, and what that evidence does not prove.
+Evidence: MEASURED for the registry table layout and names, graded in [mission-script-command-registry.md](mission-script-command-registry.md); the Goodie save offsets are graded in [goodies-system.md](../../saves/goodies-system.md); UNKNOWN for handler signatures, argument contracts and runtime command effects.
+Specimen: pristine PC retail `BEA.exe`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 This document is the implementation-facing owner for retail MissionScript and
 IScript static evidence. Historical fixture plans and command-effect rollups are
@@ -21,7 +24,7 @@ current sources.
   independently fixes all 27 factory cases to paired strict RTTI instruction
   classes and slot-0 executors while keeping eight runtime effects open.
 - `IScript.cpp.md` (in the decompilation notes, not yet published),
-  `ScriptObjectCode.cpp.md` (archived research record, not published), and
+  `ScriptObjectCode.cpp.md` (in the decompilation notes, not yet published), and
   `EventFunction.cpp.md` (in the decompilation notes, not yet published) retain
   function-level identities and call relationships.
 - [`msl-scripting.md`](msl-scripting.md) retains

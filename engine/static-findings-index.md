@@ -1,7 +1,7 @@
 # Binary Analysis
 
 Status: living index of the static and byte-level findings
-Last updated: 2026-11-02 (historical debugger runbook availability clarified)
+Last updated: 2026-11-06 (unpublished index entries marked not yet published; earlier: historical debugger runbook availability clarified)
 Summary: front door to the static and byte-level findings about the Steam `BEA.exe`: specimen baseline, dated
 analyses, per-system contracts and per-function notes. Makes no claim of its own — every claim below belongs to the
 document it links.
@@ -75,14 +75,14 @@ names quoted in the documents below are dated snapshots.
 - [Physics script contract](../formats/physics-script-static-contract.md)
 - [Texture resource decoding](../formats/texture-resource-decode-static-contract.md)
 - [Terrain shade plane origin and axis order](render/terrain/terrain-shade-plane-origin.md)
-- Terrain shade bilinear interpolation decode (to be published here after review)
+- Terrain shade bilinear interpolation decode (not yet published)
 - [Terrain draw texture-stage flags](render/terrain/terrain-draw-stage-flags.md)
 - [Terrain per-node colour light absent from the PC path](render/terrain/terrain-per-node-colour-absent.md)
 - Retail's implied macro cache inverted from rendered pixels (archived research record, not published)
-- Sun colour route to the terrain draw — all ten references, negative (to be published here after review)
-- Terrain material record and the `LANDSCAPE_LIGHTING` gate (to be published here after review)
+- Sun colour route to the terrain draw — all ten references, negative (not yet published)
+- Terrain material record and the `LANDSCAPE_LIGHTING` gate (not yet published)
 - Terrain ambient-light term implemented and measured (archived research record, not published)
-- Cockpit lighting law — located, decoded, already implemented (to be published here after review)
+- Cockpit lighting law — located, decoded, already implemented (not yet published)
 - [The default render-state block `0x004EB1E0` — re-derived from bytes](render/d3d-default-render-state-block.md)
 - Half-pixel pixel-centre offset corrected in the projection (archived research record, not published)
 - [CMSH `CPOS`/`CORI` identity](../formats/cmsh-cpos-cori-identity.md)

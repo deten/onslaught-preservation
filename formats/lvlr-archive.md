@@ -3,7 +3,7 @@
 Status: active format contract — complete outer/tag census; most payload schemas
 remain owner-specific or open
 Date: 2026-08-28
-Last updated: 2026-10-29 (the PS2 loader table's raw-body digests recomputed from the retained images, each had one character doubled; the seven non-numeric `MESH` rows are base and Frontend, not Goodie rows; the 53 empty outer MESH names are separate from the internal CMSH names, which the usage census also reads as empty; earlier: research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (pin, Goodie MESH and PS2 name corrections, PS2 path wording, the terminal Goodie's cutscene 33 rule sourced; PS2 loader digests fixed 2026-10-29; detail in Git)
 Verdict: all 301 streams and 23,884 top-level tags are accounted for; the
 numeric WRES Unit/Feature instance join and released PS2 texture-page runtime
 boundary are bounded, while most other payload schemas and world dependencies
@@ -93,7 +93,7 @@ filtering, although both are nonempty in every measured numeric shelf. PC has
 `TEXT` 249–319 and `MESH` 30–71; PS2 has `TEXT` 240–312 and `MESH` 25–71.
 The fixed prefix geometry is `LVLR@0:size4`, `TARG@12:size4`,
 `AYAD@24:size24`. Pinned
-`references/Onslaught` commit `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`
+`references/Onslaught` commit `c3d8ac464259942b83fa8aa7f867c856e77b734d`
 corroborates the PC-host builder schedule: `ResourceAccumulator.cpp:324-347`
 writes the prefix, `:504-592` emits stable filtered texture then mesh runs, and
 `:627-697` writes the six numeric tail owners in this order. This does not prove
@@ -131,7 +131,7 @@ whole-file SHA-256 gate before inflation.
 
 ## Retail PC encounter-order loader contract
 
-The pristine PC function at `0x004D7200–0x004D7A16` is the released outer
+The pristine PC function at `[0x004D7200,0x004D7A16]`, both ends included, is the released outer
 dispatcher, not an order-validating decoder. Its exact 2,071 bytes have SHA-256
 `4922caa624a79108fbfd90b185e48367e03129b5d3694dbe201d8251807321cf`
 in the named `74154bfa…7750` executable. It is `CResourceAccumulator__ReadResources`, a `__cdecl`
@@ -158,7 +158,7 @@ enforced by this loader.
 | `SURF` | Calls `CDXSurf__CreateSurfaceArray`. |
 | `ERES` | Calls `CEngine__Deserialize`. |
 | `SSHD` | Calls `CStaticShadows__LoadAll`. |
-| `WRES` | Calls `CWorld__DeserializeWorld`. |
+| `WRES` | Calls `CWorld__Deserialize`. |
 
 The complete comparison-chain vocabulary is
 `LVLR,TARG,AYAD,MESH,TEXT,ERES,WRES,IMPS,LNDS,VSDS,PLAT,SURF,SSHD,PMIB,DMKR,GDIE`.
@@ -168,7 +168,7 @@ The five non-numeric delegates are `VSDS -> CVertexShader__DeserializeAll`,
 `PMIB -> CDXPatch__LoadFromFile`, `DMKR -> CDamage__CreateTextureBuffer`, and
 `GDIE -> CFEPGoodies__Deserialise`; unknown tags are traced and skipped.
 
-The September 27 [reader/dispatcher recheck](../engine/source/io/chunker-system.md)
+The 2026-09-27 [reader/dispatcher recheck](../engine/source/io/chunker-system.md)
 re-derives this caller and all twelve consumer transports from pristine bytes.
 Other consumer labels above remain identifiers for locating the saved analysis;
 their concrete class spellings and complete payload semantics are not all
@@ -204,11 +204,11 @@ Xbox retail families, and all three PS2 executables:
 
 | Resource ID | Relative filename |
 | ---: | --- |
-| `-1` | `data\\Resources\\base_res_<TARGET>.aya` |
-| `-2` | `data\\Resources\\Frontend_res_<TARGET>.aya` |
-| `-3` | `data\\Resources\\Loading_res_<TARGET>.aya`, or `_LANGUAGE.aya` only while both playable-demo and pause-for-controls are nonzero |
-| `>=0` | `data\\Resources\\%03d_res_<TARGET>.aya` |
-| every other negative | `data\\Resources\\goodie_%02d_res_<TARGET>.aya`, where the displayed value is `-id-1000` |
+| `-1` | `data\Resources\base_res_<TARGET>.aya` |
+| `-2` | `data\Resources\Frontend_res_<TARGET>.aya` |
+| `-3` | `data\Resources\Loading_res_<TARGET>.aya`, or `_LANGUAGE.aya` only while both playable-demo and pause-for-controls are nonzero |
+| `>=0` | `data\Resources\%03d_res_<TARGET>.aya` |
+| every other negative | `data\Resources\goodie_%02d_res_<TARGET>.aya`, where the displayed value is `-id-1000` |
 
 The widths are minimums, not truncation. PC retail constructor
 `[0x004D6F70,0x004D71F3)` is 643 bytes with SHA-256
@@ -254,9 +254,8 @@ streamed from their retained ISO owners and independently rehashed:
 | Europe | `87cb89b020cf107b3ba4612ac6bc86ed3fcbd6dd985e2cd3978bf897be96b655` | `[0x00281398,0x00281B68)` | `b864394f6ab260db3831f5ecbce8880a6f5de393c4d699e20515c81e71638395` |
 | USA | `4cfed76f0b0cdf84377a4d5b1613fd197c27be9a3814743590fecba22ba4e166` | `[0x00281B00,0x002822D0)` | `ee0126daaf2e124b31b5fdfc70bced0746417cbf44be557e1fdcec7d451ee43b` |
 
-The three "Raw body SHA-256" values were corrected on 2026-10-29: each had been recorded with one character doubled
-(65 digits). They were recomputed from the retained images after confirming each executable's SHA-256 above: the
-2,000 bytes at each Loader VA, mapped through the ELF's loadable segments to the file offset in `.text`, hashed. The
+Each "Raw body SHA-256" value hashes the 2,000 bytes at its Loader VA, mapped through the ELF's loadable
+segments to the file offset in `.text`, after confirming each executable's SHA-256 above. The
 normalized digest below reproduces from all three by the stated rule (J/JAL keep only the opcode bits; every other
 opcode except SPECIAL and SPECIAL2/MMI has its low 16 bits zeroed, REGIMM and coprocessor opcodes included).
 
@@ -296,10 +295,10 @@ static xref census reaches only this texture-mip page-in path.
 #### `PS2MipmapData` runtime module
 
 The missing platform source is now bounded from all three released PS2 ELFs.
-Each contains the exact 36-byte NUL-terminated path
-`C:/dev/Onslaught2/PS2MipmapData.cpp` once (path SHA-256
-`430352d799d63fc91b450c2a2c30116a3e4cb8c6391fd78ab8450fa309b757e5`)
-and passes it to texture-category allocation sites at source lines 52, 97,
+Each embeds the source file name `PS2MipmapData.cpp` once, inside an exact
+36-byte NUL-terminated build-path string (the path is omitted here; the string's
+SHA-256 is `430352d799d63fc91b450c2a2c30116a3e4cb8c6391fd78ab8450fa309b757e5`)
+and that string is passed to texture-category allocation sites at source lines 52, 97,
 144, 204, and 290. The retained source only includes the unavailable header in
 [`engine.cpp`](https://github.com/dlprentice/Onslaught/blob/c3d8ac464259942b83fa8aa7f867c856e77b734d/engine.cpp); no implementation,
 object, map, or project entry was recovered.
@@ -416,7 +415,9 @@ canonical PS2 archive uses four bytes.
 
 Released PS2 prefix enforcement is weaker than the source assertions. `LVLR`
 and `TARG` are never compared. `AYAD[0]` and `[4]` are ignored; `[1]` is compared
-with 372, aligned `[2]` with 320, and `[3]` with 5084. A mismatch only formats a
+with 372, `[2]` with 320 after the PS2 alignment in the pinned source
+(`references/Onslaught/ResourceAccumulator.cpp:912-916` rounds up to a multiple of 16,
+so the stored 316 becomes 320), and `[3]` with 5084. A mismatch only formats a
 diagnostic into a stack buffer and continues because the source `SASSERT` has
 no release instruction counterpart. The 67 measured retail PS2 numeric members
 use `LVLR=103`, `TARG=3`, and `AYAD=(344,372,316,5084,92,1)`.
@@ -454,7 +455,7 @@ top-level chunks:
 | `PLAT` / `PMIB` / `VSDS` | 1 each | specialized vocabulary; schemas incomplete |
 
 The canonical warning in
-[`game-assets/aya-resource-tag-family-static-contract.md`](aya-resource-tag-family-static-contract.md)
+[`aya-resource-tag-family-static-contract.md`](aya-resource-tag-family-static-contract.md)
 applies: a fourcc is loader vocabulary, not a complete payload schema or runtime
 coverage claim.
 
@@ -462,7 +463,7 @@ coverage claim.
 
 - Each Goodie archive has the four outer chunks `LVLR`, `TARG`, `AYAD`, `GDIE`.
   Filename indices align with save Goodies slots 0–231; terminal slot 232 maps to
-  cutscene 33 and has no PC archive. The `GDIE` layout, and what each Goodie
+  cutscene 33 and has no PC archive. That is the one exception to the number-minus-200 rule for 201–231: the pinned source's `get_goodie_fmv` (`references/Onslaught/FEPGoodies.cpp:956-957` at commit `c3d8ac4`) names cutscene 33 for it, and the install has no cutscene 32. The `GDIE` layout, and what each Goodie
   shows, is in [goodie-resources.md](goodie-resources.md).
 - Each of the 66 numeric archives has a same-number MissionScripts directory and
   world-header record, but the reverse sets are larger. Shared numeric IDs prove
@@ -497,8 +498,8 @@ that consume the same tagged-resource family are:
 | --- | --- | --- |
 | `0x004D6F70` | `CResourceAccumulator__GetFileName` | Builds the resource filename selected by the accumulator path. |
 | `0x004D7200` | `CResourceAccumulator__ReadResources` | Encounter-order outer dispatcher for 16 FourCCs; routes each occurrence to its inline/subsystem owner and does not enforce the canonical writer order. |
-| `0x0050B780` | `CWorld__DeserializeWorld` | Reads four tags with `CChunkReader__GetNext` and updates world load state. |
-| `0x0040F980` | `CBattleEngineData__LoadFromMemBuffer` | Forty-two buffered reads for one embedded Battle Engine data owner. |
+| `0x0050B780` | `CWorld__Deserialize` | Reads four tags with `CChunkReader__GetNext` and updates world load state. |
+| `0x0040F980` | `CBattleEngineData__Load` | Forty-two buffered reads for one embedded Battle Engine data owner. |
 | `0x00423910` / `0x00423960` | `CChunkReader__GetNext` / `Read` | Shared inner tag/field primitives. |
 
 These VAs route future work; they do not establish which function owns every
@@ -523,8 +524,9 @@ and reports it with its own status. The focused test
 `test_empty_lvlr_names_are_anonymous_embedded_cmsh_not_loose_aliases` in
 `tools/cmsh_animation_usage_census_tests.py` pins all 53 internal names as empty and none as unknown. It runs
 only where the retail data and the mirror index named in the header are present, and the census checks its inputs
-against that index. Version 4 is later than the Onslaught-Career-Editor commit the README pins, so this tool and
-test are cited at commit
+against that index. Version 4 is later than the Onslaught-Career-Editor commit
+[`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50) that the
+README pins, so this tool and test are cited at commit
 [`843c86e`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/843c86e06810c8fce953226ccebd41bf2cf74473).
 
 ## Open questions and falsifiers

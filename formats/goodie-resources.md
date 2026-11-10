@@ -2,21 +2,21 @@
 
 Status: active format contract — complete PC Goodie archive layout and Goodie-to-content mapping
 Date: 2026-10-16
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (the Goodie 232 cutscene rule sourced; function names in the decompilation's spelling and cited to their public sources; earlier: research-campaign records and decompiler-style code removed)
 Verdict: all 232 installed Goodie archives parse to their exact final byte. In each, the number matches the
 file name and the type matches the game's number rule. Every texture and mesh they name resolves to exactly one
 installed file: 312 texture references and 45 mesh references, 248 distinct files. The archives hold no pixels or
 geometry of their own; they name files on the game's existing texture and mesh shelves. Video and level Goodies
 carry nothing, and the game picks their cutscene or level from the Goodie number.
-Evidence: SOURCE + MEASURED. The layout and the rules were verified against the matched reader in the private
-byte-matching decompilation:
-- `CFEPGoodies::StartLoadingGoody`, `0x0045c9f0`, and `CFEPGoodies::LoadingGoodyPoll`, `0x0045cc10`;
-- `CFEPGoodies::Deserialise`, `0x0045c870`, and `CFEPGoodies::Process`, `0x0045d7e0`;
-- `CResourceAccumulator::GetFileName`, `0x004d6f70`;
-- `CDXTexture::Deserialize`, `0x00559be0`, `CDXTexture::LoadFrame`, `0x00557300`, and
-  `CDXTexture::FormatToString`, `0x00557a00`;
-- `CMesh::Deserialize`, `0x004aab90`;
-- `MakeCutsceneName`, `0x0046d810`, and `CDXFMV::Play`, `0x0053f190`.
+Evidence: SOURCE + MEASURED. The layout and the rules were verified against the matched reader in the
+byte-matching decompilation, [onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), which names each function below at the address given:
+- `CFEPGoodies__StartLoadingGoody`, `0x0045c9f0`, and `CFEPGoodies__LoadingGoodyPoll`, `0x0045cc10`;
+- `CFEPGoodies__Deserialise`, `0x0045c870`, and `CFEPGoodies__Process`, `0x0045d7e0`;
+- `CResourceAccumulator__GetFileName`, `0x004d6f70`;
+- `CDXTexture__Deserialize`, `0x00559be0`, `CDXTexture__LoadFrame`, `0x00557300`, and
+  `CDXTexture__FormatToString`, `0x00557a00`;
+- `CMesh__Deserialize`, `0x004aab90`;
+- `MakeCutsceneName`, `0x0046d810`, and `CDXFMV__Play`, `0x0053f190`.
 
 The archives were walked with `tools/goodie_resource_walk.py` in Onslaught-Career-Editor. The companion's
 separate C# reader resolves every archive the same way: both print the content digest
@@ -39,8 +39,8 @@ game decides its type from the number (the rule below).
 
 Only image and model Goodies read an archive. The game loads resource id `-1000 - N`, which
 `GetFileName` turns into `data\Resources\goodie_NN_res_PC.aya`: the number has at least two digits, so the first
-ten are `goodie_00` to `goodie_09`. The load runs in the background (`LoadingGoodyPoll`), and the archive's
-`GDIE` chunk reaches `CFEPGoodies::Deserialise` through the ordinary resource dispatcher
+ten are `goodie_00` to `goodie_09`. The game's capital R in `Resources` is its own spelling; the texture and mesh loaders below use `resources`, and Windows matches either without regard to case. The load runs in the background (`LoadingGoodyPoll`), and the archive's
+`GDIE` chunk reaches `CFEPGoodies__Deserialise` through the ordinary resource dispatcher
 ([lvlr-archive.md](lvlr-archive.md)).
 
 Video and level Goodies are started from their number alone. Their archives exist (Goodies 66–70, 75, 77 and
@@ -128,7 +128,7 @@ A video Goodie plays `data\video\<name>.vid` (Bink video) full-screen:
 | 75 | `GILL_M_on_a_fork` |
 | 77 | `UsTheMovie` |
 | 201–231 | `cutscenes\NN`, where NN is the Goodie number minus 200, two digits |
-| 232 | `cutscenes\33` |
+| 232 | `cutscenes\33` (the exception; see below) |
 
 The game's file names are matched without regard to case, as on Windows: Goodie 75 asks for `GILL_M_on_a_fork`, and
 the install holds `gill_m_on_a_fork.vid`. A reader on a case-sensitive file system must match the same way. For a
@@ -136,6 +136,8 @@ cutscene, `MakeCutsceneName` falls back to `cutscenes\NN_small` when `NN.vid` is
 cutscene from 01 to 31, and 33, is present. Goodies 209, 212–216, 228 and 231 play without localisation. The
 other cutscene Goodies pass the player's language to the video opener; how the opener uses it is an open
 question. Goodies 75 and 77 are not localised.
+
+Goodie 232 is the one exception to the rule for 201–231. The pinned source's `get_goodie_fmv` (`references/Onslaught/FEPGoodies.cpp:952-970` at commit `c3d8ac4`) names cutscene 33 for it, and the public decompilation's `get_goodie_fmv` carries the same case ([onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), `src/FEPGoodies.cpp`). The rule would name cutscene 32, and the install has no `cutscenes\32` ([bink-video.md](bink-video.md)). The source gives no reason for the choice, so it is recorded as an observed exception with that evidence.
 
 ## Race levels
 
@@ -157,7 +159,7 @@ the gallery grid never shows (get_goodie_number; in the decompilation notes, not
 
 ## Source lineage
 
-The pinned GPL source's writer (`CFEPGoodies::Serialise`) cuts an image into strips of at most 512 rows and
+The pinned GPL source's writer (`CFEPGoodies::Serialise`, `references/Onslaught/FEPGoodies.cpp:1004` at commit `c3d8ac4`) cuts an image into strips of at most 512 rows and
 embeds them. The PC archives instead hold one reference to a whole texture, and the retail reader reads exactly
 one. The installed files and the matched reader are the authority here.
 

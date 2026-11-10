@@ -1,24 +1,22 @@
-# Stuart's 50,266-line Onslaught source is deeply mapped, but it is a partial internal lineage—not the Steam game
+# Stuart's Onslaught source is deeply mapped, but it is a partial internal lineage—not the Steam game
 
 Status: active canonical synthesis of the pinned Stuart Gillam source corpus; its source files remain the
 line-level primary evidence, and the progress queue is historical
-Last updated: 2026-10-30 (historical queue and current project ownership clarified)
+Last updated: 2026-11-06 (census commit and fork pin told apart; volatile counts left the header; rate, path, licence and byte-total statements corrected; historical queue renamed)
 Summary: Source evidence and its historical research queue, with links to the current project and rebuild owners.
 Verdict: **The pinned `references/Onslaught` drop is an exceptionally valuable
-but incomplete architecture corpus: 106 C/C++ files (52 `.cpp`, 54 headers),
-50,266 physical source lines, 1,354,693 source bytes, 254 distinct quoted
-include targets, and 202 targets absent even after case-insensitive basename
-recovery (204 do not resolve by their written relative paths). It exposes the real object model,
-20 Hz event/game architecture, Battle Engine simulation, Career graph,
-frontend, input, audio, resource, memory, and platform algorithms. It does not
-contain a build system, tests, or enough dependencies to compile; it is not the
-exact Steam source tree; mutually exclusive PC/Xbox/PS2/editor/debug bodies
-coexist in the text; and released behavior still belongs to controlled Steam
-runtime and pristine-binary evidence. This file is an integrated source synthesis
-and records a historical work queue; it does not claim that every textual body is a released Steam
+but incomplete architecture corpus; its counts are in the executive state table,
+with their commit. It exposes the real object model, 20 Hz event/game
+architecture, Battle Engine simulation, Career graph, frontend, input, audio,
+resource, memory, and platform algorithms. It does not contain a build system,
+tests, or enough dependencies to compile; it is not the exact Steam source tree;
+mutually exclusive PC/Xbox/PS2/editor/debug bodies coexist in the text; and
+released behavior still belongs to controlled Steam runtime and pristine-binary
+evidence. This file is an integrated source synthesis and records a historical
+work queue; it does not claim that every textual body is a released Steam
 function or that the absent source has been recovered.**
 Evidence: SOURCE + MEASURED — complete read-only scan of every tracked file at
-Onslaught commit `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`, its Git tree and
+Onslaught census commit `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`, its Git tree and
 history, all quoted/system includes and conditional directives, source-derived
 function/type/table inventories, the retail function inventory and source-path/RTTI
 ledgers, current rebuild source, focused byte crosswalks, and controlled-runtime
@@ -33,7 +31,7 @@ static specimen. No game executable, retail data, or installed
 game file was mutated for this document.
 
 “Baseline” here means the repository-designated unpatched retail specimen. It
-is pristine only relative to the retired AppCore patch catalogue; this research does
+is pristine only relative to the retired AppCore patch catalogue (the patch set of the retired AppCore editor, [last present at `4ac3c9ae`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/4ac3c9ae32d97c1293858c49bf9cc485eb814f28)); this research does
 not establish its Steam depot identity.
 
 ---
@@ -41,7 +39,7 @@ not establish its Steam depot identity.
 ## Purpose and reading contract
 
 This is the narrative synthesis for Stuart's partial Onslaught source and its
-use in the Battle Engine Aquila reverse-engineering/rebuild project. Its earlier
+use in the Battle Engine Aquila reverse-engineering and rebuild project. Its earlier
 rebuild observations and work queue are retained as historical context; the
 current project and rebuild owners are linked from the queue below. It answers
 five different questions without pretending they are one:
@@ -61,7 +59,7 @@ master. `../installed-corpus-census.md` (archived research record, not published
 relationship is:
 
 ```text
-../source-code/stuart-source-synthesis.md        architecture, names, algorithms, intent
+stuart-source-synthesis.md (this file)           architecture, names, algorithms, intent
           │
           ├── static crosswalk ──> decompilation notes
           │                         shipped code, addresses, ABI, bytes
@@ -69,7 +67,7 @@ relationship is:
           ├── data contract ─────> ../installed-corpus-census.md
           │                         authored files and finite registries
           │
-          └── implementation ────> rebuild/
+          └── implementation ────> onslaught-godot rebuild/
                                     original reconstruction and tests
 ```
 
@@ -85,7 +83,7 @@ locations needed to inspect an individual claim.
 | Grade | Meaning in this file |
 | --- | --- |
 | **SOURCE** | Directly present in the pinned source. Establishes text, naming, ownership, algorithm, and developer intent for that lineage. |
-| **CORPUS-MEASURED** | Counted mechanically from the exact pinned tree: files, bytes, lines, includes, definitions, tables, markers, or Git objects. |
+| **CORPUS-MEASURED** | Counted mechanically from the exact census tree: files, bytes, lines, includes, definitions, tables, markers, or Git objects. |
 | **RETAIL-STATIC** | Independently read from the repo-designated unpatched baseline executable, the function inventory, RTTI, shipped strings/tables, or disassembly. |
 | **RUNTIME** | Observed in a controlled copied-retail execution and bounded to that captured path. |
 | **REBUILD** | Describes current original reconstruction code or tests. It cannot prove what retail did. |
@@ -127,7 +125,7 @@ are interchangeable.
 - [Resources, I/O, memory, and containers](#resources-io-memory-and-containers)
 - [Source-to-Steam crosswalk](#source-to-steam-crosswalk)
 - [Source-to-rebuild crosswalk](#source-to-rebuild-crosswalk)
-- [Historical progress queue](#canonical-progress-queue)
+- [Historical progress queue](#historical-progress-queue-2026-source-audit)
 - [Per-unit census](#appendix-a-complete-source-unit-census)
 - [Finite source registries](#appendix-b-finite-source-registries)
 - [Missing quoted includes](#appendix-c-complete-missing-quoted-include-registry)
@@ -138,15 +136,15 @@ are interchangeable.
 
 | Question | Current exact answer |
 | --- | --- |
-| Pinned commit | `5352a81cdb838b145a57f7febc5d9fc4b0129ebb` |
-| Pinned tree | `7a8d0a83257ff7a2e9831455eca576ade11decbd` |
-| Working state | Clean submodule at the pin during this pass |
+| Census commit (the fork's pin is `c3d8ac4`; see [Pin and upload history](#pin-and-upload-history)) | `5352a81cdb838b145a57f7febc5d9fc4b0129ebb` |
+| Census tree | `7a8d0a83257ff7a2e9831455eca576ade11decbd` |
+| Working state | Clean checkout at the census commit during this pass |
 | Git entries | 108: 106 source files, `README.md`, `LICENSE` |
 | C++ units | 52 `.cpp` |
 | Headers | 54: 53 `.h` plus uppercase `DX.H` |
 | Source bytes | 1,354,693 |
 | Source lines | 50,266 physical lines |
-| Whole tree bytes | 1,390,527 |
+| Whole tree bytes | 1,389,853 (Git blobs, README and LICENSE included; 1,390,527 if LICENSE's line endings are counted as CRLF) |
 | Encoding/newlines | All 106 source files are 7-bit ASCII, no BOM, CRLF-only |
 | Layout | Flat directory; 52 implementation units, usually paired with headers, plus `DX.H` and `membuffer.h` |
 | Build files | None: no solution, project, makefile, CMake, or other build owner |
@@ -165,7 +163,7 @@ are interchangeable.
 | Function implementation census | 1,855 physical textual body blocks / 1,857 target-conditional definition heads; neither is a one-target linker count |
 | Callable declarations without bodies | 1,013 |
 | Types | 110 class bodies, 13 struct-body occurrences, 45 enum bodies / 312 enumerators |
-| Steam source-path evidence | 166 case-preserving `C:\dev\ONSLAUGHT2\...` strings; 163 case-insensitive full paths; 162 case-insensitive basenames |
+| Steam source-path evidence | 166 case-preserving `<build root>\ONSLAUGHT2\...` strings; 163 case-insensitive full paths; 162 case-insensitive basenames |
 | Drop/Steam-path basename overlap | 28 |
 | Steam-path basenames absent from drop | 134, a lower bound because only assert-bearing paths survive |
 | Drop basenames without a shipped path literal | 78; absence of an assert path is not evidence that the code was absent |
@@ -222,7 +220,9 @@ history, not original production revision dates:
 | `24939a605ee7` | 2025-12-12 19:59:40 Z | 72 source files, 32,192 inserted lines |
 | `ac5eff7a2528` | 2025-12-12 20:01:40 Z | `EditorD3DApp.cpp/.h`, 2,064 lines |
 | `a073df730148` | 2025-12-12 20:06:43 Z | `CLIParams.cpp/.h`, 479 lines |
-| `5352a81cdb83` | 2025-12-12 20:16:26 Z | Empty final “Add files via upload” commit; current pin |
+| `5352a81cdb83` | 2025-12-12 20:16:26 Z | Empty final “Add files via upload” commit; census commit |
+
+The census commit is the last of these upload commits. The fork's pin, `c3d8ac4`, adds 23 files to its tree (21 C/C++ sources and headers and two non-source files) and changes none of the 108 files at the census commit, so the 106 C/C++ files have the same bytes and lines at both commits. Their absence claims do not carry over: several names this file lists as absent (Appendices C and D) are among the added files. Counts and absence claims here refer to the census commit unless a sentence names another commit.
 
 The root `README.md` contains only `# Onslaught`. There is no changelog,
 original depot metadata, compiler configuration, project file, or claim that
@@ -231,11 +231,11 @@ therefore be decided from the text and retail evidence, not Git dates.
 
 ### License and provenance boundary
 
-- The source root carries GPLv3 with no "any later version" notice, so it is version 3 only. The rebuild (`rebuild/` in Onslaught-Career-Editor)
+- The source root carries GPLv3 with no "any later version" notice, so it is version 3 only. The rebuild (`rebuild/` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot), the live repository; the Onslaught-Career-Editor copy is frozen)
   is distributed as a whole under GPL-3.0-only (files adapting this source are marked so; see
-  `rebuild/PROVENANCE.md`), source- and RE-informed, and explicitly not clean-room.
-- The repository's root GPL-3.0 license does not relicense the pinned source;
-  `rebuild/` carries its own `LICENSE`.
+  [`rebuild/PROVENANCE.md`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/PROVENANCE.md)), source- and RE-informed, and explicitly not clean-room.
+- The root licences of Onslaught-Career-Editor, including its GPL-3.0 [license](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/LICENSE), do not relicense the pinned source;
+  its `rebuild/` carries its own `LICENSE`.
 - Four Direct3D framework files preserve Microsoft sample copyright notices:
   `d3dapp.cpp:6-10`, `d3dapp.h:1-6`, `EditorD3DApp.cpp:3-8`, and
   `EditorD3DApp.h:1-6`. Their redistribution posture requires review; this
@@ -252,7 +252,7 @@ Several independent facts prevent calling this “the Steam source”:
 - Source rendering headers and shell types are Direct3D 8-era; the pristine
   Steam binary imports and uses Direct3D 9.
 - Source `CCareer` selects a developer
-  `c:\dev\onslaught2\career.dat` path under `TARGET == PC`; Steam uses the
+  `<build root>\onslaught2\career.dat` path under `TARGET == PC`; Steam uses the
   released `.bes` wrapper/layout.
 - Source contains substantial Xbox, PS2, editor, resource-builder, devkit,
   playable-demo, and development-tool code.
@@ -310,7 +310,7 @@ All 106 source files:
 - use CRLF line endings only;
 - are ordinary text rather than generated/minified payloads.
 
-That makes byte fingerprints and line citations stable at this pin. It does not
+That makes byte fingerprints and line citations stable at the census commit. It does not
 make old documentation line numbers stable across future source updates; cite
 the commit with consequential claims.
 
@@ -464,7 +464,7 @@ project-authored compatibility environment—not recovery of the original build.
 
 The two-count difference is exact and instructive. `d3dapp.cpp:27-28` includes
 `..\cliparams.h` and `..\DX.h`; those written parent-relative paths do not
-exist in the flat pin, but root files `CLIParams.h` and `DX.H` are available by
+exist in the flat census tree, but root files `CLIParams.h` and `DX.H` are available by
 basename. `..\resource.h` and `..\capture.h` on the preceding two lines remain
 absent. Therefore 204/537 is literal preprocessor-path truth, while 202/535 is
 the repository's established source-recovery availability metric. Neither
@@ -872,12 +872,7 @@ The main update order at `game.cpp:1836-2060` is materially:
 renders. Slow-frame handling advances `mBaseTime` by measured elapsed time and
 hard-resets it when the overrun exceeds 1.3 times the frame length.
 
-The current deterministic rebuild declares a 30 Hz Core. Retail runtime already
-establishes a 20 Hz released update, agreeing with the source event clock; the
-rate decision is therefore settled in principle, while migration remains
-pending because it touches hashes, message quantization, and many per-tick
-coefficients. Thirty hertz is a current implementation divergence, not an open
-retail-rate question.
+The earlier fixed-point rebuild Core, `OnslaughtRebuild.Core` (kept as reference), ran at 30 Hz before its move to the 20 Hz retail step; onslaught-godot's [`rebuild/DETERMINISM.md`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/DETERMINISM.md), at commit `f44e31e`, records that the prior 30 Hz step was migrated out in the 20 Hz work. Retail runtime already establishes a 20 Hz released update, agreeing with the source event clock; the rate decision was therefore settled in principle, and the migration, which touched hashes, message quantization, and many per-tick coefficients, has been made. Thirty hertz is historical, not an open retail-rate question.
 
 ### Event manager geometry
 
@@ -1405,7 +1400,7 @@ The source contains two different persistence bodies:
 
 **Internal PC-development branch** (`Career.cpp:1039-1080`)
 
-- reads/writes `c:\dev\onslaught2\career.dat`;
+- reads/writes `<build root>\onslaught2\career.dat`;
 - stores a four-byte `CAREER_VERSION`;
 - raw-copies `sizeof(CCareer)`;
 - points level selection at the highest available level.
@@ -1430,7 +1425,7 @@ save/options data. The measured file is 10,004 bytes:
 
 Retail `CCareer__Load @ 0x00421200` and `CCareer__Save @ 0x00421350`
 therefore have useful source names and broad serializer shape, but the source
-PC branch is not the Steam implementation. Retail byte evidence (and the companion's `CareerSave`, which
+PC branch is not the Steam implementation. Retail byte evidence (and the companion's [`CareerSave`](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/companion/OnslaughtToolkit.Godot/Careers/CareerSave.cs), which
 follows it) own actual `.bes` offsets and mutation safety.
 
 `PCFEPLoadGame.cpp` and `PCFEPSaveGame.cpp` are seven-line implementation
@@ -1545,7 +1540,7 @@ Goodie content types:
 GT_IMAGE, GT_MESH, GT_FMV, GT_LEVEL, GT_CHEAT
 ```
 
-The type hack resolves:
+The type hack is `get_goodie_type_hack` in `FEPGoodies.cpp`, which returns each goodie number's content type. It resolves:
 
 - selected bios/unit ids as images;
 - most ids 8..57 as meshes;
@@ -1592,7 +1587,7 @@ Core ranges:
 
 | Range | Contract |
 | --- | --- |
-| `FEPGoodies.cpp:150-388` | 232 unlock-description records |
+| `FEPGoodies.cpp:150-386` | 232 unlock-description records |
 | `:393-454` | grid id/state mapping |
 | `:512-999` | texture, mesh, background, type, text, FMV and level maps |
 | `:1004-1336` | resource build/serialize/load/free |
@@ -1663,8 +1658,8 @@ Retail is not source-identical:
 - retail has six analog codes and additional push modes `0xB..0x11`;
 - `PCController.cpp` is a developer mapping table, while shipped mappings come
   from `defaultoptions.bea`;
-- a normal retail mapping does not establish the supposed direct-mouse walker
-  route; a virgin install with no options file remains a separate unknown.
+- a normal retail mapping does not establish a direct mouse-to-walker route;
+  a virgin install with no options file remains a separate unknown.
 
 The source and retail agree on the player's nonlinear look curve:
 
@@ -1909,7 +1904,7 @@ cooperation, and configures a stereo 44,100 Hz, 16-bit primary buffer
 
 The source carries commented-out DirectSound3D listener/buffer updates.
 Its live PC path sets pan, caps pitch multiplication at 1.0, sets frequency
-against 44,000, transforms the already attenuated volume below -4000, and
+to the pitch multiplier times 44,000 (the source reference rate, not the 44,100 Hz buffer rate), transforms the already attenuated volume below -4000, and
 passes that to `IDirectSoundBuffer::SetVolume`
 (`pcsoundmanager.cpp:324-431`). The platform-neutral manager's source distance
 law uses `FAR_SOUND = 50` and a manual linear percentage falloff
@@ -1969,7 +1964,10 @@ Two source-level hazards must not silently become reconstruction behavior:
 
 - `PlayFromList` uses assignment in
   `if ((mPlayType=MPT_RANDOM) && (mFirstSong))`
-  (`Music.cpp:448`), so the null-selection branch forces random mode;
+  (`Music.cpp:448`): the assignment in the condition runs each time the test is
+  reached, before `mFirstSong` is tested, so the null-selection branch sets the
+  play type to random; the random pick runs only when the assigned value is
+  non-zero and `mFirstSong` is non-null;
 - `GetMenuSoundsMasterVolume` returns `mGameSoundsMasterVolume`, not
   `mMenuSoundsMasterVolume` (`SoundManager.h:243`).
 
@@ -2067,8 +2065,8 @@ The PC writer emits `LNDS` (`:631-650`), while the non-PS2 reader explicitly
 skips it (`:970-976`); this source reader does not reconstruct PC landscape
 data from that chunk.
 
-Thirteen independent resource bits control paging, target exclusion, base and
-loading sets, sky cropping, compression, alpha fixing, optionality,
+Thirteen independent resource bits control paging, target exclusion (two bits, PS2 and Xbox), base and
+loading sets (two bits), sky cropping, compression, alpha fixing, optionality,
 downsampling, shadow palette, swizzling, and paging inhibition
 (`ResourceAccumulator.h:18-31`). On Xbox level builds, the accumulator
 repeatedly drops a mip from the largest eligible texture until its computed
@@ -2083,7 +2081,7 @@ when applicable (`ResourceAccumulator.cpp:388-493`).
 `CDXMemBuffer`:
 
 - default read block: 64 KiB;
-- PC write buffer: 2 MiB;
+- PC write buffer: 2 MiB (source value; retail write-open allocates 1 MiB, see [`pc-memory-io-semantics.md`](../io/pc-memory-io-semantics.md));
 - non-PC DirectX write buffer: 10 KiB;
 - optional next-read size must be a multiple of `0x8000`;
 - Windows `CreateFile`/`ReadFile`/`WriteFile` backing;
@@ -2149,14 +2147,14 @@ mirrors:
 - enum position 42 is `MEMTYPE_MESSAGELOG`, but the table repeats
   `MEMTYPE_MESSAGEBOX` for the `"MessageLog"` row;
 - `MEMTYPE_IBUFFER` moves from enum position 47 to table position 81;
-- `MEMTYPE_FMV` is absent at enum position 96 and appears at table position
+- `MEMTYPE_FMV` sits at enum position 96 but appears at table position
   127;
 - index-buffer and tiny-heap ordering diverges in the tail.
 
 The set difference is one missing `MESSAGELOG` and one duplicated
 `MESSAGEBOX`, but the positional drift is far broader. Any tool that zips enum
 ordinal to table row will silently mislabel memory. Use the explicit
-`MemoryTypeData.mType` field (`MemoryManager.cpp:99-240`), not row position.
+`MemoryTypeData.mType` field (`MemoryManager.cpp:99-241`), not row position.
 
 ### Local containers and monitored pointers
 
@@ -2307,7 +2305,7 @@ shorthand labels in an earlier intermediate report.
 ### Shipped source-path lower bound
 
 The unpatched baseline executable retains MSVC `__FILE__` strings under
-`C:\dev\ONSLAUGHT2\`. A fresh scan, normalized explicitly, gives:
+`<build root>\ONSLAUGHT2\`. A fresh scan, normalized explicitly, gives:
 
 | Measure | Exact count |
 | --- | ---: |
@@ -2417,16 +2415,15 @@ frozen survey facts are not current repository architecture.
 Ignored locally materialized retail assets are also excluded from source-file
 counts.
 
-Core currently advances at 30 Hz (`SimulationConstants.cs:7`) while explicitly
+At the 2026-07-29 survey base, Core advanced at 30 Hz (`SimulationConstants.cs:7`) while explicitly
 carrying the released/source 20 Hz rate (`:15`) and time-converting selected
-laws. That is a current reconstruction divergence, not a source-exact
-scheduler port; the move to the established released 20 Hz cadence is decided
-in principle but pending implementation sequencing. Tests establish
-reconstruction behavior only.
+laws. That was a reconstruction divergence, not a source-exact
+scheduler port; the move to the established released 20 Hz cadence was decided in principle
+and has since been made, as onslaught-godot's [`rebuild/DETERMINISM.md`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/DETERMINISM.md) records. Tests establish reconstruction behavior only.
 
 ### Complete Stuart-unit classification
 
-| Stuart unit | Current rebuild verdict | Current owner or boundary |
+| Stuart unit | Verdict at the survey base | Current owner or boundary |
 | --- | --- | --- |
 | `activereader` | Superseded, partial semantics | stable ids, owned/nullable references; no raw monitored-pointer clone |
 | `actor` | Partial | Level 100 registry/mechanics, chiefly retail-data/static-derived |
@@ -2452,7 +2449,7 @@ reconstruction behavior only.
 | `EndLevelData` | Partial with bounded bridge | snapshot carries world/state, objective tables, ranking, time/score, kills/base flags, and the bounded Career/debrief handoff; live first-play score/time join and a general bridge remain open |
 | `engine` | Partial algorithms; backend superseded | selected timing/render concepts only |
 | `event` | Partial | typed deterministic events, not generic `CMonitor` events |
-| `eventmanager` | Partial | typed 30 Hz queues, not the source 20 Hz generic scheduler |
+| `eventmanager` | Partial | typed queues (30 Hz at the survey base), not the source 20 Hz generic scheduler |
 | `FEPGoodies` | Absent as a page/system | only shared helper corroboration and menu-facing identity remain; topology, unlocks, viewer, resources, and lifecycle are absent |
 | `FEPLoadGame` | Absent | no load-page/system |
 | `FEPSaveGame` | Absent | no save-page/system |
@@ -2523,7 +2520,7 @@ The current largest source-visible gaps are exact:
    velocity by `1-cosSurface`. Current `Simulation.cs:2163-2180` emits only a
    threshold event and calls the translation unknown; that comment is stale.
    The Stuart law is exact SOURCE evidence but not yet retail-adjudicated, and
-   its per-tick velocity also depends on resolving the current 30→20 Hz
+   its per-tick velocity also depended on the then-pending 30→20 Hz
    migration.
 3. **Lock/autoaim/launch position.** Source families around
    `BattleEngine.cpp:586-1013` and `:2278-2610` are not implemented as a
@@ -2626,7 +2623,7 @@ Do not put these in the gameplay parity queue:
 Their useful semantics—ordering, invalidation, ids, resource roles, and
 serialization vocabulary—should be expressed in current safe owners.
 
-## Canonical progress queue
+## Historical progress queue (2026 source audit)
 
 **Historical queue and labels.** This source audit's former priorities are retained
 below as research context; the heading and priority labels are not a current
@@ -2643,11 +2640,11 @@ needed to be split into a counted function, table, event, or draw/state set befo
 implementation claims closed. The order was to change when new evidence changed
 impact or dependency.
 
-### P0: current correctness
+### P0: correctness items (historical)
 
 1. **Migrate deterministic Core from 30 Hz to the established retail 20 Hz
-   cadence.** The retail-rate decision is settled; implementation sequencing is
-   not. Inventory and convert every per-tick coefficient, message/event
+   cadence.** Done after the survey base (see the rebuild's determinism note). At the survey base the retail-rate decision was settled and
+   implementation sequencing was open. Inventory and convert every per-tick coefficient, message/event
    quantization, hash, and timing assertion before adding further tick-coupled
    source behavior. Acceptance includes an explicit intentional state-hash
    update and focused wall-time equivalence checks.
@@ -2722,7 +2719,7 @@ a production-code failure independent of the omniscient test autopilot's
 
 ### Stem-pair semantic census
 
-This table covers every one of the 106 C/C++ files. A “unit” is the
+This table covers every one of the 106 C/C++ files at the census commit. A “unit” is the
 case-preserving `.cpp`/header stem pair, except the two standalone headers.
 `Bodies` is physical implementation blocks; `Heads` is target-conditional
 definition heads; `Decl` is bodyless callable declarations; `G/E` is
@@ -2855,11 +2852,7 @@ exactly to the semantic table above.
 | `thing.cpp` | 19,657 | 830 | `thing.h` | 11,680 | 318 |
 | `XBoxMemoryCard.cpp` | 33,744 | 1,408 | `XBoxMemoryCard.h` | 3,407 | 101 |
 
-Support files are `LICENSE` (35,823 bytes, 674 lines) and `README.md` (11
-bytes, one line). All 108 tracked content files therefore total 1,390,527 bytes
-and 50,941 physical lines. The source total is 50,215 CRLF terminators plus 51
-unterminated final lines; exactly 51 of 106 source files lack a terminal
-newline.
+Support files are `LICENSE` (35,149 bytes as a Git blob, 674 lines; 35,823 bytes with its LF line endings read as CRLF) and `README.md` (11 bytes, one line, no final newline). The 108 Git blobs total 1,389,853 bytes; with LICENSE's line endings read as CRLF they total 1,390,527 bytes, and the tree has 50,941 physical lines. The source total is 50,216 CRLF terminators (every LF in these files is preceded by CR) plus 50 unterminated final lines; exactly 50 of 106 source files lack a terminal newline.
 
 ### Parser audit and collision registry
 
@@ -2915,7 +2908,7 @@ PCLTShell::ForceTS             ltshell.h:202/205
 The 112 global/static definitions reduce to 105 unique names. The seven
 duplicate-name groups are target/config alternatives: `g_pD3DApp`, `ENGINE`,
 `FRONTEND`, `GAME`, `goodies_matProjSave`, `resfile_vshadersize`, and
-`allowed_to_load_sample`. Extern names with no definition in the pin are
+`allowed_to_load_sample`. Extern names with no definition at the census commit are
 `MUSIC`, `STORAGE`, and `performing_stress_test`; their owning implementations
 are absent.
 
@@ -3209,9 +3202,9 @@ Every table limit is `0xFFFFFFFF`.
 | `PCEngine.cpp:612` | `rsx[]` | 2 / 2 | alpha-test exception + sentinel |
 | `ResourceAccumulator.cpp:43` | `resdata_tag[8]` | 8 / `"AYADATA"` | seven bytes + NUL |
 | `ResourceAccumulator.cpp:54` | `resdata_end[4]` | 4 / `"END"` | three bytes + NUL |
-| `XBoxMemoryCard.cpp:887` | `root_path[4]` | 4 / `"x:\\"` | local root |
-| `XBoxMemoryCard.cpp:1018` | `root_path[4]` | 4 / `"x:\\"` | local root |
-| `XBoxMemoryCard.cpp:1335` | `root_path[4]` | 4 / `"x:\\"` | local root |
+| `XBoxMemoryCard.cpp:887` | `root_path[4]` | 4 / drive-root string (drive letter omitted) | local root |
+| `XBoxMemoryCard.cpp:1018` | `root_path[4]` | 4 / drive-root string (drive letter omitted) | local root |
+| `XBoxMemoryCard.cpp:1335` | `root_path[4]` | 4 / drive-root string (drive letter omitted) | local root |
 
 The ten zero entries in `mNotRI` are render states 28 `FOGENABLE`, 34
 `FOGCOLOR`, 35 `FOGTABLEMODE`, 36 `FOGSTART`, 37 `FOGEND`, 38 `FOGDENSITY`,
@@ -3817,7 +3810,7 @@ XBoxMemoryCard.cpp
 XBoxMemoryCard.h
 ```
 
-The final list is non-evidence of absence: a file without an emitted assert
+The final list (the 78 drop basenames above) is non-evidence of absence: a file without an emitted assert
 path is invisible to this instrument. All three lists are case-insensitive
 basename projections of the 163 distinct full paths / 162 basenames, not a
 claim that source directories were flat in the shipped tree.
@@ -3826,7 +3819,7 @@ claim that source directories were flat in the shipped tree.
 
 ### Corpus reproduction contract
 
-The census is reproducible from the pin as follows:
+The census is reproducible from the census commit as follows. This repository does not contain the source: clone the public reference fork, `https://github.com/dlprentice/Onslaught`, into `references/Onslaught` in your working copy and run `git -C references/Onslaught checkout 5352a81cdb838b145a57f7febc5d9fc4b0129ebb`. The steps below use that checkout:
 
 1. Verify identity and cleanliness with
    `git -C references/Onslaught rev-parse HEAD`,
@@ -3853,6 +3846,8 @@ The census is reproducible from the pin as follows:
    directives; group duplicates case-insensitively; hand-read every
    load-bearing parser-error-adjacent site and finite-table mismatch.
 
+Steps 5 to 7 need a Node tree-sitter parser and a parser script; this repository publishes neither, so those steps cannot be re-run from it alone.
+
 The unpreprocessed trees contain 276 `ERROR` nodes and eight missing nodes
 across 51 files because original macro/type owners are absent. All 52
 translation units fail first-principles standalone preprocessing at the absent
@@ -3866,16 +3861,16 @@ or retail-function count.
 | --- | --- |
 | RE front door and evidence policy | [`INDEX.md`](../../INDEX.md) |
 | Source pin/buildability audit | `reference-submodule-audit-2026-07-12.md` (archived research record, not published) |
-| Source corpus itself | [`references/Onslaught`](https://github.com/stuart73/Onslaught) |
+| Source corpus itself (census commit) | [`references/Onslaught`](https://github.com/stuart73/Onslaught/tree/5352a81cdb838b145a57f7febc5d9fc4b0129ebb) |
 | Executable master | the decompilation notes (not yet published) |
 | Installed-data master | `../installed-corpus-census.md` (archived research record, not published) |
-| Rebuild evidence/authority boundary | `rebuild/PROVENANCE.md` in Onslaught-Career-Editor |
-| Rebuild architecture and commands | `rebuild/README.md` in Onslaught-Career-Editor |
+| Rebuild evidence/authority boundary | [`rebuild/PROVENANCE.md`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/PROVENANCE.md) in onslaught-godot (the live rebuild; the Onslaught-Career-Editor copy is frozen) |
+| Rebuild architecture and commands | [`rebuild/README.md`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/README.md) in onslaught-godot (the live rebuild; the Onslaught-Career-Editor copy is frozen) |
 | Battle Engine movement crosswalk | `battleengine-movement-static-crosswalk-2026-07-12.md` (in the decompilation notes, not yet published) |
 | Retail source paths/RTTI | `rtti-and-source-path-evidence-2026-07-25.md` (in the decompilation notes, not yet published) |
 | Controller static crosswalk | [`controller-system.md`](frontend/controller-system.md) and the decompilation notes |
 | Career/save structures | [`save-format.md`](../../saves/save-format.md), `struct-layouts.md` (archived research record, not published) |
-| Source subsystem indexes | [`source-code/_index.md`](README.md) |
+| Source subsystem indexes | [`README.md`](README.md) |
 
 ### Machine-local measured evidence
 
@@ -3910,4 +3905,4 @@ It does **not** close reconstruction of the game. The source pin is partial,
 multi-target, unbuildable in isolation, and not the exact Steam tree. Its value
 is that it turns anonymous behavior into named hypotheses and often into exact
 algorithms. The Steam specimen and controlled runtime decide which hypotheses
-survived release; `rebuild/` then implements that adjudicated result.
+survived release; the live rebuild (onslaught-godot, `rebuild/`) then implements that adjudicated result.

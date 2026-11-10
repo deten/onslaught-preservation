@@ -1,7 +1,7 @@
 # `CTokenArchive` particle grammar and reference semantics
 
 Status: active, bounded semantic recovery
-Last updated: 2026-10-22 (neutral evidence wording)
+Last updated: 2026-11-06 (source file checked against the public reference fork; drive-letter build path, stale correction sentence and undated headings fixed; earlier: neutral evidence wording)
 Evidence: MEASURED — complete pristine retail bodies, exact parser tables,
 particle-set files, callers, memory layout, and twelve normalized-identical PC
 demo twins; October adds bounded original-code numeric/header comparisons.
@@ -15,9 +15,9 @@ Specimen: pristine PC retail `BEA.exe`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`;
 PC demo `BEA.exe`, SHA-256
 `d8637dd755b21c720c0cb8f71923f94d2a04a184d90f5343c2e868ce8606e5c2`.
-The retail binary retains the exact source path
-`C:\dev\ONSLAUGHT2\TokenArchive.cpp`, but that file is not present in the
-retained Stuart source collection. This report therefore treats the path as
+The retail binary retains the original source file name `TokenArchive.cpp`
+(its build directory is omitted), but that file is not present in the public
+reference fork ([dlprentice/Onslaught](https://github.com/dlprentice/Onslaught/tree/c3d8ac464259942b83fa8aa7f867c856e77b734d) at `c3d8ac4`). This report therefore treats the file name as
 ownership evidence, not source-code evidence.
 
 ## Result
@@ -71,11 +71,10 @@ Tokens 49..57 (`Start_*`, `End_*`, and `Transition_*` RGB components) multiply
 unreferenced numeric values by the exact retained approximately-`1/255`
 constant. All other numeric tokens retain their parsed units.
 
-## Allocation and scan-format recheck — October 1
+## Allocation and scan-format recheck — 2026-10-01
 
 The integer scanner passes the string at `0x00633a24`, whose bytes are `%i` and
-a terminator (`0x004f586c`–`0x004f5876`). The earlier `%d` description above is
-corrected. This is a format-string finding; the numeric scanner itself was not
+a terminator (`0x004f586c`–`0x004f5876`). This is a format-string finding; the numeric scanner itself was not
 executed by the new prefix experiment. The original guard structure remains:
 direct numeric branches check their output pointer and initial scan count;
 plain references check the string-output pointer/count and then write the integer
@@ -108,7 +107,7 @@ and `allocation-v1/receipt.json` (SHA-256
 Complete parser/allocator behavior remains open; a useful next falsifier compares
 the whole reader on a disposable particle-set copy with real numeric conversion.
 
-## Original numeric scanner — October 1
+## Original numeric scanner — 2026-10-01
 
 The maintainer independently reproduced `sscanf` at `0x0055e14f`, its `_input`
 implementation and admitted original CRT dependencies on 72 authored ASCII cases
@@ -147,7 +146,7 @@ Maintainer reproduction owner:
 `native-v04/receipt.json`:
 `95f748a72bb132a775c4342368a228ca16c95917b84b9b4cfb3be6eee9701a5d`.
 
-## Composed numeric and header reads — October 1
+## Composed numeric and header reads — 2026-10-01
 
 The maintainer reproduced twelve authored ASCII streams through 38 complete ReadToken
 calls, executing original ReadLine `0x0048de00`, ReadString `0x00548820`, token-name
@@ -198,7 +197,7 @@ Original receipt `composition-v02/receipt.json` SHA-256:
 fresh candidate comparison `comparison-v05/receipt.json`:
 `df634855aae4862dd022521d047491f295654b484c45391c25695f16fc0bce90`.
 
-## Simple-sprite caller retains the scalar — October 1
+## Simple-sprite caller retains the scalar — 2026-10-01
 
 The original loader at `0x004c05c0` ignores ReadToken's return value after its
 call at `0x004c05fb`, dispatches the token at `0x004c0600`, and loops until the
@@ -251,7 +250,7 @@ the 10,000-entry bound or a failed name allocation.
 `ResolveReferences` walks the particle objects through their `+0x38` next
 links, builds a temporary pointer array, and resolves every pending name with
 CRT `bsearch`. The previously unnamed adjacent function at `0x004f5c70` is the
-missing comparator: `stricmp(key, object->name_at_+4)`. `CreateByType` inserts
+missing comparator: a case-insensitive string compare of the search key with the object's name field at +4. `CreateByType` inserts
 the same list in case-insensitive name order, closing the sort/search contract.
 Each fixup receives the matched object pointer or null; every allocated name
 and the temporary array is freed, and pending count is reset to zero.

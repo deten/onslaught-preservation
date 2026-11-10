@@ -5,18 +5,18 @@ complete released PS2 material-binding population, and a bounded PC/Xbox/PS2
 material-identity join; position and linked-shader normal skinning laws are
 closed while animation/general scene import remain partial
 Date: 2026-08-28
-Last updated: 2026-10-29 (corrected the number of files containing chained meshes; earlier: research-campaign records and decompiler-style code removed)
-Verdict: all 213 PC mesh streams frame and their complete tag population is
-counted; the PS2 shelf closes 3,547 meshes and 14,028 material bindings across
-307 unique AYA identities; a three-platform join closes the portable material
-key and the need for build-specific row variants, while PB* and animation
-scheduling remain partial.
-Evidence: MEASURED — all 213 mirror-index PC mesh rows were re-aggregated on
+Last updated: 2026-11-06 (Verdict made count-free; frozen Toolkit rebuild copy labelled; public names for the mesh loader and vertex-buffer builder; BBOX question narrowed; earlier: corrected the number of files containing chained meshes; earlier: research-campaign records and decompiler-style code removed)
+Verdict: all PC mesh streams frame and their complete tag population is
+counted; the PS2 shelf closes its complete mesh and material-binding population
+across its unique AYA identities (counts in the body); a three-platform join
+closes the portable material key and the need for build-specific row variants,
+while PB* and animation scheduling remain partial.
+Evidence: MEASURED — all PC mesh rows of the mirror index were re-aggregated on
 2026-08-22; the complete named PS2 demo/Europe/USA package population was
 streamed and independently replayed on 2026-08-28. Field names below are
 either measured by repository parsers or explicitly attributed to Stuart's
 AYAResourceExtractor lineage.
-Specimen: `<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`, SHA-256
+Specimen: `<maintainer evidence>/bea-asset-mirror/INDEX.jsonl`, SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`;
 retail VAs cite `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`;
@@ -98,7 +98,7 @@ unpacking stays open there.
 ## Bounded field contracts
 
 The following are tool/source contracts from
-[`game-assets/aya-asset-format.md`](aya-asset-format.md), retained
+[`aya-asset-format.md`](aya-asset-format.md), retained
 with that provenance rather than promoted to released-runtime behavior:
 
 - The `CMSH` root payload is the 372-byte mesh record, fully laid out in
@@ -267,10 +267,10 @@ names. Equal structure or raw lane values does not prove equal pixels or equal
 renderer semantics.
 
 The retained independent reports are
-`<maintainer evidence>/continuous-20260827/lane-cross-platform-material-join.md`
+`<maintainer evidence>/lane-cross-platform-material-join.md`
 (`0ea1e124...eeb314b`) and
-`<maintainer evidence>/continuous-20260827/lane-cross-platform-material-join-refuter.md`
-(`bb45db32...5b9763`).
+`<maintainer evidence>/lane-cross-platform-material-join-refuter.md`
+(`bb45db32...5b9763`); only these truncated identities are recorded here, not the full SHA-256 values.
 
 ## Animation and skinning boundary
 
@@ -284,7 +284,7 @@ It measures 64 meshes / 659 parts with non-trivial `VHFM` maps, seven one-part
 membership joins, and 56 authored `PlayAnimation*` calls. Those are storage and
 reference contracts, not universal scheduling or render proof.
 The retail image has no `HFOV` fourcc literal because
-`CMeshPart__LoadFromStream @ 0x004B27A0` consumes the keyframe sequence largely
+`CMeshPart__Deserialize @ 0x004B27A0` (onslaught-decomp's name) consumes the keyframe sequence largely
 positionally. The measured note
 [`player-camera-attach-and-mesh-hfov.md`](../engine/render/player-camera-attach-and-mesh-hfov.md)
 bounds that one path; it does not close general animation.
@@ -305,10 +305,10 @@ Retail static routes include:
 
 | VA | Identity | Boundary |
 | --- | --- | --- |
-| `0x004B27A0` | `CMeshPart__LoadFromStream` | Positional mesh-part/keyframe consumer with selected tag checks. |
+| `0x004B27A0` | `CMeshPart__Deserialize` | Positional mesh-part/keyframe consumer with selected tag checks. |
 | `0x0054E160` | `CDXMeshVB__Load` | Reads ten fields through `CChunkReader__Read` and six tags through `GetNext`. |
 | `0x0054C0A0` | `CDXMeshVB__BuildStaticVB` | Static vertex-buffer construction. |
-| `0x0054C920` | `CDXMeshVB__BuildSkeletalVB` | Skeletal vertex-buffer construction. |
+| `0x0054C920` | `CDXMeshVB__BuildSkinnedVB` | Skeletal vertex-buffer construction. |
 
 The address summary is in
 `coordinate-long-tail.md` (in the decompilation notes, not yet published).
@@ -324,18 +324,23 @@ The address summary is in
   the 36-byte `CMST` records, exact `MSHT`/`TEXB` framing, `20*n+4` payload law,
   five raw dword lanes, numeric texture key, and cached-gate bits without
   silently applying the incompatible PC fixed-name profile.
-- `rebuild/tools/cmsh_static_preview.py` in Onslaught-Career-Editor
-  and its focused tests parse, emit OBJ for the supported geometry surface, and
-  byte-round-trip all 367 measured streams. The byte-accounting gate attributes
-  32.05% of 100,813,615 stream bytes to typed model state and 67.95% to honest
-  opaque carry-through; byte identity is not semantic completeness.
+- `rebuild/tools/cmsh_static_preview.py` in Onslaught-Career-Editor, a frozen copy at
+  audit commit `21fcd11` (its npm scripts and validation rows were removed at commit
+  `51129bab`; onslaught-godot gates the rebuild), and its focused tests recorded
+  parsing, OBJ emission for the supported geometry surface, and byte round-trip of
+  all 367 measured streams. The byte-accounting gate recorded 32.05% of
+  100,813,615 stream bytes as typed model state and 67.95% as honest opaque
+  carry-through; byte identity is not semantic completeness.
 - `tools/cmsh_animation_usage_census.py` in Onslaught-Career-Editor
   joins the loose frame/skeleton lanes to numeric-LVLR `MESH` membership,
   definition-bearing WRES placements through physics mesh fields, and bounded
   authored MSL animation calls. The hash-pinned full-corpus gate also parses the
   53 anonymous direct embedded bodies without assigning guessed loose names.
-- The dedicated rebuild Aquila consumer is exact and specimen-bounded; it is not
-  a general CMSH importer.
+- The dedicated rebuild Aquila consumer, `RetailAquilaWalkerAsset` in
+  `rebuild/OnslaughtRebuild.Godot/RetailAquilaWalkerAsset.cs` of
+  [onslaught-godot](https://github.com/dlprentice/onslaught-godot) at commit
+  [`f44e31e`](https://github.com/dlprentice/onslaught-godot/tree/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29),
+  is exact and specimen-bounded; it is not a general CMSH importer.
 
 ## Open questions and falsifiers
 
@@ -350,8 +355,8 @@ The address summary is in
 - Trace the population of the runtime named-animation table at
   `CMesh+0x14/+0x18`; MSL requests and `VHFM` pose maps are separate evidence
   until their exact frame-range records are joined.
-- Resolve the apparent repeated `BBOX` writer behavior without assuming it is a
-  harmless exporter bug.
+- Confirm the wrapper-plus-record reading of the repeated `BBOX` tag against one
+  loader branch: the census counts each wrapper and each 40-byte record under that tag.
 - Exercise a controlled two-sample PS2 binding to observe dormant phase
   stepping, and determine whether the transform helper's lane-1/lane-2 writeback
   accumulates across reachable renders.

@@ -1,8 +1,9 @@
 # CCareer__GetGradeForWorld
 
 Status: active function note
-Last updated: 2026-10-22 (research-campaign records removed)
+Last updated: 2026-11-06 (Specimen line added, band table made half-open to match the source, placeholder named, pasted code described in words; earlier: removed private-evidence references)
 Summary: `GRADE` (earlier `CCareer__GetGradeForWorld`) at `0x0041c330`: the letter grade for one world.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: 0x0041c330 | Source: `references/Onslaught/Career.cpp`
 >
@@ -15,7 +16,7 @@ The 2026-08-17 anchor audit
 (`name-cohort-promotion-manifest-2026-08-17.tsv` (archived research record, not published))
 found no `CCareer` type descriptor anywhere in the shipped image and no vtable
 owning this VA, so the descriptive name lost its structural support and was
-replaced by a neutral placeholder rather than by a second invented label.
+replaced by a neutral placeholder, `CCareer_T3_0041c330`, rather than by a second invented label.
 
 Read that for exactly what it is. The audit graded *names* against RTTI and
 vtable anchors; it did not open the body and it did not look at
@@ -32,7 +33,7 @@ RTTI anchor here.
   correspondence
 
 ## Purpose
-Get letter grade (S/A/B/C/D/E) for specific level. Retrieves the mRanking value from a node and converts it to a display grade.
+Get letter grade (S/A/B/C/D/E) for one world. Retrieves the mRanking value from a node and converts it to a display grade.
 
 ## Signature
 
@@ -41,21 +42,16 @@ output byte and returns that pointer. Stuart's source declares the same helper a
 `CGrade GRADE(int world_num)`, returning the grade by value.
 
 ## Grade Calculation
-From source code (Career.cpp:1178-1195):
-```cpp
-if (f == 1.f) c = 'S';
-else if (f <= 0.f) c = 'E';
-else c = 'D' - floor(f * 4);
-```
+From the source (`references/Onslaught/Career.cpp:1178-1195`, `CCareer::GetGradeFromRanking`): a ranking of exactly 1 gives S; zero or less gives E; any other ranking gives D minus the rounded-down value of four times the ranking, so the letters run D, C, B and A as the ranking rises from zero to just below 1.
 
 | Grade | Float Range |
 |-------|-------------|
 | S | 1.0 exactly |
-| A | 0.75-0.99 |
-| B | 0.5-0.74 |
-| C | 0.25-0.49 |
-| D | 0.01-0.24 |
-| E | <= 0.0 |
+| A | 0.75 ≤ f < 1.0 |
+| B | 0.5 ≤ f < 0.75 |
+| C | 0.25 ≤ f < 0.5 |
+| D | 0 < f < 0.25 |
+| E | f ≤ 0 |
 
 ## Notes
 - Retail helper writes one grade byte into `out_grade` and returns `out_grade`

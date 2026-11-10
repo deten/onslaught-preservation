@@ -2,19 +2,24 @@
 
 Status: active contract for the rebuild's final-wave route; per-unit RNG ordering
 across the whole level remains open
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (pin stated as c3d8ac4; the Steam pan duration disclosed and the 8.95 s handoff labelled expected; citations given their repository path; Summary cut to two sentences; earlier: 2026-10-22 research-campaign records and decompiler-style code removed)
 Summary: the abort after one kill is a designed retail branch, but retail gives the
 player two helps the rebuild lacks: four friendly turrets that come online after the
 first poll below 80 % health, and the jet Missile Pod. Activated turrets can see the
-enemy drones (original-code control, 16/16 cases). Every base-world Building and
-Cannon owns an AI that draws shared RNG from level start, and all four turrets run
-a fire-control refresh that draws once per event 4001 from construction onward
-(original-code control, 21/21 cases).
+enemy drones, every base-world Building and Cannon owns an AI that draws shared RNG
+from level start, and all four turrets run a fire-control refresh that draws once per
+event 4001 from construction onward.
 Evidence: MEASURED — pristine instruction bytes read with objdump, shipped script
 source and compiled script symbols, shipped physics/configuration records and
-turret meshes, and two controlled original-code experiments; SOURCE — pinned GPL `references/Onslaught`
-(`5352a81c`) for damage, shields, weapon creation and thing initialization. No
-retail run was made; outcomes of whole fights are not measured.
+turret meshes, two controlled original-code experiments, and the intro pan's 6.0 s
+duration from two controlled Steam runs (recorded in the
+[source-to-Steam crosswalk](../engine/source/stuart-source-synthesis.md#source-to-steam-crosswalk);
+no receipt name is published); SOURCE — pinned GPL `references/Onslaught` at `c3d8ac4`,
+the commit the [README](../README.md) names. The six source files cited below are
+byte-identical between the older `5352a81c` snapshot and `c3d8ac4`
+([formats/aya-resource-extractor-source-audit.md](../formats/aya-resource-extractor-source-audit.md),
+lines 30-36), for damage, shields, weapon creation and thing initialization. Beyond the
+two Steam runs, no retail run was made; outcomes of whole fights are not measured.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`;
 `data/default physics.dat` SHA-256
@@ -34,7 +39,7 @@ The shipped script source is authoritative for control flow; the compiled
   `playerAbortHealth = 0.4 * GetHealth()`, captured once. The script native
   `GetHealth` (`0x00535920`) calls `0x004f99f0`, which returns absolute Unit life
   `+0xf8` (it defers to the segment controller when `+0x178` is set).
-  `CBattleEngine` is a `CUnit` (`BattleEngine.h:72`). Aquila Prototype `mLife` is
+  `CBattleEngine` is a `CUnit` (`references/Onslaught/BattleEngine.h:72`). Aquila Prototype `mLife` is
   20.0 (configuration offset `0x2d6`), so a full-health start gives thresholds 16.0
   and 8.0.
 - The poll runs inside `event("Reached Target Zone 3")` (`:248-282`). After
@@ -70,8 +75,8 @@ delivered before the Kramer message ends, so the turrets end active; the drones 
 friendly by then.
 
 The four rows are in the base world, whose interpreted content is identical for
-Level 100 and World 110 (both `*_BSWD.json` hash to `5a309d45…`). The lab mirror and
-the rebuild's materialized static-world manifest (`17d6112a…`) agree:
+Level 100 and World 110 (both `*_BSWD.json` hash to `5a309d45…`). The lab mirror (`<maintainer evidence>`) and
+the rebuild's materialized static-world manifest (`<maintainer evidence>`, `17d6112a…`) agree:
 
 | Row | Name | Profile | Position | Allegiance | Active |
 | ---: | --- | --- | --- | ---: | ---: |
@@ -86,9 +91,9 @@ the rebuild's materialized static-world manifest (`17d6112a…`) agree:
   initializer `+0xa0` to Unit `+0x138` (`0x004f8fb2`/`0x004f8fba`, EDI holding the
   initializer on every path). `+0xa0` is `CInitThing::mAllegiance`:
   `CBattleEngine::Init` compares it at `0x004051eb` to choose `m_be2`/`f_be2`, as
-  `BattleEngine.cpp:161` does. The profile's `CUnitAlligence` value is not read here.
+  `references/Onslaught/BattleEngine.cpp:161` does. The profile's `CUnitAlligence` value is not read here.
 - Activity: the Unit constructor stores `+0x214 = 1` (`0x004f80aa`, `0x004f80e3`);
-  `CThing::Init` calls `Deactivate()` for inactive rows (`thing.cpp:82-83`). In the
+  `CThing::Init` calls `Deactivate()` for inactive rows (`references/Onslaught/thing.cpp:82-83`). In the
   `CCannon` vtable `0x005e24dc`, slot 22 is `0x004fd6a0` (sets `+0x214 = 1`) and slot
   23 is `0x004fd700` (clears it); both forward to `+0x148` and component children.
   The script `Activate` native (`0x00535d50`) calls slot 22.
@@ -102,8 +107,10 @@ the rebuild's materialized static-world manifest (`17d6112a…`) agree:
   [`CUnitAI::Update`](../mechanics/ai/CUnitAI__Update__004fef40.md) and requeues
   3000 at time + delay. Event 3001 likewise requires `+0x214`.
 - Visibility: an allegiance-0 owner's close-target scan walks list `0x008550c0`
-  (`0x004ff7a5-0x004ff7bb`). The Hangar's `SpawnThing` (`0x00536cd0`) gives each drone
-  the Airfield's allegiance 0 (`0x00536f7a-0x00536f97`), so `CUnit::Init` lists it in
+  (`0x004ff7a5-0x004ff7bb`). The `Hangar` script's `SpawnThing` (`0x00536cd0`) gives each drone
+  the Airfield's allegiance 0 (`0x00536f7a-0x00536f97`; the Airfield is a unit, so the owner
+  test passes, see [allegiance at construction](level100-construction-order.md#allegiance-at-construction)),
+  so `CUnit::Init` lists it in
   `0x008550b0`. `SpawnThing` then calls `CreateSquad` with the Target Drone's selector
   8 (behaviour 9); the squad jump table (`0x0050f5bc`/`0x0050f5c8`) returns null, so
   the drone has no squad. Its `SetAllegiance(ENEMY)` reaches
@@ -112,8 +119,10 @@ the rebuild's materialized static-world manifest (`17d6112a…`) agree:
 
 ### Original-code control
 
-`python -P <maintainer evidence>/test-runs/level100-final-wave-20260925/turret_targeting_control.py`
-passed **16 cases**. The ELF executes unchanged script `SetAllegiance`,
+This control was run as `python -P <maintainer evidence>/test-runs/level100-final-wave-20260925/turret_targeting_control.py`,
+and it passed **16 cases**. The script and its receipts are kept privately, so a public reader
+cannot rerun this control. A reader can check the cited source at the pinned commit and the
+specimen hash in the header against their own copy of the game. The ELF executes unchanged script `SetAllegiance`,
 `SetFactionForHierarchy`, CSPtrSet add/remove, the close-target scan `0x004ff710`,
 its state and side gates, `SetReader` and monitor registration at their retail
 addresses; feasibility, capability and support helpers are recording stubs. Cases
@@ -153,8 +162,8 @@ refresh (`CUnit::HandleEvent`). It never reads the active flag `+0x214`. `CUnit:
 calls it once at `0x004f90ce`, so each turret takes one draw at construction and then
 roughly one per frame or two for the whole level, active or not.
 
-`python -P <maintainer evidence>/test-runs/level100-final-wave-20260925/turret_fire_control_control.py`
-passed **21 cases**. The ELF runs the unchanged inspection range
+This control was run as `python -P <maintainer evidence>/test-runs/level100-final-wave-20260925/turret_fire_control_control.py`,
+and it passed **21 cases** (its script and receipts are kept privately, as above). The ELF runs the unchanged inspection range
 `[0x004f889a,0x004f89fb)` with its jump table, the emitter lookup, CRT `stricmp`,
 `_strnicmp` and `_strncmp` (C-locale fast path supplied), the refresh body and
 `Random__NextLCGAbs` against part and emitter structures built from the three
@@ -174,15 +183,19 @@ out-of-range seed; that run is retained beside it.
 
 All three profiles have life 5.0 and behaviour 5 (`CCannon`).
 
-| Profile | Range | Turret turn | Weapon | Weapon mode and round |
+| Profile | Profile range | Turret turn | Weapon | Weapon mode and round |
 | --- | ---: | ---: | --- | --- |
 | Blaster Turret | 60 | 0.17453 | M6 Blaster | Blaster 0.2 damage, 45/s; reload 3.0, burst 5 × 0.1, volley 2, range 60, yaw tolerance 0.0873, inaccuracy 0.00436, `CWeaponTrack` 1 |
 | SAT Turret | 80 | 0.0698 | SAT Launcher | SAT 1: 0.5 + `SAT Hit` radius 2.0 damage 0.5, 14/s, turn 0.0785, seek 2, seek delay 2.0, seek angle 0.2618, weirdo seek, life 10; reload 10, burst 8 × 0.1, range 130, minimum target height 3.0, yaw tolerance 0.349 |
 | Pulse Turret | 60 | 0.17453 | IS3 Pulse Cannon | Pulse Bolt Medium; reload 2.5, range 1–60, **maximum target height 3.0**, yaw tolerance 0.0873 |
 
-The Pulse Turret cannot engage airborne drones; the two Blaster Turrets and the SAT
-Turret can. None of these rounds is smart and `SAT Hit` has no smart filter, so a
-stray round or blast can damage the player; turrets never select the player.
+The profile range and the range in the weapon's mode are separate fields; for the SAT
+Turret they are 80 and 130. The Pulse Turret cannot engage airborne drones; the two
+Blaster Turrets and the SAT Turret can. None of these rounds sets the `CRoundSmart` flag,
+and `SAT Hit` has no `CExplosionSmart` filter (both gates are described in the
+[round hit path](../mechanics/cround-hit-damage-path.md)), so a stray round or blast can
+damage the player; turrets never select the player. Seeking is a separate property,
+covered under [Seeking rounds](#seeking-rounds).
 
 ### Turret aiming
 
@@ -288,10 +301,10 @@ range 20–80, yaw tolerance 0.349). Explosions scale as `((R − d) × D) / R`
 `CUnit::ApplyDamage` scales only deploy states and weakpoint parts
 (`CUnit::ApplyDamage`; in the decompilation notes, not yet published).
 
-Player damage routes through `CBattleEngine::Damage` (`BattleEngine.cpp:2127-2240`).
-Jet movement zeroes shields every update (`BattleEngineJetPart.cpp:499`), so jet
+Player damage routes through `CBattleEngine::Damage` (`references/Onslaught/BattleEngine.cpp:2127-2240`).
+Jet movement zeroes shields every update (`references/Onslaught/BattleEngineJetPart.cpp:499`), so jet
 hits reach life in full. Walker movement sets shields to energy
-(`BattleEngineWalkerPart.cpp:391`); while shields cover a hit, 98 % goes to shields
+(`references/Onslaught/BattleEngineWalkerPart.cpp:391`); while shields cover a hit, 98 % goes to shields
 (Aquila `mShieldEfficiency` 98.0 at configuration offset `0x30b`, energy 8.0).
 
 Player weapons against a 1.0-life drone:
@@ -305,17 +318,17 @@ Player weapons against a 1.0-life drone:
 
 Aquila Prototype's jet list is Mech Vulcan Cannon then Missile Pod (configuration
 offsets `0x340`, `0x353`). `CBattleEngineJetPart::ResetConfiguration` creates every
-configured jet weapon with no career gate (`BattleEngineJetPart.cpp:976-1000`), and
+configured jet weapon with no career gate (`references/Onslaught/BattleEngineJetPart.cpp:976-1000`), and
 `LevelScript.msl` disables the Missile Pod only in the abort handler (`:357`).
 
 ### Missile Pod locks
 
 `CBattleEngine::Move` (`0x004081c0`) calls `HandleLocks` (`0x00406560`) at
 `0x00408b84` on every Move while the Battle Engine is not dying
-(`BattleEngine.cpp:1330-1476`); its Actor multiplier is 1 (vtable `0x005d89c4` slot
+(`references/Onslaught/BattleEngine.cpp:1330-1476`); its Actor multiplier is 1 (vtable `0x005d89c4` slot
 24 is `0x004de700`, returning 1.0), so that is every frame. `HandleLocks` returns
 at once while the current part is firing (`0x00414b30`) and otherwise follows
-`BattleEngine.cpp:586-760`, with these retail specifics:
+`references/Onslaught/BattleEngine.cpp:586-760`, with these retail specifics:
 
 - Every lock parameter comes from the weapon's current mode. Each getter rounds
   charge `+0x60` with `fistp`, divides by 100 with truncation and takes that
@@ -416,7 +429,8 @@ chunk.
 | Forseti City Building 3 (`f-city3.msh`) | orientation × (−0.00352525711, 0.000152587891, −0.965623558) | R | 2.58220625 |
 
 The iceberg and city-building rows come from each shipped mesh's mesh-level BBOX
-record (`rebuild/tools/cmsh_static_preview.py`; the same read reproduces the
+record (`rebuild/tools/cmsh_static_preview.py` in Onslaught-Career-Editor at commit `51129bab`;
+its current copy is in [onslaught-godot](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/tools/cmsh_static_preview.py); the same read reproduces the
 Warehouse, Target Tank and Target Truck rows above). Icebergs are base-world rows
 4-9 and city buildings rows 30-34. Iceberg 3's BBOX origin has x −1.0905, which the
 z-only rule ignores. Features are not units, so `CalcUnitOverCrossHair` never
@@ -619,9 +633,10 @@ Only the Unit 4003 handler (`0x004f98a8-0x004f9972`) writes `+0x110`
   `AddEvent_TimeFromNow` at now + 3.0 + (r mod 65536)/65536, reusing the event.
   `CUnit::Init` queues the first one at −1.0 with no draw.
 - The first-person camera returns the Battle Engine's `+0x1c`. The pan camera
-  returns its stored point: the pinned `Camera.cpp` spline, updated at end of
-  frame. The measured Level 100 run pans from event time 3.0 to 8.95
-  (the pan camera; in the decompilation notes, not yet published).
+  returns its stored point: the pinned `references/Onslaught/Camera.cpp` spline, updated at end of
+  frame. The pan camera runs from event time 3.0 for a 6.0 s duration that two controlled Steam
+  runs measured (see the Evidence line); the handoff at 8.95 to 9.0 s is expected, not
+  separately measured (the pan camera; in the decompilation notes, not yet published).
 - So the minimum input per delivery is player 0's current camera position. With
   no player or camera the flag stays 0.
 `0x004fec60` exits without requeueing when the owner is dying, in deploy state 1 or 2,
@@ -629,12 +644,17 @@ or in AI mode 0. These draws share the gameplay stream with each Unit's Actor In
 draw and 4003 draw; the [World 110 owner](world-110-initial-constructor-seeds.md)
 already orders rows 0–9 of this same base world.
 
-The Hangar's all-squads spawning probe never finds a spawner. The shipped `Hangar`
-profile has no `CUnitUseSpawner` entry (physics record `Hangar`), so `CUnit::Init`
+The all-squads spawning probe of the Hangar building (base row 25) never finds a spawner.
+Its shipped profile has no `CUnitUseSpawner` entry (physics record `Hangar`), so `CUnit::Init`
 appends nothing to its attached-spawner list `+0x18c`. `0x004fda90` walks that list
-and returns 0 at once. The drones come from the script's `SpawnThing`. The
-Airfield's two spawners (`Forseti Fighter Spawner`, `SpawnerA`/`SpawnerB`) are used
-the same way (`LevelScript.msl:185`), and it stays inactive.
+and returns 0 at once. The drones come from the `Hangar` script's `SpawnThing`; that script
+is bound to the Airfield (base row 23; see
+[the level 100 construction order](level100-construction-order.md)).
+The Airfield's spawners `Forseti Fighter Spawner` and `SpawnerB` are used the same way
+(`LevelScript.msl:185`), and it stays inactive. `SpawnerA` is the spawner that the Tank
+Factory's init names ([level 100 construction order](level100-construction-order.md));
+whether the Airfield also has one is not settled here, and checking the attachments needs
+the level data, which is kept privately.
 
 ## Open questions
 

@@ -1,8 +1,9 @@
 # CCareer__UpdateThingsKilled
 
 Status: active function note
-Last updated: 2026-10-22 (research-campaign records removed)
+Last updated: 2026-11-06 (source logic described in words; invented accessor names removed; specimen line added)
 Summary: `CCareer__UpdateThingsKilled` at `0x0041c180`: adds each mission's kill counts to the career totals, except on the training level.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: 0x0041c180 | Source: `references/Onslaught/Career.cpp`
 
@@ -16,16 +17,8 @@ Accumulate per-mission kill counts into the career totals (`mKilledThings[5]`). 
 A `CCareer` member with no arguments and no return value (`CCareer::UpdateThingsKilled()` in the source).
 
 ## Algorithm (Source-Accurate)
-```cpp
-// Source: references/Onslaught/Career.cpp (CCareer::UpdateThingsKilled())
-// Note: TK_TOTAL == 5
-if (END_LEVEL_DATA.mWorldFinished == 100) return; // training level
 
-for (int i = 0; i < TK_TOTAL; i++) {
-  mKilledThings[i] += END_LEVEL_DATA.mThingsKilled[i];
-  LOG.AddMessage("%-15s killed this level  %d,  Total %d", nameFor(i), END_LEVEL_DATA.mThingsKilled[i], mKilledThings[i]);
-}
-```
+The source function is `CCareer::UpdateThingsKilled()` in `references/Onslaught/Career.cpp`, described here in words. It returns at once when the finished world is 100, the training level. Otherwise it visits the five kill categories (`TK_TOTAL` is 5) in index order. For each category it adds the finished level's count to the career total in `mKilledThings`, then logs one message with the category name, the level's count and the new total.
 
 ## Kill Counter Layout (CCareer offset 0x23F4)
 Retail/Steam nuance:
@@ -44,7 +37,7 @@ This function adds per-level kills to the full dword, which preserves the top by
 | 4 | TK_MECHS | 0x2404 | 20/40/80 (40 is used by 2 goodies) |
 
 See also:
-- `CCareer__GetKillCounterTopByte_23F4/_23F8` and `CCareer__SetKillCounterTopByte_23F4/_23F8`
+- The top-byte get and set accessors of the aircraft and vehicle counters; this document gives them no name
 - [`kill-tracking.md`](../kill-tracking.md)
 
 ## File Encoding Note (Aligned vs True Dword View)

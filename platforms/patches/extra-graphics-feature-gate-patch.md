@@ -1,5 +1,11 @@
 # Extra Graphics Feature Gate Patch
 
+Status: byte-verified copied-executable patch note — the visible graphics effect is not measured
+Last updated: 2026-11-06 (header added; copy-only apply steps; function name from the public naming table)
+Summary: changing the `GEFORCE_FX_POWER` tweak default from `0` to `1` in a copied retail `BEA.exe`, with the related `cardid.txt` bypass and the limits of the evidence.
+Evidence: MEASURED — byte verification and a bounded copied-game launch and capture, as the Scope section states; the visible graphics effect is not measured.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+
 ## Summary
 
 Retail `BEA.exe` registers the tweak `GEFORCE_FX_POWER` with a default value of `0`.
@@ -17,6 +23,14 @@ A deterministic file patch can change the default to `1` directly in a copied `B
 - Original bytes: `6A 00` (`push 0`)
 - Patched bytes: `6A 01` (`push 1`)
 
+No tool in this repository applies this patch. To apply it by hand to a copy:
+
+1. Copy your retail `BEA.exe` to a folder outside the game folder; never edit the installed file.
+2. Confirm the copy's SHA-256 equals the known target above, and stop if it does not.
+3. Change only the byte that differs between the original and patched bytes above, which is the second byte of the two-byte patch site.
+4. Re-hash the copy and record the new SHA-256 with any test notes; no patched hash is pinned in this note.
+5. Keep the rollback under Scope / Side Effects ready before any test.
+
 ## Related Patch: Ignore cardid.txt Overrides
 
 To ignore `cardid.txt` vendor/device matching and always use executable defaults:
@@ -26,7 +40,7 @@ To ignore `cardid.txt` vendor/device matching and always use executable defaults
 - Original bytes: `E8 9C D7 FF FF` (`call 0x005286E0`)
 - Patched bytes: `90 90 90 90 90` (NOP ×5)
 
-This bypasses the startup call into `CD3DApplication__LoadCardIdAndApplyVendorTweaks`.
+This bypasses the startup call into `LoadCardId`.
 
 ## Why This Location
 
@@ -43,7 +57,7 @@ This changes default behavior without requiring `cardid.txt` vendor/device match
 
 ## Related Retail Flow
 
-- `CD3DApplication__LoadCardIdAndApplyVendorTweaks` at `0x005286E0` reads `cardid.txt`
+- `LoadCardId` at `0x005286E0` reads `cardid.txt`
   and applies named tweak overrides when vendor/device/version checks pass.
 - Keeping that flow intact while changing only the default avoids broad side effects from
   bypassing card/vendor checks globally.

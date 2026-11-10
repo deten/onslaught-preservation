@@ -1,11 +1,13 @@
 # View distance, cull, and LOD constants — recovered from the retail binary
 
 Status: active dated finding
-Last updated: 2026-10-22 (research-campaign records removed)
+Last updated: 2026-11-06 (Evidence and Specimen lines added; far-plane, capability-branch, PS2 and tail-dword wording corrected)
 Summary: the world far plane (700), object, mesh and tree cull distances, fog defaults and LOD constants read from the retail binary.
+Evidence: MEASURED — read from the specimen's `.data` and instructions; the reference-source matches are SOURCE; the CHFD magnitude reading is INFERRED; the unplaced leading dword is UNKNOWN.
+Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
-Date: 2026-07-25. Values read from the pristine specimen's `.data` and its
-instructions. Cross-checked against the pinned reference source
+Date: 2026-07-25. Values read from the pristine specimen named in the `Specimen:` line
+above: its `.data` and its instructions. Cross-checked against the pinned reference source
 where the file exists in the snapshot.
 
 ## The far plane: 700, and `DEFAULT_Z_FAR` is a red herring
@@ -16,14 +18,14 @@ local `float howfar = 700;` in `DXEngine.cpp:649` and again at `:788`, and the
 retail binary agrees: `CDXEngine__Render` calls
 `CDXEngine__SetProjectionMatrix` with a far plane of 700.0.
 
-**This corrects an earlier finding** that the client's `Far = 700f` was "2.73x the
+**This corrects an earlier finding** that the Godot client's `Far = 700f` (in [`FirstFlightWorldView.cs`](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/OnslaughtRebuild.Godot/FirstFlightWorldView.cs) of onslaught-godot) was "2.73x the
 reference and larger than the whole map". 700 *is* retail's value. The client is
 right and `DEFAULT_Z_FAR` should not be used as a target.
 
 Other far planes in retail, for completeness: sky pass uses
 `sqrt(SKY_HEIGHT^2 + (SKY_CELL_SIZE*SKY_RAD)^2)`; frontend Goodies uses 700.0;
 several frontend renders use 7000.0; HUD overlays use 100.0. Gamut/visibility grid
-depth is **2048.0** on PC (`PCEngine.cpp` uses 256 for the PS2 variant).
+depth is **2048.0** on PC (the 256 for a PS2 variant is not sourced here: the pinned `PCEngine.cpp` has no PS2 branch).
 
 ## Object, mesh and tree cull — CVar defaults from `.data`
 
@@ -50,7 +52,7 @@ level:
 | 1 | **30.0** | 1.0 | 1.0 | 30.0 |
 | 2 | **70.0** | 0.3 | 2.0 | 40.0 |
 
-`CRTTree__Init` then forces `g_MeshQualityDistance = 45.0`. Trees cull with
+`CRTTree__Init` then writes `g_MeshQualityDistance = 45.0` in a separate capability branch. Trees cull with
 `dist^2 - g_MeshQualityDistance^2 <= 0`; dynamic unit passes use
 `(g_MeshQualityDistance + 10.0)^2`. The value is persisted to the options tail.
 
@@ -71,8 +73,8 @@ mesh-to-imposter swap distance from `defaultoptions.bea` offset `0x26CA`.
 | **0.03** | camera smoothing |
 | **8.0 / 512.0** | tile size / map extent |
 
-These are already reproduced in `Level100HeightFieldAsset.cs` — camera smoothing
-0.03, finest geometry radius 32^2, root texture radius 128^2, thresholds 64/32/16
+These are already reproduced in [`Level100HeightFieldAsset.cs`](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/OnslaughtRebuild.Godot/Level100HeightFieldAsset.cs) (onslaught-godot, `rebuild/OnslaughtRebuild.Godot/`) — camera smoothing
+0.03, finest geometry radius 32^2 (the rebuild's geometry cut; the table above has the same value as the texture level 2 threshold, a separate use), root texture radius 128^2, thresholds 64/32/16
 with shifts 60/28/12. No divergence found.
 
 ## Fog render states
@@ -121,32 +123,34 @@ not imagery. `CWorld__InitLODLists` allocates three of them with slope threshold
 `max_slope_degrees * 0.01745329` (degrees to radians) at `bitplane_base + 0x2000`.
 
 The class is **`CWorld`**, proven by the retail alloc debug string
-`C:\dev\ONSLAUGHT2\world.cpp`. There is no `CBaseWorld` or `CRealWorld` anywhere in
-the reference snapshot or the RE corpus.
+naming `world.cpp`. There is no `CBaseWorld` or `CRealWorld` anywhere in
+the pinned reference source (`references/Onslaught`).
 
 Of the 11 leading dwords, **six are written and never read** (`0x008a9b84`, `88`,
 `9c`, `a0`, `a4`, `a8`), the first three are read and discarded on the retail path,
 and only `0x008a9bb0` has a consumer — a message-display duration read by
 `CMessageBox__TryAdvanceQueuedMessage`.
 
+That accounts for ten of the eleven leading dwords. The eleventh is not placed in this note: its reads and writes are not recorded here, and the listed globals are not tied to file positions, so they do not show which dword it is. Open question: a static read of `CWorld__LoadWorld`'s handling of each leading dword settles which one is unplaced.
+
 ## OID ordinals, derived from `__LINE__` alloc arguments
 
 Recovered by matching the `__LINE__` argument in retail's
-`CDXMemoryManager__Alloc(..., "C:\dev\ONSLAUGHT2\InitThing.cpp", line)` calls
+`CDXMemoryManager__Alloc` calls whose debug string names `InitThing.cpp`
 against the `new` statements in the pinned `InitThing.cpp`:
 
 | OID | class |
 | ---: | --- |
 | 7 | `CTree` |
-| **8** | `CUnit` |
-| **15** | `CStart` |
+| 8 | `CUnit` |
+| 15 | `CStart` |
 | 19 | `CSpawnerThing` |
 | 25 | `CBuilding` |
 | 26 | `CCutscene` |
 | 28 | `CSquad` |
 | 33 | `CWall` |
-| **35** | `CFeature` |
-| **36** | `CSphereTrigger` |
+| 35 | `CFeature` |
+| 36 | `CSphereTrigger` |
 | 39 | `CHazard` |
 | 41 | `CSpawnPoint` |
 

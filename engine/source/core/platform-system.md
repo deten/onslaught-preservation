@@ -1,7 +1,7 @@
 # Platform System
 
 Status: mixed — source architecture with bounded retail corrections
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (source-only labels, dated attribution, a duplicate table and banners corrected; god-mode persistence follows the god-mode account; earlier: research-campaign records and decompiler-style code removed)
 Summary: platform source reference with bounded retail font, device lifecycle, window-message and shell-helper corrections.
 Evidence: MEASURED — static pristine font/device-lifecycle bodies, strings, callers and RTTI; SOURCE — the pinned platform implementation elsewhere below.
 Specimen: pristine `BEA.exe.original.backup`, SHA-256
@@ -86,7 +86,7 @@ The `Flip()` method handles frame buffer presentation. The `mStopEverything` che
 
 ## Quit Types (EQuitType)
 
-Returned by `CPlatform::Process()` to signal the game loop about desired state transitions:
+Returned by `CPCPlatform::Process()` to signal the game loop about desired state transitions:
 
 | Constant | Value | Description |
 |----------|-------|-------------|
@@ -105,10 +105,10 @@ Returned by `CPlatform::Process()` to signal the game loop about desired state t
 
 | Constant | Value | Description |
 |----------|-------|-------------|
-| `FONT_NORMAL` | 0 | Standard game text (22pt bitmap) |
-| `FONT_SMALL` | 1 | Small text (13pt bitmap) |
+| `FONT_NORMAL` | 0 | Standard game text (bitmap font) |
+| `FONT_SMALL` | 1 | Small text (bitmap font) |
 | `FONT_DEBUG` | 2 | Debug overlay (system font "Terminal", size argument 7) |
-| `FONT_TITLE` | 3 | Title/header text (32pt bitmap) |
+| `FONT_TITLE` | 3 | Title/header text (bitmap font) |
 
 The font system uses bitmap fonts loaded from TGA texture files. Each platform may use different font assets (PC vs Xbox have separate font files).
 
@@ -241,7 +241,7 @@ if (CLIPARAMS.mForcedCard) {
 }
 ```
 
-The game was designed for GeForce 3 hardware (the first GPU with programmable vertex shaders). Non-GeForce 3 systems trigger a warning dialog and may run in degraded mode.
+The game was designed for GeForce 3 hardware (the first GPU with programmable vertex shaders). Non-GeForce 3 systems trigger a warning dialog. The code forces windowed mode, exits if the player declines the dialog, and otherwise continues as if a GeForce 3 were present.
 
 ---
 
@@ -254,7 +254,9 @@ unconditionally clears the two Xbox slots. Its complete 457-byte body ends at
 `ec8ec8533b96948d5c4854cb3a1750b7eae3165945b77668129f33b781c9bfe0`.
 This September 26 recheck corrects the earlier retail filename claim.
 
-| Font | Texture File | Size | Purpose |
+The Size column is the size argument each font is constructed with. The 22 and 13 in the texture names `font22.512.tga` and `Font13PS.tga` are part of those file names, not sizes.
+
+| Font | Texture File | Size argument | Purpose |
 |------|--------------|------|---------|
 | `mFont` / retail `+0x18` | `font22.512.tga` | 32 | Normal text |
 | `mDebugFont` | System "Terminal" | Argument 7 | Debug overlay |
@@ -293,7 +295,7 @@ if (ra->GetTargetPlatform() == XBOX) {
     // ... Xbox fonts
 } else if (ra->GetTargetPlatform() == PS2) {
     mFont->Serialize(c, ra);
-    // ... PS2 fonts (note: reuses mSmallFont twice - possible bug)
+    // ... PS2 fonts (this snippet serializes mFont here; no mSmallFont reuse is shown)
 } else {
     mFont->Serialize(c, ra);
     // ... PC fonts
@@ -332,7 +334,7 @@ float CPCPlatform::GetSysTimeFloat() {
 
 ## Registry Access (Volatile)
 
-**CRITICAL DISCOVERY**: PC settings use the Windows registry with `REG_OPTION_VOLATILE` flag (lines 464-503).
+**Registry use**: PC settings use the Windows registry with `REG_OPTION_VOLATILE` flag (lines 464-503).
 
 ### Registry Path
 
@@ -367,7 +369,7 @@ The `REG_OPTION_VOLATILE` flag means registry settings exist **only in memory** 
 **Permanent** settings are stored in game-generated files, not the volatile registry:
 - Global options are stored in `defaultoptions.bea` (retail-observed 10,004-byte envelope with a `CCareer` core plus options/tail blocks).
 - Career saves (`.bes`) use the same retail envelope shape, but in the Steam build they load via `CCareer::Load(..., flag=1)` which does **not** apply options entries/tail snapshot and preserves pre-load Sound/Music floats (so `.bes` is not a reliable persistence vehicle for those settings).
-- The only persisted god-related field we track in this build is `g_bGodModeEnabled` (but it remains cheat-gated at runtime).
+- God mode is per-player state saved in the career: the player 1 and player 2 flags have their own field rows in [save-format.md](../../../saves/save-format.md). [God mode](../../../mechanics/cheats/god-mode.md) gives the account; the effect of a saved flag without the cheat name is static only.
 
 ---
 
@@ -410,7 +412,7 @@ These are used throughout the codebase for platform-independent key references.
 
 | Feature | PC | Xbox | PS2 |
 |---------|-----|------|-----|
-| Graphics API | DirectX 8 | DirectX subset | DMA lists |
+| Graphics API | DirectX 8 (pinned source); DirectX 9 (retail) | DirectX subset | DMA lists |
 | Font files | font22.512.tga | font22.512Xbox.tga | (shared with PC) |
 | Registry | Volatile HKCU | N/A | N/A |
 | Vertex shaders | Optional (GeForce 3) | Required | N/A |
@@ -434,7 +436,7 @@ However, understanding the platform system explains:
 
 ### Stuart's Internal Build vs Steam Release
 
-The provided source code is from the **internal PC build** used during development. The Steam release is a later retail build (console-port lineage) where Encore was the **publisher**; per Stuart, the Windows retail release work was done **in-house at Lost Toys** by Jan and possibly others. Compared to the internal build it has:
+The provided source code is from the **internal PC build** used during development. The Steam release is a later retail build (console-port lineage) where Encore was the **publisher**; the identity of the Windows retail release developer is unconfirmed ([history/attribution.md](../../../history/attribution.md)). Compared to the internal build it has:
 
 - Different on-disk save layout (CCareer dump begins at `file+2` after a 16-bit version word; legacy aligned views can look “shift-16”)
 - Stubbed PC-specific features
@@ -503,7 +505,7 @@ pass the lifecycle result to that call; invalidation and deletion even overwrite
 `AL` with the byte at `0x0063dc20` before testing it. Calling it a lifecycle
 result handler would therefore be unsupported.
 
-The existing name-evidence tool checks these reviewed correspondences, both
+A name-evidence check kept outside this repository checks these reviewed correspondences, both
 list transports, unique fixed primary ancestry, every known RTTI holder,
 aligned non-code pointer cells, complete-body return cleanup and naming
 collisions. The current packet admits 31 resource-method identities across
@@ -658,7 +660,7 @@ public:
 
 ### Hardcoded Resolution: 640x480
 
-**CRITICAL**: The display resolution is hardcoded to 640x480.
+**Source define: 640x480 (source only).** The source hardcodes the display resolution to 640x480.
 
 ```cpp
 #define DX_SCREEN_WIDTH     640
@@ -667,7 +669,7 @@ public:
 
 During device enumeration, the framework specifically searches for 640x480 modes and prefers 32-bit color formats.
 
-**Stuart's Comment (Discord)**: "The display is hardcoded to 640x480 and assumes a GeForce 3."
+The retail default creation size is also 640x480; `-res W H` overrides it, with a 640x480 minimum (see [display settings](../../../platforms/display/display-settings.md) and [lore errata](../../../history/lore-errata.md)).
 
 ### Display Format Priority
 
@@ -717,7 +719,7 @@ The framework tries vertex processing modes in this order:
 
 #### Automatic Fullscreen Toggle
 
-In release builds, the game automatically switches to fullscreen:
+Source only (not retail): in release builds, the game automatically switches to fullscreen. The retail `Create` body lacks the release-profile `ToggleFullscreen` branch; see [Retail startup shell — September 27 correction](#retail-startup-shell--september-27-correction).
 
 **Build Configuration Matrix:**
 
@@ -725,7 +727,7 @@ In release builds, the game automatically switches to fullscreen:
 |------------|--------------|-------|
 | `_DEBUG` | Windowed | Always windowed for debugging |
 | `OPTIMISED_DEBUG` | Windowed | Optimized debug stays windowed |
-| `DEV_VERSION` | Windowed* | Fullscreen unless modelviewer/cutsceneeditor |
+| `DEV_VERSION` | Windowed | Fullscreen unless modelviewer/cutsceneeditor |
 | Release | Fullscreen | Auto-fullscreen unless `-forcewindowed` |
 
 #### Fullscreen Presentation
@@ -825,15 +827,6 @@ The GeForce 3 (released March 2001) was the high-end GPU during Battle Engine Aq
 - Programmable vertex shaders
 - 64MB video memory
 
-### Files Analyzed
-
-| File | Purpose |
-|------|---------|
-| `d3dapp.cpp` | CD3DApplication implementation (1929 lines) |
-| `d3dapp.h` | Class definition, data structures (217 lines) |
-| `D3DRes.h` | Menu resource IDs (referenced, not provided) |
-| `DX.H` | Platform routing (includes d3dapp.h for PC) |
-
 ---
 
 ## See Also
@@ -841,7 +834,3 @@ The GeForce 3 (released March 2001) was the high-end GPU during Battle Engine Aq
 - [engine-system.md](engine-system.md) - Rendering pipeline
 - [../frontend/controller-system.md](../frontend/controller-system.md) - Input handling
 - [../io/storage-system.md](../io/storage-system.md) - Save file I/O
-
----
-
-*Last updated: December 2025*

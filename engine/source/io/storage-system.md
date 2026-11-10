@@ -1,8 +1,10 @@
 # Storage System
 
-## Storage System (storage.cpp/h, DXMemBuffer.cpp/h, MemoryCard.h)
+Status: active — source map of the storage layer, with retail cross-checks
+Last updated: 2026-11-06 (header added; the analysis dates from December 2025 and the February 2026 note are recorded here; speculation and a raw byte pair removed; PC and PS2 statements corrected or labelled; save-size names corrected)
+Summary: the storage classes in Stuart's published source (the PC and Xbox implementations, buffers and the memory-card interface; the PS2 class is named but not in the drop), and how the Steam save's version word and size compare with them.
 
-> Analysis added December 2025
+## Storage System (storage.cpp/h, DXMemBuffer.cpp/h, MemoryCard.h)
 
 **Purpose**: Platform-abstracted file I/O and save game management. This is **CRITICAL** for understanding save file formats across PC/Xbox/PS2.
 
@@ -14,7 +16,7 @@ The storage system uses a class hierarchy for platform abstraction:
 CStorage (abstract base)
    |
    +-- CPCStorage     (PC implementation)
-   +-- CPS2Storage    (PlayStation 2)
+   +-- CPS2Storage    (PlayStation 2; not in the pinned drop)
    +-- CXBOXStorage   (Xbox)
 
 CDXMemBuffer (PC/Xbox buffered I/O)
@@ -34,21 +36,21 @@ The PC version uses a much larger write buffer (2MB vs 10KB) since it writes to 
 
 Retail/Steam uses a **16-bit version word** at file offset `0x0000`:
 
-- `0x4BD1` (little-endian `d1 4b`)
-- Retail `BEA.exe` validates only this word during `CCareer::Load`.
+- `0x4BD1` (a 16-bit word, stored little-endian)
+- On the load path traced in the [frontend note](../frontend/fep-systems.md#save-validation-minimal), which runs through `CCareer::Load`, the 16-bit version word is the only required check.
 
 The internal source snapshot has its own versioning helpers, but that code is not the retail persistence layer. Do **not** rely on any internal-build “version + sizeof(CCareer)” formulas unless you have verified them against the retail binary.
 
 ### Steam Release Save Format
 
-**File size**: 10,004 bytes (verified)
+**File size**: 10,004 bytes (observed in the Steam build and the tracked fixture)
 
 | Offset | Size | Content |
 |--------|------|---------|
 | 0x0000 | 2 bytes | Version word (0x4BD1) |
 | 0x0002 | 10,002 bytes | CCareer dump + options entries + tail snapshot (Steam build observed fixed layout/size) |
 
-**Note (Feb 2026)**: Retail `BEA.exe` validates the **16-bit version word** and copies CCareer bytes from/to `buffer + 2`. Many hex dumps show the first 4 bytes as `0x00004BD1` because the next 16 bits after the version word are often zero.
+Retail `BEA.exe` validates the **16-bit version word** and copies CCareer bytes from/to `buffer + 2`. Many hex dumps show the first 4 bytes as `0x00004BD1` because the next 16 bits after the version word are often zero.
 
 ### Xbox Save Header (CXBoxSaveHeader)
 
@@ -59,8 +61,6 @@ Xbox saves include a tamper-detection header:
 | `mMagic` | char[4] | "NEKO" (0x4F4B454E) | File identification |
 | `mVersion` | int | 100 | Header version |
 | `mSig` | XCALCSIG_SIGNATURE | (varies) | Xbox signature for tamper detection |
-
-The "NEKO" magic is likely a developer in-joke (Japanese for "cat").
 
 ### Memory Card Constants
 
@@ -84,7 +84,7 @@ The "NEKO" magic is likely a developer in-joke (Japanese for "cat").
 - Supports 8 Memory Unit slots + HDD
 - Save titles stored in Unicode
 
-**PS2 (CPS2Storage)**:
+**PS2 (CPS2Storage)**, not in the pinned drop, so these details are INFERRED from the other platforms (see the [PS2 note](#ps2-implementation-note)):
 - Memory card I/O via Sony SDK
 - 8KB block alignment
 - Icon data for memory card display
@@ -107,7 +107,7 @@ The "NEKO" magic is likely a developer in-joke (Japanese for "cat").
 | `DXMemBuffer.cpp` | CDXMemBuffer PC/Xbox buffered I/O |
 | `DXMemBuffer.h` | CDXMemBuffer class definition |
 | `MemoryCard.h` | CMEMORYCARD class, MCE_* error codes |
-| `PCMemoryCard.cpp` | **EMPTY STUB** - `IsHDDAvailable()` returns FALSE |
+| `PCMemoryCard.cpp` | **Stub**, except the texture-loading method (`AccumulateResources`) |
 | `PCMemoryCard.h` | PCMemoryCard class definition |
 
 ---
@@ -133,8 +133,6 @@ Creates 4-byte identifiers from string literals in little-endian. Example: `MKID
 ---
 
 ## Memory Card Abstraction Layer (MemoryCard.cpp/h)
-
-> Analysis added December 2025
 
 The memory card system provides a platform-agnostic abstraction layer for save file operations across PC, PS2, and Xbox. This is particularly relevant for understanding how the game handles `.bes` career files.
 
@@ -246,7 +244,7 @@ public:
 
 ### PC Implementation (CPCMemoryCard)
 
-**Key Insight**: The PC implementation is a **complete stub** that does nothing!
+**Key Insight**: The PC implementation is a **stub** whose methods do nothing, except the texture-loading method below.
 
 ```cpp
 class CPCMemoryCard : public CMemoryCard {
@@ -276,8 +274,6 @@ void CPCMemoryCard::AccumulateResources(CResourceAccumulator *ra, DWORD flags) {
 ---
 
 ## Xbox Memory Card System (XBoxMemoryCard.cpp/h)
-
-> Analysis added December 2025
 
 The Xbox implementation is comprehensive and provides insight into the original console save system.
 
@@ -346,8 +342,6 @@ public:
     BOOL CheckHeader(BYTE *data, DWORD datasize);
 };
 ```
-
-**Easter Egg**: The magic `MKID("NEKO")` = "NEKO" (Japanese for "cat") - likely Lost Toys studio mascot or team joke.
 
 #### Signature Verification
 
@@ -497,7 +491,7 @@ for (WCHAR *walker = mCardName[card]; *walker; walker++) {
 In outline: saving a career creates (or overwrites) a save on the chosen card and writes the whole `CCareer`
 object to it; loading reads the same number of bytes back into `CAREER`.
 
-The retail build computes save size via `CCareer::GetSaveSize()` and serializes bytes beginning at `file + 2` after a 16-bit version word. In the Steam build we patch here, `.bes` is **observed fixed at 10,004 bytes** (size formula yields that with `N=16`), so do not resize saves without separate build verification.
+The retail build computes save size in the function the decompilation names `CCareer__SizeOfSaveGame` (the source's `CCareer::SizeOfSaveGame()` is at Career.cpp:1151 at c3d8ac4), and serializes bytes beginning at `file + 2` after a 16-bit version word. In the Steam build we patch here, `.bes` is **observed fixed at 10,004 bytes** (size formula yields that with `N=16`), so do not resize saves without separate build verification.
 
 ---
 

@@ -1,11 +1,13 @@
-# Moved to the decompilation notes
+# Removed per-function notes
 
 Status: active — list of removed documents
-Last updated: 2026-10-22 (decompilation linked)
+Last updated: 2026-11-06 (heading no longer says the notes are unpublished: earlier copies of most remain in the Toolkit's frozen reverse-engineering tree; earlier: decompilation linked)
 Summary: per-function notes that were removed from this repository because they were mostly records of the
 research process (per-function packets, digests, grades, coverage tables and promotion verdicts) rather than
 findings about the game. Their subject matter belongs to the function notes of the byte-matching decompilation
-([onslaught-decomp](https://github.com/dlprentice/onslaught-decomp)), which are not published.
+([onslaught-decomp](https://github.com/dlprentice/onslaught-decomp)), which are not published. Earlier copies of most of the
+listed notes remain, by file name, in the frozen `reverse-engineering/` tree of the
+[Toolkit repository](https://github.com/dlprentice/Onslaught-Career-Editor); that tree is not maintained.
 
 Each line names a removed path; the address is the last part of the file name. What the game does in these
 areas is described in the subsystem documents that remain, such as

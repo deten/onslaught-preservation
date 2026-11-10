@@ -1,13 +1,13 @@
 # Unit / BattleEngine / gameplay static contract
 
 Status: bounded retail static map; not runtime gameplay proof
-Last updated: 2026-10-22 (neutral evidence wording)
+Last updated: 2026-11-06 (weapon caller renamed, unpublished function notes marked, Z values in decimal; earlier: neutral evidence wording)
 Summary: retained gameplay routing plus specimen-bound aircraft arithmetic, provider, debris and squad-registration findings.
 Evidence: MEASURED — October 1 whole-section/relocation match, bounded original-code arithmetic and squad instruction reads; the retained map sections keep their July 16 evidence limits.
 Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 This contract routes the retained Unit/BattleEngine evidence without repeating
-the retired wave ledger. Function-level notes under `functions` (in the decompilation notes, not yet published)
+the retired wave ledger. Function-level notes (in the decompilation notes, not yet published)
 remain the detailed evidence owners.
 
 ## Dropship landing-turn threshold — October 1
@@ -96,7 +96,7 @@ The maintainer executed the original fragment and freshly compiled correction in
 2,184 Z results; the correction agrees in XYZ and x87 status in all admitted
 cases. A control inserting only the intermediate float store/reload reproduces
 the former XYZ results. With all integer components `-99` and PC53 nearest,
-the old Z bits are `bdd0a3d6`, versus retail/corrected `bdd0a3d7`.
+the old Z value is `-0.10187499` and the retail and corrected value is `-0.101875` (float32 values one step apart).
 
 The full `0x0049fdb0` function remains unmatched. PRNG calls, all combinations
 of inputs, live control-word reachability and world effects were not exercised.
@@ -164,7 +164,7 @@ evidence includes constructor/destructor, thrust, turn, pitch, yaw, gravity, and
 configuration reset notes under
 `BattleEngineJetPart.cpp` (in the decompilation notes, not yet published).
 
-Static weapon/projectile anchors include `CWeapon__HandleFireBurstEvent`,
+Static weapon/projectile anchors include `CWeapon__HandleEvent` (formerly `CWeapon__HandleFireBurstEvent`),
 `ProjectileBurst__SpawnFromPercentBucketFallback`,
 `ProjectileBurst__SpawnFromCurrentPreset`, `CRound__SpawnConfiguredProjectile`,
 and `CRound__ArmProjectileAndSpawnTrailEffect`.

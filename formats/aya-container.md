@@ -4,18 +4,20 @@ Status: active format contract — complete outer framing; payload semantics spl
 by inflated owner
 Date: 2026-08-22
 Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Verdict: all 1,361 PC AYA outer envelopes are accounted for; payload contracts
+Verdict: every PC AYA outer envelope is accounted for; payload contracts
 remain owner-specific.
 Evidence: MEASURED — the 2026-08-22 read-only reparse of
-`<maintainer evidence>\bea-asset-mirror\INDEX.jsonl` accounts for 5,464/5,464 indexed files and all
-1,361 PC AYA files. Earlier complete-member measurements and static VAs are
+`<maintainer evidence>/bea-asset-mirror/INDEX.jsonl` accounts for every indexed file and every PC AYA file
+(counts in Population and dispatch). Earlier complete-member measurements and static VAs are
 cited rather than silently re-derived.
-Specimen: `<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`, SHA-256
+Specimen: `<maintainer evidence>/bea-asset-mirror/INDEX.jsonl`, SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`;
 retail VAs cite `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 ## Population and dispatch
+
+The 2026-08-22 read-only reparse of the mirror index accounts for 5,464 of 5,464 indexed files and all 1,361 PC AYA files.
 
 The PC tree contains **1,361** `.aya` files:
 
@@ -94,10 +96,7 @@ that one function owns the whole outer envelope:
 | `0x0055D5F2` | imported `uncompress` thunk | Six-byte IAT thunk used by `CDXMemBuffer` read/open paths. |
 | `0x0055D5F8` | imported `compress` thunk | Six-byte IAT thunk used by buffered write/close paths. |
 
-Evidence: the two focused
-`ChunkReader` notes (in the decompilation notes, not yet published),
-`CChunkReader__Read` (in the decompilation notes, not yet published),
-and `import-thunks.md` (in the decompilation notes, not yet published).
+Evidence: the two focused `ChunkReader` notes, for `CChunkReader__GetNext` and `CChunkReader__Read` (in the decompilation notes, not yet published), and `import-thunks.md` on its own (in the decompilation notes, not yet published).
 The precise top-level function that opens every AYA family and its malformed
 member behavior remain unpinned.
 
@@ -108,8 +107,7 @@ member behavior remain unpinned.
   the same envelope reader.
 - **Chunking policy:** obtain writer/source evidence or compare more platform
   builds before treating 1 MiB as a format rule.
-- **Failure behavior:** use only a disposable copied profile and deliberately
-  truncate one length prefix/member; never edit the pristine shelf.
+- **Failure behavior:** use a disposable copy of the specimen and truncate one length prefix; never modify the pristine specimen copy.
 - **Search precedence and case:** a file-I/O trace across packed and loose
   resource paths is required.
 - **DLL versus internal codec work:** the imported zlib thunk establishes the

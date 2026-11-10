@@ -3,15 +3,15 @@
 > Address: `0x004ff710`
 
 Status: active multi-build static contract plus replicated bounded-runtime note
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Source File: none — no current source-crosswalk row | Binary: pristine
-`BEA.exe.original.backup`, 2,506,752 bytes, SHA-256
-`74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Last updated: 2026-11-06 (specimen roles and status words stated in plain words, Core and Level 521 defined, pointer-return clause matched to the body, Specimen line added; pinned-source citations name `references/Onslaught/`; the GetStealth and IsAThreat sources and the factory's clear are stated; earlier: research-campaign records and decompiler-style code removed)
+Source File: none — no current row in the source crosswalk of the decompilation notes (not yet published)
+Specimen: pristine `BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 Summary: exact PC transaction/scoring law, corresponding PC-demo/Xbox/PS2
-virtual-suite bodies, and replicated Level-521 call-context behavior. The
-function ran 86 times on 50 receivers; 41 gap-free returns were heap-shaped
-pointers, and every call was nested in
-`CUnitAI__UpdateTargetSupportAndFireFlags_004ff4f0` on the same receiver.
+virtual-suite bodies, and replicated Level 521 (Versus The Hive, shared with level 522; see [the level inventory](../../levels/level-inventory.md)) call-context behavior. The
+function ran 86 times on 50 receivers; 41 gap-free returns were pointer-shaped
+(outside the module image and above the small-integer band), seven of them non-null
+heap-shaped values, which is not proof of pointed-to RTTI or ownership; every call was
+nested in `CUnitAI__UpdateTargetSupportAndFireFlags_004ff4f0` on the same receiver.
 Evidence: MEASURED — independently decoded pristine instructions and console
 bodies establish static branch/order correspondence; two serialized read-only
 replays over the retained Level-521 take2 trace establish only the bounded
@@ -32,7 +32,7 @@ runtime call/return envelope.
 ## Exact transaction and scoring law
 
 The receiver's `this+0x0C` cell is a deletion-aware active-reader reference.
-The exact 52-byte `CGenericActiveReader::SetReader` body
+The exact 52-byte `CGenericActiveReader__SetReader` body
 `[0x00401000,0x00401034)` (SHA-256
 `5540848cb8c7cd9fd46fc6a2d068b76527166c61510dd33c36b2c4dc1e41dca2`)
 does same-target return, unlink-old, store-new, then register-new, matching
@@ -41,7 +41,7 @@ runtime caller-supplied retained-target gate; its only proved nonzero producer
 is the hierarchy-propagation path, which supplies literal `1`. `this+0x14` is a
 construction-fixed fast-reuse gate: base initialization writes `1`, five PC
 construction paths overwrite it with `0`, and no accepted post-construction
-writer exists. It is not a mutable refresh latch. `this+0x18/+0x1C` receive two
+writer exists (the default AI factory's clear is one of the five; see the [World 110 seeds page](../../levels/world-110-initial-constructor-seeds.md)). It is not a mutable refresh latch. `this+0x18/+0x1C` receive two
 raw helper results. B at `+0x1C` is behaviorally the ballistic-reach/line-
 clearance prerequisite; A at `+0x18` is the final aim-angle/obstruction fire
 acceptance. Those are bounded descriptions rather than recovered member/method
@@ -51,7 +51,7 @@ Fast reuse requires a non-null current target, target virtual `+0x16C == 0.0`,
 non-zero `this+0x14`, and a non-zero active/state helper. It preserves the
 reader and `this+0x10`, performs support selection, stores helper B to `+0x1C`,
 then either stores helper A to `+0x18` or explicitly zeros `+0x18` when B is
-zero. Target slot `+0x16C` is source-backed `GetStealth()`. PC retail/demo test
+zero. Target slot `+0x16C` is `GetStealth()`; the pinned tree declares it only on `CBattleEngine` (`references/Onslaught/BattleEngine.h:274`), not on the unit class. PC retail/demo test
 only x87 status bit C3, so unordered/NaN passes this one gate alongside positive
 and negative zero; Xbox's parity test and PS2's `c.eq.s` reject NaN and accept
 only ordered zero.
@@ -75,11 +75,10 @@ Deterministic primary scoring is first-match in this exact flag order:
 | `0x00000100` | `THING_TYPE_BUILDING` | `2 / config[0x16C]` |
 | `0x00008000` | `THING_TYPE_NAVAL` | `3 / config[0x170]` |
 
-Candidate virtual-table displacement `+0x164` is slot 89, source-backed as
-`CUnit::IsAThreat()`: the `CBattleEngine` primary vtable at `0x005D89C4`
-points that slot to literal-true body `0x004014A0`, exactly matching
-`BattleEngine.h:250`, while the `CUnit` primary vtable points it to
-`0x004FD440`. Owner config `+0x138` is the normalized field written by shipped
+Candidate virtual-table displacement `+0x164` is slot 89, `IsAThreat()`, source-backed by the
+`CBattleEngine` override at `references/Onslaught/BattleEngine.h:250`: the `CBattleEngine` primary vtable at `0x005D89C4`
+points that slot to literal-true body `0x004014A0`, exactly matching that line, while the `CUnit` primary vtable points it to
+`0x004FD440`; the pinned tree has no `CUnit` declaration. Owner config `+0x138` is the normalized field written by shipped
 property `CUnitIgnoreThreats` at `0x00432E50`; it is not a second candidate
 field. When `IsAThreat()` is false and `CUnitIgnoreThreats` is zero, primary is
 positive zero and the floor is skipped, but the candidate continues into the
@@ -120,8 +119,11 @@ the active/state check, B-to-`+0x1C`, and conditional A-to-`+0x18`. The common
 exit writes `+0x10=0` again. If the post-commit state or B check fails, the new
 reader remains bound and the pre-cleared result cells remain zero; there is no
 rollback. No winner still calls `SetReader(null)` before clearing `+0x10`.
-`RetailUnitAITargetTransaction` carries this ordered plan into Core without
-claiming monitor mutation or support/helper side effects.
+`RetailUnitAITargetTransaction` is implemented in the reference Core project
+(`OnslaughtRebuild.Core` in [onslaught-godot](https://github.com/dlprentice/onslaught-godot),
+the earlier fixed-point rebuild kept as reference; its simulation owner is
+`OnslaughtRebuild.Parity`, which does not carry these types) without claiming monitor
+mutation or support/helper side effects.
 
 ## Cross-build correspondence
 
@@ -140,8 +142,8 @@ stream phase, period/frequency, or every floating-point knife edge.
 Scenario: retained `level521-native-20260802-0018-take2` combat trace,
 full native replay window. Trace SHA-256
 `F7A8F93F7E499C4C92E6CC8FF5C301BDBBF1A70C80B64185E7A71A9D3A59FD5C`;
-runtime specimen SHA-256
-`E1436EF7E0AD9CCBDDD43AAACA952F6E84D4B1A282835CEAD745EFCFC32FADF4`.
+copied capture target SHA-256
+`E1436EF7E0AD9CCBDDD43AAACA952F6E84D4B1A282835CEAD745EFCFC32FADF4` (pristine plus the force_windowed patch; not pristine; see [the retail specimen baseline](../../platforms/pc/retail-specimen-baseline.md)).
 
 - Corrected replay target 0: 86 calls / 86 entries / 41 raw returns; 41
   validated gap-free return envelopes; every exact-count expectation passed.
@@ -173,11 +175,11 @@ runtime specimen SHA-256
 - Independent adjudication output SHA-256
   `2C4B7987EC08FBBFCC063C793196BD66BBF5093480B7D54899883F36AD6FF6A7`;
   promotion manifest:
-  `../unitai-targeting-runtime-replication-promotion-manifest-2026-08-24.tsv` (archived research record, not published).
-- The original run-a control design failed and remains preserved as a RED
-  plate. Promotion rests on the later preregistered corrected replay, not on a
+  `unitai-targeting-runtime-replication-promotion-manifest-2026-08-24.tsv` (archived research record, not published; not in this repository).
+- The original run-a control design failed and is kept as a record.
+  Promotion rests on the later preregistered corrected replay, not on a
   post-hoc reinterpretation of that first control.
-- The take2 recorder receipt is RECONSTRUCTED/PARTIAL: the trace bytes are
+- The take2 recorder receipt is partial and reconstructed: the trace bytes are
   hash-bound after lock release, but capture-time target hash was not
   independently bound. All claims here inherit that provenance limit and are
   bounded to this copied-runtime trace.
@@ -185,8 +187,8 @@ runtime specimen SHA-256
   pointed-to RTTI, helper side effects, scenario-specific shared-stream phase,
   RNG period/frequency, scoring-rounding knife edges, and other-level population
   remain open. The fast-reuse zero/NaN platform distinction is closed statically.
-- `RetailUnitAITargetSelection` carries the finite-domain deterministic and
-  indiscriminate transcript reducer into Core. `RetailUnitAITargetTransaction`
+- `RetailUnitAITargetSelection` is implemented in the reference Core project as the
+  finite-domain deterministic and indiscriminate transcript reducer. `RetailUnitAITargetTransaction`
   consumes its optional winner and emits the exact ordered retained-refresh,
   fast-reuse, or full-selection plan. Both remain unwired from actor state;
   autonomous population, monitor execution, and helper side effects remain open.

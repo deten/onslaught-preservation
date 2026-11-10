@@ -1,15 +1,16 @@
 # CFEPSaveGame__IsCheatActive
 
 Status: mixed — inherited cheat reference with scoped autoconfig identity correction
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (Specimen line added, source pin set to the README commit, return type stated as a boolean, callers not surveyed are marked as such; earlier: removed private-evidence references and decompiler-style code)
 Summary: retain the retail early-return behavior while separating autoconfig-test and developer-mode fields.
-Source File: `references/Onslaught/FEPSaveGame.cpp` at `5352a81cdb838b145a57f7febc5d9fc4b0129ebb` | Binary: pristine BEA.exe.original.backup, SHA-256 74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+Source File: `references/Onslaught/FEPSaveGame.cpp` at `c3d8ac464259942b83fa8aa7f867c856e77b734d` | Binary: pristine BEA.exe.original.backup, SHA-256 74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750
 
 > Address: 0x00465490 | Source: `references/Onslaught/FEPSaveGame.cpp`
 
 ## Autoconfig identity correction — September 19
 
-The first read at `00465490` concerns `00662df4`, CLIParams `+3c`, cleared
+As corrected on 2026-09-19, the first read at `00465490` concerns `00662df4`, CLIParams `+3c`, cleared
 by its initializer and set by `-autoconfigtest`. It is distinct from developer
 selector `00662dd0` (`+18`). Nonzero still takes `004654a0 → 0046551c`, returning
 one before index/name processing. The old `g_bDevModeEnabled` name was misleading;
@@ -18,13 +19,13 @@ the measured early-return behavior remains valid.
 This flag also has automation consumers. On its gated counter branch,
 `CGame__Update` clears it at `0046ea2e` and sets byte `00679ec1` at `0046ea34`.
 That observation does not audit the complete automation sequence. Source
-`FEPSaveGame.cpp`:545–564 has a different, PS2-only `mDevKit` bypass; it must
+`references/Onslaught/FEPSaveGame.cpp`:545–564 has a different, PS2-only `mDevKit` bypass; it must
 not supply the retail field identity by analogy.
 
 Private `<maintainer evidence>/test-runs/cli-startup-20260919/selector-neighbors.json`
 binds the complete enclosing bodies. This function's `[00465490,0046552b)`
 bytes have SHA-256 `39aaeea83c1a3635708e30f6329e68af2435b9c4b7904f62d0d62b4e195dc4fe`.
-The function is a member taking the cheat index and returning a 32-bit value. The remaining historical cheat effects
+The function is a member taking the cheat index and returning a boolean (a 32-bit value). The remaining historical cheat effects
 and receiver-class interpretation below were not revalidated by this correction.
 
 ## Status
@@ -100,7 +101,7 @@ Earlier notes modelled it as a `CCareer` member (receiver in ECX) taking `int ch
 
 - `CFEPGoodies::Initialize` (0x0045c870) - checks index 0 (MALLOY)
 - `PauseMenu` - checks index 3 (Maladim) for god mode toggle
-- Various game systems
+- Other callers are not surveyed in this note.
 
 ## Important Discovery
 

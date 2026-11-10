@@ -1,11 +1,11 @@
 # CBattleEngine__AddShockShake
 
 Status: active, bounded instruction and original-code contract
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (the unreproduced RNG end values marked; the source pin set to the README commit; the frontend aside dropped; earlier: removed private-evidence references and decompiler-style code)
 Summary: float threshold, replacement shake fields, separate engine/cockpit RNG and the retail no-op rumble boundary.
 Evidence: MEASURED — complete pristine bodies/callers/constants and 41 isolated original-code cases; SOURCE — pinned BattleEngine counterpart; no rendered or device acceptance.
 Specimen: pristine `BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-Source File: `references/Onslaught/BattleEngine.cpp:1094–1115`, commit `5352a81cdb838b145a57f7febc5d9fc4b0129ebb` | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: `references/Onslaught/BattleEngine.cpp:1094–1115`, commit `c3d8ac464259942b83fa8aa7f867c856e77b734d` | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 
 > Address: `0x00407940`
 
@@ -41,7 +41,6 @@ RecoilWeapon counterpart at `0x0040c355`.
 5. Read player pointer `+0x574`, then player number `+0x2c`, subtract 1 and call
    `0x00452b60` with receiver `0x0088a0a8`. This entire retail callee is `RET 4`
    (SHA-256 `e598d0c3ba86d917b177d7adde0556aa99bc355543c57aee0a3e50b684dd7e99`).
-   Its historical frontend name does not make this a frontend operation.
    The source call is TriggerRumble; pinned PC source forwards into substantive
    platform code, while this retail body has no hardware effect. The preceding
    player dereferences still occur, including when cockpit is null.
@@ -51,7 +50,11 @@ Game RNG has multiplier 48271 and the unusual modulus **214783647**, read from
 not arbitrary-precision Park–Miller with modulus 2147483647. Stored states can
 be negative; the return applies signed negation to a negative stored state.
 The controlled initial seed 1 ends after three draws at signed −649368920;
-initial seed 12345 ends at −732905716. The cockpit instead uses four CRT rand
+initial seed 12345 ends at −732905716. Neither end value comes with its per-draw
+update or a receipt, and the simple readings of that arithmetic (plain or wrapped products,
+C or floor remainders) do not reproduce either one, so both are unreproduced here. The
+cheapest check is an original-code run from each seed that records the stored state and
+the returned value after every draw. The cockpit instead uses four CRT rand
 calls and a separate thread-data seed. Its presence must not add four draws
 to the gameplay stream.
 

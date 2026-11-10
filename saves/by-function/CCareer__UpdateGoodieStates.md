@@ -1,9 +1,10 @@
 # CCareer__UpdateGoodieStates
 
 Status: mixed — reset-time execution rechecked; broader unlock claims retain their dated evidence
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (reset-result scope stated; table names used; falsifier restated without byte columns; specimen line added)
 Summary: original reset produces nine instruction states; canonical progression reads and separate pending/count bookkeeping matter.
 Source File: `references/Onslaught/Career.cpp` (partial-source comparison) | Binary: pristine `BEA.exe.original.backup`; selected instructions and original reset execution are linked below.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: 0x0041c470 | Source: `references/Onslaught/Career.cpp`
 
@@ -11,7 +12,7 @@ Source File: `references/Onslaught/Career.cpp` (partial-source comparison) | Bin
 - **Verified vs Source:** inherited partial-source comparison; the September 20 original-code reset check below does not certify all unlock rules.
 
 ## Purpose
-Complex goodie unlock logic. This is the master function that evaluates all goodie unlock conditions including kill thresholds, level completion, grade milestones, and special conditions.
+Complex goodie unlock logic. This function computes goodie unlock states. This document covers the checked reset result, a static recheck of its helpers, and the level 100 predicate sites; it does not cover every unlock condition.
 
 ## Signature
 A `CCareer` member with no arguments and no return value (`CCareer::UpdateGoodieStates()` in the source).
@@ -35,10 +36,10 @@ A `CCareer` member with no arguments and no return value (`CCareer::UpdateGoodie
 - Source logic: `references/Onslaught/Career.cpp` (`CCareer::UpdateGoodieStates()`) and `references/Onslaught/FEPGoodies.cpp` (goodies[] data)
 - Binary: `CCareer__UpdateGoodieStates` at `0x0041c470` (uses `& 0x00FFFFFF` masks before threshold compares)
 - Supporting helpers now source-mapped:
-  - `CGrade__ctor_char` (`0x00420ab0`) from `CGrade(char g)`
-  - `CGrade__operator_gte` (`0x00420ac0`) from `CGrade::operator >=`
+  - `CGrade__ctor` (`0x00420ab0`) from `CGrade(char g)`
+  - `CGrade__operator>=` (`0x00420ac0`) from `CGrade::operator >=`
   - `CCareer__GetNode` (`0x00420af0`) from inline `CCareer::GetNode(int)`
-  - `CCareer__NodeArrayAt` (`0x00421970`) compiler-emitted `node_base + index*0x40` helper used in one unlock branch
+  - `CSArray<CCareerNode,100>__operator[]` (`0x00421970`) compiler-emitted `node_base + index*0x40` helper used in one unlock branch
 
 ## September 20 original reset execution
 
@@ -56,7 +57,7 @@ receiver `+0`, accumulated count at `00662b20`, and first-Goodie flag at
 `00662b24`. Recompute adds pending extras and the unlocked-count delta, then
 clears receiver `+0`. The old `new_goodie_count` name for that object field was
 misleading. Partial source agrees at `Career.cpp:81–83,897–902` in the pinned
-reference; these addresses were independently read from the executable.
+reference; those are source line numbers. The addresses above (`00420230–0042026c`, `00662b20` and `00662b24`) were independently read from the executable.
 
 World, grade and kill predicates read canonical CAREER `00660620`, while slot
 updates use the supplied receiver. Original `0045ac30` initializes descriptor
@@ -73,24 +74,24 @@ A static recheck covered this function and seven supporting helpers:
 - `TOTAL_S_GRADES` (`0x0041c240`)
 - `CCareer__GetAndResetGoodieNewCount` (`0x00421550`)
 - `CCareer__GetAndResetFirstGoodie` (`0x00421560`)
-- `CGrade__ctor_char` (`0x00420ab0`)
-- `CGrade__operator_gte` (`0x00420ac0`)
+- `CGrade__ctor` (`0x00420ab0`)
+- `CGrade__operator>=` (`0x00420ac0`)
 - `CCareer__GetNode` (`0x00420af0`)
-- `CCareer__NodeArrayAt` (`0x00421970`)
+- `CSArray<CCareerNode,100>__operator[]` (`0x00421970`)
 
 Observations:
 
-- `CCareer__UpdateGoodieStates` still calls `CCareer__CountGoodies`, `TOTAL_S_GRADES`, the `CGrade` constructor/comparison helpers, `CCareer__GetNode`, and `CCareer__NodeArrayAt`.
+- `CCareer__UpdateGoodieStates` still calls `CCareer__CountGoodies`, `TOTAL_S_GRADES`, the `CGrade` constructor/comparison helpers, `CCareer__GetNode`, and `CSArray<CCareerNode,100>__operator[]`.
 - The four `TOTAL_S_GRADES` callsites line up with developer-item Goodies `74..77`.
 - Source inspection confirms Goodies `71..73` are explicitly marked new when `COMPLETE_LEVEL_OR_EVO(741)` is true; the related episode-instruction logic marks 71 in episode 7 and 72/73 in episode 8, even though the normal Goodies wall coordinate mapping still skips from 70 to 74.
 - Kill-threshold branches mask packed kill counters with `0xffffff`, matching the current true-view save docs.
 - The function updates the aggregate new-goodie counter global consumed by `CCareer__GetAndResetGoodieNewCount`.
 - The function updates the first-goodie flag global consumed by `CCareer__GetAndResetFirstGoodie`.
-- No game launch, rename map, signature edit, or executable patch was performed for this read-back.
+- No game launch or executable patch was performed for this read-back.
 
 ## Level 100 (training is not exempt)
 
-MEASURED 2026-08-19 against official specimen `74154bfa…7750`. Training
+MEASURED 2026-08-19 against pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`. Training
 skips **kill accumulation** (`CCareer__UpdateThingsKilled` `cmp eax, 0x64`
 at `0x0041c188`) but this body still runs. World `100` is not a special
 early-out.
@@ -99,24 +100,25 @@ early-out.
 | --- | --- | --- |
 | 0 | walk `0x00660634` `cmp [edx], 0x64` / hit `0x0041c527` → `cmp [node+4], 1` then `[this+0x1f44] = 2` if state `<= 1` | complete world 100 |
 | 8 | same walk at `0x0041c7f2` / hit `0x0041c84f` → `[this+0x1f64] = 2` | complete world 100 |
-| 78 | `0x0041de68` `push 0x43` (`'C'`) `CGrade__ctor_char`; `push 0x64`; `CCareer_T3_0041c330`; `CGrade__operator_gte`; `CCareer__GetGoodiePtr(0x4e)` store `2` | `GRADE(100) >= C` |
-| 121 | `0x0041ea4f` `push 0x42` (`'B'`); same helpers; `GetGoodiePtr(0x79)` | `GRADE(100) >= B` |
-| 164 | `0x0041f70e` `push 0x41` (`'A'`); same helpers; `GetGoodiePtr(0xa4)` | `GRADE(100) >= A` |
+| 78 | `0x0041de68` `push 0x43` (`'C'`) `CGrade__ctor`; `push 0x64`; `GRADE`; `CGrade__operator>=`; a goodie-pointer accessor (not named here) `(0x4e)`, store `2` | `GRADE(100) >= C` |
+| 121 | `0x0041ea4f` `push 0x42` (`'B'`); same helpers; a goodie-pointer accessor (not named here) `(0x79)` | `GRADE(100) >= B` |
+| 164 | `0x0041f70e` `push 0x41` (`'A'`); same helpers; a goodie-pointer accessor (not named here) `(0xa4)` | `GRADE(100) >= A` |
 
 `CGrade::operator>=` treats `'S'` as above every other grade
 (`Career.h:35`). A FillOut ranking of `1.0f` that survives the
 score-time arm therefore unlocks 0, 8, 78, 121, and 164 together.
-`0x0041e4a7` `push 0x64` is `GetGoodiePtr(100)` (concept-art band), not
+`0x0041e4a7` `push 0x64` is a call to a goodie-pointer accessor (not named here) with argument 100 (concept-art band), not
 world 100.
 
-Cheapest falsifier: `0x0001c4c7` is not `83 3a 64`, **or** `0x0001de68`
-is not `6a 43` (next insn is `lea ecx,[esp+0x16]` at `0x0001de6a`),
-**or** `0x0001ea4f` is not `6a 42` (the preceding byte is `00`), **or**
-`0x0001f70e` is not `6a 41`.
+Cheapest falsifier: the instruction at `0x0001c4c7` is not `cmp [edx], 0x64`,
+**or** the instruction at `0x0001de68` is not `push 0x43` (the next instruction
+is `lea ecx,[esp+0x16]` at `0x0001de6a`), **or** the instruction at
+`0x0001ea4f` is not `push 0x42`, **or** the instruction at `0x0001f70e` is
+not `push 0x41`.
 
 ## Related Functions
 - [CCareer__Update](../../mechanics/career/CCareer__Update.md) - Calls this after mission updates
 - [CCareer__UpdateThingsKilled](CCareer__UpdateThingsKilled.md) - Kill counts affect unlocks
 - [TOTAL_S_GRADES](../../mechanics/career/TOTAL_S_GRADES.md) - S-rank milestone checks
-- CCareer__GetAndResetGoodieNewCount (in the decompilation notes, not yet published) - Debriefing new-goodie count consume/reset
-- CCareer__GetAndResetFirstGoodie (in the decompilation notes, not yet published) - Debriefing first-goodie consume/reset gate
+- CCareer__GetAndResetGoodieNewCount - Debriefing new-goodie count consume/reset
+- CCareer__GetAndResetFirstGoodie - Debriefing first-goodie consume/reset gate

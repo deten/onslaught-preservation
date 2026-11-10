@@ -1,9 +1,11 @@
 # Free-camera Aurore-gate bypass
 
 Status: experimental copied-profile patch with bounded static and runtime evidence.
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (evidence and specimen lines added; earlier: retired AppCore/WinUI tools in the past tense)
 Summary: the branch that gates the free-camera toggle behind the Aurore cheat, the bytes that bypassed it, and the
 keyboard camera rows, with what controlled copied runs observed.
+Evidence: MEASURED — controlled copied-profile comparisons and bounded scoped runs; the byte sites are those of the named specimen.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 The rows were defined in the patch catalogue of the retired AppCore editor (Onslaught-Career-Editor [`4ac3c9ae`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/4ac3c9ae32d97c1293858c49bf9cc485eb814f28), the last commit that has it); that catalogue is retired and this note is now the record of why the rows existed and what was observed.
 
@@ -22,7 +24,7 @@ In a controlled copied-profile comparison, the clean branch received button `1` 
 
 ## Keyboard companion rows
 
-Eight mutually exclusive experimental variants redirect the same function prologue at VA `0x0041A980` / file offset `0x01A980` to a cave at VA `0x005A3A15` / file offset `0x1A3A15`. The cave is clean `CC` padding in the pinned Steam specimen; the earlier candidate at `0x005A3955` was rejected because it overlaps community widescreen/FOV cave space.
+Eight mutually exclusive experimental variants redirect the same function prologue at VA `0x0041A980` / file offset `0x01A980` to a cave at VA `0x005A3A15` / file offset `0x1A3A15`. The cave is clean `CC` padding in the pinned Steam specimen (`BEA.exe.original.backup`); the earlier candidate at `0x005A3955` was rejected because it overlaps community widescreen/FOV cave space.
 
 | Variant | Input button | Camera button | Observed scoped hits |
 | --- | ---: | ---: | ---: |

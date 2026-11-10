@@ -1,13 +1,13 @@
 # Retail save format
 
 Status: active — the saves folder index
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (every top-level saves document now has a row in the Documents table; earlier: retired AppCore/WinUI tools in the past tense)
 Summary: the fixed 10,004-byte `.bes` career format and the documents that describe it.
 
 This directory documents the observed fixed 10,004-byte (`0x2714`) `.bes`
 career format used by the supported retail/Steam specimen. An editor starts from
 a real baseline, preserves unknown bytes and file size, and writes only fields
-selected by the user; the companion's `CareerSave` (Onslaught-Career-Editor) does so.
+selected by the user; the Onslaught Companion in Onslaught-Career-Editor (`CareerSave`) does so.
 
 ## Documents
 
@@ -22,6 +22,16 @@ selected by the user; the companion's `CareerSave` (Onslaught-Career-Editor) doe
 | [`goodies-system.md`](goodies-system.md) | Displayable Goodie slots and states |
 | [`kill-tracking.md`](kill-tracking.md) | Lower-24-bit counters and metadata preservation |
 | [`career-save-format-semantics.md`](career-save-format-semantics.md) | Released serializer/load modes, dynamic size law, and demo cross-build proof |
+| [`career-progression-static-bridge-contract.md`](career-progression-static-bridge-contract.md) | Where each career-progression concern is documented, from source vocabulary to retail save bytes |
+| [`cpcmemorycard-pc-save-backend-semantics.md`](cpcmemorycard-pc-save-backend-semantics.md) | How the released PC build maps the console-shaped memory-card interface onto ordinary `.bes` files |
+| [`frontend-save-load-semantics.md`](frontend-save-load-semantics.md) | The released PC frontend save and load transaction, and where it diverges from the source |
+| [`options-control-bindings.md`](options-control-bindings.md) | Control bindings: what preset execution establishes, with remapping and key capture bounded |
+| [`public-save-options.md`](public-save-options.md) | Public rules for `.bes` saves and `defaultoptions.bea`: fixed size, unknown bytes preserved, edits on copies only |
+| [`save-goodies.md`](save-goodies.md) | Where the Goodie states live in a `.bes` save, and the corrections an editor must keep |
+| [`save-kills.md`](save-kills.md) | Kill counter and metadata lookup |
+| [`save-ranks.md`](save-ranks.md) | Rank float and bit-pattern lookup |
+| [`save-structs.md`](save-structs.md) | `.bes` and CCareer struct layout lookup |
+| [`save-options-startup-compatibility.md`](save-options-startup-compatibility.md) | Startup and serialization behaviour independently rechecked, and the save and settings compatibility boundaries that remain |
 
 ## Quick layout
 

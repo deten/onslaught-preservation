@@ -1,11 +1,11 @@
 # CCareer__GetGradeFromRanking
 
 Status: active, bounded static and original-code contract
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Summary: ranking produces a 16-bit character in AX; the saved full-int return is wrong, and negative ranking selects E.
+Last updated: 2026-11-06 (source pin set to the README commit, summary wording, the -1 correction names the claim it corrects; earlier: removed private-evidence references and decompiler-style code)
+Summary: ranking produces a 16-bit character in AX; the earlier analysis's full-integer return type is wrong, and negative ranking selects E.
 Evidence: complete pristine bodies and 14 caller windows; 19 isolated original-code cases, not save/UI acceptance.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-Source File: `references/Onslaught/Career.cpp:1178` and `Career.h:150`, commit `5352a81cdb838b145a57f7febc5d9fc4b0129ebb` | Binary: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+Source File: `references/Onslaught/Career.cpp:1178` and `Career.h:150`, commit `c3d8ac464259942b83fa8aa7f867c856e77b734d` | Binary: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: `0x00421470`
 
@@ -35,8 +35,9 @@ With invalid floating-point exceptions masked:
 1. Compare ranking against `1.0f` at `0x005d8568`. `TEST AH,0x40` selects
    character `S` for equality **or unordered comparison**.
 2. Otherwise compare against zero at `0x005d856c`. Nonpositive ranking selects
-   `E`. The former note's claim that `-1` displays no letter is disproved for
-   this function; actual presentation is a separate caller/UI question.
+   `E`. [save-ranks.md](../../saves/save-ranks.md) says that `-1` shows no letter.
+   For this function `-1` returns `E`, so that claim does not hold here;
+   whether a letter is displayed is a separate caller/UI question.
 3. For the remaining finite inputs, multiply by `4.0f` at `0x005d85bc`, store
    a binary64 argument and call retail `_floor` at `0x0055dfe7`. Convert its
    result to a signed qword with FISTP, use the low byte, and subtract it from

@@ -1,7 +1,7 @@
 # Dropships: flight
 
-Status: active static contract for the rebuild's U-17 and World 110 landing craft
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Status: active — static contract for the [C# Godot rebuild](https://github.com/dlprentice/onslaught-godot)'s U-17 and World 110 landing craft
+Last updated: 2026-11-06 (Core-only identifiers attributed to the earlier Core project, live Parity file named; earlier: research-campaign records and decompiler-style code removed)
 Summary: how a `CDropship` moves each tick while flying: the order of its Move, the guide's
 steering targets and thrust, damping and the speed cap, turning, goal setting and what ends a
 leg. Landing, unloading and the AI are in [dropship landing](dropship-landing.md).
@@ -64,9 +64,11 @@ The air-unit step `0x00402fa0`, in order (all stores float32):
    - the Euler step (slot 77, `0x004fa4b0`) when slot 76 allows it and the target Euler
      `+0x120` differs from the current `+0x114` by exact compare (`0x004fa925-0x004fa97a`).
 
-The rebuild's `RetailPlaneMotion` and `RetailUnitEuler` already follow this order and the slot-77
-arithmetic for planes. A dropship differs in its guide, its slots 45 and 73, its Move wrapper
-and state arm, and its turn rates.
+The earlier `OnslaughtRebuild.Core` project's `RetailPlaneMotion` and `RetailUnitEuler` already follow this order
+and the slot-77 arithmetic for planes. The live Parity owner's dropship motion is `DropshipMotionController.cs`
+([parity record](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/PARITY.md), 2026-10-17 entry);
+this note does not check whether it follows this order. A dropship differs in its guide, its slots 45 and 73,
+its Move wrapper and state arm, and its turn rates.
 
 ## Steering
 
@@ -111,7 +113,7 @@ Slot 77 (`0x004fa4b0`) steps each Euler angle toward its target by
 to [−π, π], pitch unwrapped. It then rebuilds the matrix `+0x3c`. With the dropship's rates this
 is at most `+0xb8` of yaw and `+0xb8 / 4` of pitch or roll per tick. The exact operation order
 is recorded in `CComplexThing.cpp.md` (in the decompilation notes, not yet published) and
-implemented by the rebuild's `RetailUnitEuler`.
+implemented by the earlier `OnslaughtRebuild.Core` project's `RetailUnitEuler`.
 
 ## Goals
 

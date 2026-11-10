@@ -1,7 +1,7 @@
 # `CSoundManager` shared audio-policy semantic recovery
 
-Status: active, bounded semantic recovery
-Last updated: 2026-10-22 (VALIDATION citations pinned to sections)
+Status: active — bounded semantic recovery
+Last updated: 2026-11-06 (source commit named as the README pins it; receipt paths written as maintainer-evidence placeholders; GDC deck linked; earlier: VALIDATION citations pinned to sections)
 Evidence: MEASURED — September 27 original event-queue and intercepted sample-lookup execution; September 20 volume/event/backend execution retains its date. Earlier source/demo/deck analysis below remains bounded evidence.
 Verdict: event acquisition preserves the existing active head and inserts after a selected node; earlier head-insertion wording is corrected. Device, mixer and audible behavior retain explicit limits.
 
@@ -53,8 +53,8 @@ It is bound to source hashes and freshly decoded original bytes. The source name
 also correct GetSoundEvent and GetSample and give their relevant arguments as
 insert_after_head and music; the physical interfaces are unchanged. Earlier
 interface notes remain fallible; identity is a narrower
-claim than complete behavior. Source references below use the pinned commit
-`5352a81cdb838b145a57f7febc5d9fc4b0129ebb`.
+claim than complete behavior. Source references below use the README's pinned commit,
+`c3d8ac464259942b83fa8aa7f867c856e77b734d`.
 
 Consequential fresh instruction findings:
 
@@ -135,10 +135,8 @@ both gates, callee-saved registers, stack balance and call arguments.
 
 The two altered-copy controls invert the initialized gate or the matched-name
 reload gate; each produces the predicted contrary result. Receipts and complete
-input/output files are in the existing private sound owner under
-`sample-lookup-4qft4rv1/` and `sample-lookup-kv0o1crh/`; drivers are
-`original_sample_lookup.py` and `original_sample_lookup_v2.py`. The latter
-variant supplies the nonzero upper-ECX witness. No real device, sample resource,
+input/output files are in the private sound evidence, `<maintainer evidence>/…/sample-lookup-4qft4rv1/` and `<maintainer evidence>/…/sample-lookup-kv0o1crh/`. The second variant
+supplies the nonzero upper-ECX witness. No real device, sample resource,
 non-ASCII comparison, allocator/lifetime or audible result is established.
 
 ## September 20 independent volume/event recheck
@@ -235,7 +233,7 @@ Its interface is
 
 ## First-party architecture join
 
-Jeremy Longley's 2003 GDC deck describes a shared `CSoundManager` interface
+[Jeremy Longley's 2003 GDC deck](../README.md#first-party-source) describes a shared `CSoundManager` interface
 over platform-specific sound managers and samples. The pristine PC executable
 independently preserves `SoundManager.cpp`, `pcsoundmanager.cpp`, `CSample`,
 `CPCSample`, `IAudibleThing`, and the fixed-pool warning. The released bodies

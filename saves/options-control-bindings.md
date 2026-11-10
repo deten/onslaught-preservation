@@ -1,7 +1,7 @@
 # Control Bindings (Options Entries)
 
 Status: active bounded contract; complete remap/input acceptance pending
-Last updated: 2026-10-22 (VALIDATION citations pinned to sections; neutral evidence wording)
+Last updated: 2026-11-06 (dead save-format pointer repaired; evidence and one label given for the notes)
 Summary: original preset execution establishes initialized-table replacement and device fallback; separate reconstruction comparisons bound remapping and key capture on authored runtime bindings.
 Source File: binary-derived contract; no exact partial-source body asserted. Binary: pristine `BEA.exe.original.backup`.
 Evidence: MEASURED — selected pristine instructions, direct/composed preset controls and the separately dated remap/key-capture comparisons below; historical UI mappings retain their original limits.
@@ -11,7 +11,7 @@ This documents the **0x20-byte “options entries”** block in `.bes` / `defaul
 
 The key finding is that these “options entries” are not generic settings blobs; they are **persisted control bindings** (two slots per action) plus a small remap state machine.
 
-Related save-file doc: [`save-format.md`](save-format.md) (Region 3: Options Block + Tail).
+Related save-file doc: [`save-format.md`](save-format.md) ([Options entries](save-format.md#options-entries) and [Tail snapshot](save-format.md#tail-snapshot)).
 
 ## File Layout Summary
 
@@ -296,7 +296,7 @@ The remap pipeline uses these globals:
 | 0x00677d74 | `g_ControlRemapArmed` | Capture state flag (byte) |
 | 0x006290b4 | `g_ControlRemapActive` | UI “remap active” flag (byte) |
 
-## Notes / Open Questions
+## Notes
 
-- Mapping `entry_id` to “semantic actions” is confirmed from the retail UI code path: `ControlsUI__RenderBindingsList` (`0x00455010`) assigns `action_code = rowIndex + 0x37` and renders labels via `Localization__GetStringById(action_code)`, and `Controls__DispatchRemap` maps that `action_code` to the persisted `entry_id` values shown above.
-- `0x00456190` is reached only as an installed callback, so it was recorded as a code label rather than as an ordinary function entry point.
+- Mapping `entry_id` to “semantic actions” is confirmed from the retail UI code path (the Key Functions rows above name both functions, and the dispatch table above is the observed mapping in the specimen named in the header): `ControlsUI__RenderBindingsList` (`0x00455010`) assigns `action_code = rowIndex + 0x37` and renders labels via `Localization__GetStringById(action_code)`, and `Controls__DispatchRemap` maps that `action_code` to the persisted `entry_id` values shown above.
+- The `Controls__RemapCaptureKeySink` entry in the Key Functions table is reached only as an installed callback, so it is a code label with a descriptive identity, not an ordinary function entry point.

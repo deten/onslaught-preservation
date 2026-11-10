@@ -4,6 +4,7 @@ Status: active bounded retail size contract
 Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
 Summary: counts initialized active binding rows; this is allocation sizing, not loader validation.
 Source File: `references/Onslaught/Career.cpp` (partial-source comparison) | Binary: pristine `BEA.exe.original.backup`; September 19 byte/control evidence is linked below.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: 0x00421430 | Source: `references/Onslaught/Career.cpp`
 
@@ -26,14 +27,13 @@ A `CCareer` member with no arguments that returns the save size in bytes as an `
 | Version word | 2 |
 | Fixed CCareer dump | 0x24BC |
 | Options entries | 0x20 * N |
-| Tail snapshot (`OptionsTail_Write`) | 0x56 |
+| Tail snapshot (`CCareer__WriteOptions`) | 0x56 |
 | **Total** | **0x2514 + 0x20 * N** |
 
 ## Notes
-- 2026-02-13: MCP signature set to `int CCareer__GetSaveSize(void)` and read-back verified via `functions_get`.
 - Used by save system to allocate buffers
 - September 19: the original single-binding initializer and this complete 52-byte body execute in the [startup controls](../save-options-startup-compatibility.md#september-19-independent-recheck), producing 10,004 bytes. Raw PE zero-filled storage is not an initialized table. Traversal uses 32-byte stride, not a linked list.
-- For this project/tooling: treat save files as fixed `0x2714` bytes (do not resize) and preserve all bytes in options/tail regions.
+- Saves of the observed Steam retail build are `0x2714` bytes. A tool that rewrites one keeps that size and every byte of the options and tail regions.
 
 ## Related Functions
 - [CCareer__Save](CCareer__Save.md) - Uses this size

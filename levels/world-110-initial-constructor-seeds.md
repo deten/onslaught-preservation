@@ -2,8 +2,9 @@
 
 Status: accepted authored-data and bounded Unit static admission; the rebuild code it describes was
 retired on 2026-09-26 (see "Rebuild pointers")
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
-Verdict: until 2026-09-26, Core admitted all 40 exact World-110 RLWD initial-object rows as one
+Last updated: 2026-11-06 (retired owners and the test set marked as retired; pinned source named as c3d8ac4; pinned-source citations name `references/Onslaught/`; the evidence label, the commit references and the factory clear are corrected; Core defined; P7 named; earlier: research-campaign records and decompiler-style code removed)
+Summary: Static admission of World 110's 40 serialized initial-object rows and of the bounded Unit, tree, Building and Feature construction inputs they feed, as the retired rebuild stage handled them; no runtime construction was observed.
+Verdict: until 2026-09-26, [Core](../INDEX.md#terms) admitted all 40 exact World-110 RLWD initial-object rows as one
 immutable ordered seed projection with closed type-specific tails. These are
 serialized constructor inputs, not 40 actors, a registry, or a session. The
 September 7 extension recorded ordered Unit/child initialization and prepared the
@@ -11,7 +12,7 @@ four landing-craft turret inputs from the measured attachment calculation. It
 also retained both explicit-tree tables and constructed the base pines followed
 by the first three Buildings, SAT turret and six Features, with shared spatial
 membership, RNG and undelivered events under explicit FP/seed/resource assumptions.
-Evidence: MEASURED serialized data plus SOURCE-INFORMED field semantics — the
+Evidence: MEASURED serialized data plus SOURCE field semantics — the
 hash-pinned retail archive and RLWD reproduce every offset, record digest, raw
 word, common field, and tail; pinned `InitThing` source names the version-50
 field order and derived records. The Unit extension uses bounded pristine-byte
@@ -25,7 +26,7 @@ RLWD 76,600 bytes, SHA-256
 
 ## Rebuild pointers (2026-09-26)
 
-The rebuild types this page names were retired on 2026-09-26, together with their tests:
+The rebuild types this page names were retired on 2026-09-26:
 - the `RetailWorld110*` owners;
 - `RetailWorldInitialObjectSeedAdmission` and `RetailWorldActorDefinitionAdmission`;
 - `RetailWorldPlayerStartAdmission` (with `RetailWorldPlayerStartResolution`);
@@ -33,11 +34,10 @@ The rebuild types this page names were retired on 2026-09-26, together with thei
 - `RetailUnitConstructionAttachments` and `RetailBuildingSegments`.
 
 That separate World 110 stage never ran in the product. `Simulation` now builds World 110 from
-the materialized static world in the retail load order. That work is `c44977d3`; Level 100's
-base world is carried over in `df392cb4`. See the
-[World 110 construction order](world-110-construction-order.md).
+the materialized static world in the retail load order. Level 100's base-world carry-over is part of
+that build. See the [World 110 construction order](world-110-construction-order.md).
 
-The retired code is last present at `df392cb4`. The retail evidence on this page is unchanged:
+The retired code is no longer in the rebuild; its code is kept in Git history. The retail evidence on this page is unchanged:
 offsets, hashes, orders and values. Where the page says what Core does, it describes the
 retired code.
 
@@ -93,7 +93,7 @@ word, not interpreted as a collision volume or converted coordinate.
 ## Materializer and Core boundary
 
 `rebuild/tools/materialize_retail_assets.py` in Onslaught-Career-Editor
-now retains all seven tail cases during its one table walk. A supported retail
+retained all seven tail cases during its one table walk at commit `51129bab`; onslaught-godot's copy differs and has not been checked for this claim. A supported retail
 materialization writes deterministic compact JSON to the ignored local path
 `rebuild/OnslaughtRebuild.Core/Assets/Level110/level110-initial-object-seeds.json`.
 The schema is `onslaught.world110-initial-object-seeds.v1`; the exact 21,651
@@ -108,7 +108,7 @@ unsupported shapes, validates the exact envelope and census, snapshots every
 row, and exposes read-only typed views over the same row instances. There is no
 public arbitrary-world or caller-supplied-row admission.
 
-The 16 definition-bearing RLWD seeds join exactly to the existing RLWD subset
+Retired owner: the 16 definition-bearing RLWD seeds join exactly to the existing RLWD subset
 of `RetailWorld110LevelActors.AuthoredDefinitions`. Its 33 shared-BSWD
 definitions remain separately owned and are not fabricated as rows in this
 RLWD projection. Existing player-start, height-clamp, script/HFLD admission,
@@ -160,7 +160,7 @@ creates another grove.
 
 ### Connected base-tree prefix and numerical limits
 
-`RetailWorld110Tree` owns CThing state, exact retail XYZ, its mesh fields,
+Retired owner: `RetailWorld110Tree` owns CThing state, exact retail XYZ, its mesh fields,
 MapWho entry and persistent collision listener. `ThingBaseState` shares flags
 and type composition with the existing Actor owner without giving trees Actor
 lineage, old pose, movement or contact timestamps. Ordinary actor states remain
@@ -228,8 +228,7 @@ open. MapWho contains no local rounding-control instruction; at layer 4, 336
 actual placements differ among floor/nearest/ceiling. The first pine maps to
 (41,31) under nearest versus (41,30) under floor. The standalone index's
 integer-rounding parameter tests that particular law; it is not a complete
-alternative x87 environment. Capture the control word and seed at the first
-Tree Init when desktop/runtime work is available.
+alternative x87 environment. Capture the control word and seed at the first Tree Init in a copied runtime (open).
 
 The startup path now narrows those unknowns. `CGame::InitRestartLoop` calls
 the seed setter with 123456 at `0x46c7eb`, then publishes the stream at
@@ -251,8 +250,7 @@ Device mode flags are `0x50/0x40/0x80/0x20`, with only optional `0x100` added
 before CreateDevice at `0x52b2d6`; `FPU_PRESERVE` is absent. Microsoft's
 [device-creation contract](https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dcreate)
 specifies single precision and nearest rounding without that flag. That API
-contract makes carrying the CRT's precision forward unjustified; it does not
-measure this installation's Proton/device behavior. CreateDevice and Reset
+contract makes carrying the CRT's precision forward unjustified; it does not measure device behavior in the Windows-compatibility runtime used here. CreateDevice and Reset
 (`0x52b28d`, resize `0x52b781`) remain external boundaries. The inspected
 application load path does not reassert a standing control word. The October 1
 [precision recheck](../platforms/display/CD3DApplication__Initialize3DEnvironment__0052af00.md#precision-setup--october-1-instruction-recheck)
@@ -294,8 +292,8 @@ their exact hashes were measured directly. No retail process was opened.
 | Startup precision request `[0x560cb1,0x560cc3)` | 18 | `38dcf78aa3dab9d5e661a8e7fbaabcbab0399decb645b9d088bed196a65eef42` |
 | Device environment `[0x52af00,0x52b754)` | 2,132 | `bf98f3c6884486a9f4d40fed2a60d1b21641ea622fa85eb2aaeddc99a1a60379` |
 
-Pinned GPL source `thing.cpp:27-89`, `InitThing.cpp:68-86`,
-`InitThing.h:76-109,360-369`, and `engine.h:22` supply the base lifecycle,
+Pinned GPL source `references/Onslaught/thing.cpp:27-89`, `references/Onslaught/InitThing.cpp:68-86`,
+`references/Onslaught/InitThing.h:76-109,360-369`, and `references/Onslaught/engine.h:22` supply the base lifecycle,
 initializer defaults and big-list threshold; Tree and MapWho sources are absent.
 
 The former test-only World110 `Simulation` route ran Level100's Setup against
@@ -319,7 +317,7 @@ class enrichment, mesh/life/contact state, squad-member formation or poses,
 spawner initialization, path construction, script startup, `CStart::Init`, a
 Battle Engine or player, actor IDs, registry/world-list publication, nested
 construction failure policy, state hashing, `Simulation`, `InteractiveSession`,
-Godot ownership, or campaign 100-to-110 play. P7 remains open.
+Godot ownership, or campaign 100-to-110 play. The World 110 generalization item of the earlier rebuild queue (called P7 in the Toolkit's PROGRAM.md) has been paused since 2026-10-15.
 
 ## Ordered Unit initialization: bounded static admission
 
@@ -327,8 +325,7 @@ The September 7 read-only check used
 `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, 2,506,752 bytes,
 SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 PE section mapping was checked before comparing retained instruction bytes.
-The ranges below are **half-open**; the function-name table's end column is
-inclusive. Every selected retained instruction, including the complete final
+The ranges below are **half-open**. Every selected retained instruction, including the complete final
 `RET`, matched the specimen. These are static contracts, not observed runtime
 values, completed constructors or a new campaign promotion.
 
@@ -342,9 +339,7 @@ values, completed constructors or a new campaign promotion.
 | BasedOn profile copy | `[0x00433390,0x00433cd4)` | 2,372 | `f41c3a1dd0d000032b4868bbdda3a3d5811ba94be54fa4c23250ce3669193cb5` |
 
 The instruction rows come from the maintainer's instruction exports. The Unit Init owner carries that
-body and fire-control evidence. The pinned GPL source remains
-`5352a81cdb838b145a57f7febc5d9fc4b0129ebb`; it contains `InitThing.h`,
-`InitThing.cpp` and `actor.cpp`, but no `Unit.cpp` or `Unit.h`. Source describes
+body and fire-control evidence. The pinned GPL source is `c3d8ac464259942b83fa8aa7f867c856e77b734d`, the pin in [README](../README.md#how-to-read-a-finding). The earlier `5352a81cdb838b145a57f7febc5d9fc4b0129ebb` snapshot has byte-identical copies of every source file this page cites, so the line citations hold at either commit. Both contain `references/Onslaught/InitThing.h`, `references/Onslaught/InitThing.cpp` and `references/Onslaught/actor.cpp`, but no `Unit.cpp` or `Unit.h`. Source describes
 common initializer fields; it does not supply the missing Unit implementation.
 The independently owned base contract is
 `Actor.cpp.md` (in the decompilation notes, not yet published).
@@ -406,7 +401,7 @@ Component-input calculation below stops before child Init.
 
 ### First three Buildings and the following Features
 
-The first three BSWD rows are Control Tower (active 1, life 100), Forseti
+BSWD row numbers here are zero-based, as in [level100-final-drone-wave.md](level100-final-drone-wave.md), so row 3 is the fourth row (the SAT turret). The first three BSWD rows are Control Tower (active 1, life 100), Forseti
 Pulse Tank Factory (active 0, life 150) and Forseti Repair Pad (active 1,
 life 80), all allegiance 0. Their authored active flag is separate from the
 career-existence gate. Row 3 is a cannon, and rows 4–9 are the six icebergs.
@@ -419,7 +414,7 @@ The normal Building wrapper is primary-table `0x5d8eb4` slot 9,
 ORs mask `0x08000020`; `init+0x8c` receives `(profile+0x13c == 0)`. It creates
 the destructible-segment controller at Building `+0x178` and its motion
 controller at Thing `+0x70`, then calls shared Unit Init at `0x41727d`.
-After Unit returns, a **core count** of zero destroys and clears those controllers.
+After Unit returns, a **core-segment count** of zero destroys and clears those controllers.
 The measured counts are 8, 5 and 2, so all three retain them.
 The subsequent order is:
 
@@ -581,14 +576,13 @@ Eligible type-1 geometry with original `+0xa4=0` creates a segment. Names whose
 first four bytes are exactly `core` or `CORE` create cores; otherwise positive
 `+0xa0` selects the swap variant, exact `x1`/`X1` selects kind 3, and the remaining
 eligible nodes create extras. Global segment publication precedes head insertion
-into the parent child list. Core ordinals count construction order, not digits
+into the parent child list. Core-segment ordinals count construction order, not digits
 in the name.
 
 Tower has **29 segments: eight cores and 21 extras**; factory has 19 (five cores
 and 14 extras); repair pad has 16 (two cores, two swaps and 12 extras). Repair
 pad's two NMIC references alias existing segment owners, so its 18 non-null
-part-array cells do not mean 18 allocations: part 5 aliases segment 17 and
-part 2 aliases segment 18. Both swap owners retain `NumNmic=1` and current
+part-array cells do not mean 18 allocations: part 5 aliases segment 17 and part 2 aliases segment 18; the index space of those two numbers is not stated here (open). Both swap owners retain `NumNmic=1` and current
 variant zero. Tower's array has 40 cells,
 including the extra null sentinel after its 39 source parts; ten emitter parts
 remain null. No segment Init creates a gameplay event, RNG draw or animation.
@@ -644,7 +638,7 @@ marks an existing entry. `Control Tower` therefore misses; it must not create
 a used-name entry. An alternate non-resource route requires the entire ordered
 parse/recursive definition catalog, not a synthetic singleton.
 
-`RetailWorld110InitialConstruction.CreateWithInitialBuildings(seed)` constructs
+Retired owner: `RetailWorld110InitialConstruction.CreateWithInitialBuildings(seed)` constructs
 the first three Buildings' bounded Core state after the actual 1,481 pines.
 `CreateWithControlTower(seed)` stops the same path after one Building. They use
 the existing registry Actor owners with exact float current/old poses and movement
@@ -673,7 +667,7 @@ The following bodies were independently read from the pristine executable:
 | Segment node traversal `[0x444c10,0x444ef8)` | `323510d8d9dd2d27a2df360948b09c92302dc2a3ebe09b30f0a1f50b4a86e29b` |
 | Segment creation `[0x4449c0,0x444bcd)` | `f538fc0c2e48a0b7fc25af510334b178def1b758608dc072b36e957ad0bfeefa` |
 | Segment scale `[0x442870,0x442884)` | `1a6ed815a122f0cf6945e94930bfda6cc696820b4f96d3c2c30cead0bce5f41e` |
-| Core scale `[0x443590,0x4435bb)` | `566fe30c70e8b9db39d7ad1a541dd62f1f8255185f64d9d111a55d5cf6790464` |
+| Core-segment scale `[0x443590,0x4435bb)` | `566fe30c70e8b9db39d7ad1a541dd62f1f8255185f64d9d111a55d5cf6790464` |
 | Subtree health `[0x442900,0x44295b)` | `d04a75d129e94c85f4f9017fd0b37e9d1d32eec7f755bb1e7c9f6ea6d632a96e` |
 | Shared AI `[0x4fe710,0x4fea24)` | `2eadfbd3a63747b453291d5b7584cb973c6b5bc239e755cfa329ccf3b16dfd1d` |
 | CRTMesh Init `[0x4dc370,0x4dc94e)` | `2bbe733893b0700b92657f7ff7573febd365e1699a45b0de2489933bd3fff99e` |
@@ -696,7 +690,7 @@ The following bodies were independently read from the pristine executable:
 
 ### SAT Cannon and the six Features on the same prefix
 
-`CreateThroughInitialIcebergs(seed)` extends those same world owners through
+Retired owner: `CreateThroughInitialIcebergs(seed)` extends those same world owners through
 BSWD rows 3–9. `RetailWorld110Actor` shares Actor pose/spatial/collision/event
 initialization; `RetailWorld110Unit` shares attachments, effects, Unit/faction
 publication and event 4003. Building retains its segment and late-grounding
@@ -743,20 +737,17 @@ It does not execute Building's later position-copy/ground-seating call.
 The Feature owner (in the decompilation notes, not yet published)
 records the six actual clamps, sectors, rejected-peer counts and sphere words.
 Each Feature adds one Actor draw and two events, with no Unit/weapon/AI/animation
-owners. The combined prefix has **1,491 spatial entries, 1,513 pending events,
+owners. The combined prefix has **1,491 spatial entries, 1,514 pending events,
 four Units, 64 segments, eight empty effect nodes and ten occupancy members**.
 Named and Unit lists contain only the first four actors. Big-list tail order
 is factory, then BSWD Features 4/5/6/8. Actor draw count is ten after the 1,481
-tree draws. SAT's events are collision, Actor, fire-control 4001, Unit4003, animation, AI;
-the counts above predate the 2026-09-25 correction and omit that 4001 event and
-its draw.
+tree draws. SAT's events are collision, Actor, fire-control 4001, Unit 4003, animation, AI;
+the pending-event total includes SAT's event 4001, which the 2026-09-25 correction added to the earlier total of 1,513. The draw count in the sentences above predates that correction and omits that event's shared draw; it is not recomputed here.
 Features append collision then Actor events to the same immediate FIFO bucket.
 
-The six `RetailWorld110CannonFeatureConstructionTests` check these connected
-states and reject legacy damage, restore, hashing and premature frame delivery.
+The six `RetailWorld110CannonFeatureConstructionTests` (retired 2026-09-26; archived research record, not published) checked these connected states and rejected legacy damage, restore, hashing and premature frame delivery.
 Mutating water assignment into Teleport destroys old signed zero; inverting
-the centre type branch changes Building spheres. Both tests fail on those
-mutations and pass after exact source restoration. Full CRTMesh/resource
+the centre type branch changes Building spheres. Both tests failed on those mutations and passed after exact source restoration. Full CRTMesh/resource
 caches, eligible collision responses, remaining actors, frame delivery,
 reset and Godot play remain open. These are static calculations and headless
 reconstruction tests, not observed retail initialization.
@@ -825,7 +816,7 @@ Its `Component` emitter references part 31, `Emit08`, under `mainbody`.
    and spawned-by readers select state 1 and queue AI event 3000 at current time.
    Profile `+0x19c == 0` eliminates its four-draw jitter branch; unwritten jitter
    fields are not initialized zeroes. After the constructor, the factory clears
-   AI `+0x14`. The guide is then created with child owner and its four-word pose;
+   AI `+0x14`, one of the five construction-path writers that the [SelectOrRefresh note](../mechanics/ai/CUnitAI__SelectOrRefreshCloseTarget-notes.md) counts (the note records no post-construction writer). The guide is then created with child owner and its four-word pose;
    Component sets `+0x278 = 99999` and clears `+0xf4/+0x268/+0x260/+0x274/+0x2bc`.
 5. Only after child Init returns does `0x00428b50` bind child `+0x26c` to the
    parent and store attachment index 1. `RET 8` proves two explicit arguments.
@@ -836,11 +827,9 @@ Its `Component` emitter references part 31, `Emit08`, under `mainbody`.
 The child Unit's event 4003 precedes the animation request, which precedes the
 AI request; parent binding follows them. Delivery uses the existing
 event-manager contract (in the decompilation notes, not yet published).
-The four initial attachment calculations now have a connected implementation in
-`RetailWorld110InitialConstruction.ComponentInitInputs`. The existing actor asset
+The four initial attachment calculations had a connected implementation in the retired `RetailWorld110InitialConstruction.ComponentInitInputs` (see Rebuild pointers). The existing actor asset
 materializes the shared local mesh pose once and its four ordered owner uses.
-Core retains actual float positions, computes the attachment with measured store
-order, then converts to child Euler inputs. The
+The retired owner retained actual float positions, computed the attachment with measured store order, then converted to child Euler inputs. The
 Unit transform owner (in the decompilation notes, not yet published)
 records cache eligibility, the constant part chain, inverse-trig correction and
 native arithmetic probe. This prepares incoming arguments; it creates no child
@@ -938,7 +927,7 @@ nonempty membership; it does not justify an empty-world adapter. Other landers,
 later events and ready-on collision remain outside this result.
 
 CPlayer itself is allocated after World.Load returns, as pinned
-`game.cpp:700–718` and retail call/store sites `0x0046cea9/0x0046cf2d` show.
+`references/Onslaught/game.cpp:700–718` and retail call/store sites `0x0046cea9/0x0046cf2d` show.
 PostLoadProcess later assigns the engine and runs Player Init. A separate
 physical Player Thing must not be invented beside the Start-created engine.
 
@@ -975,27 +964,27 @@ claimed by the new tree inputs or this static event closure.
 Level 100 and World 110 share one base world: `100_BSWD` and `110_BSWD` are
 byte-identical (35 ordinary rows, 753 ferns, 1,481 pines). What Level 100 hands
 to World 110 is which of those rows survived. Pristine specimen `74154bfa…7750`,
-static reads, 2026-09-25; pinned `Career.cpp`/`game.cpp` agree where cited.
+static reads, 2026-09-25; pinned `references/Onslaught/Career.cpp` and `references/Onslaught/game.cpp` agree where cited.
 
 - **Career table.** The retail level table at `0x00623e28` equals
-  `Career.cpp:24-60`. Row 0 is (world 100, lower child node 1 = world 110, no
+  `references/Onslaught/Career.cpp:24-60`. Row 0 is (world 100, lower child node 1 = world 110, no
   higher child, base world to update on primary completion 110, none on
   secondary). A fresh career marks every base thing as existing
-  (`CCareerNode::Blank`, `Career.cpp:91-109`: every bitmap word `0xffffffff`,
+  (`CCareerNode::Blank`, `references/Onslaught/Career.cpp:91-109`: every bitmap word `0xffffffff`,
   288 bits per node).
 - **Survivor list.** During a base load the ordinary Init loop appends one entry
   per BSWD row, in serialized order, to the world's base list at `world+0xc0`:
   a reader to the new object (`0x0050d015`), or a null entry for a skipped row
   (`0x0050d061`). The list index is therefore the BSWD row index.
 - **Level end.** `CGame::RestartLoopRunLevel` calls `FillOutEndLevelData`
-  (`0x0046d470`, at `0x0046e1cb`; `game.cpp:910-936`). Entry *i* becomes alive
+  (`0x0046d470`, at `0x0046e1cb`; `references/Onslaught/game.cpp:910-936`). Entry *i* becomes alive
   when its reader is non-null and the object's dying bit (`+0x2c` bit 2) is
   clear, otherwise dead.
 - **Career update.** Back in the front end, `CFrontEnd::Init` calls
-  `CCareer::Update` (`0x0041bd00`, at `0x00466315`; `FrontEnd.cpp:67`). Only a
+  `CCareer::Update` (`0x0041bd00`, at `0x00466315`; `references/Onslaught/FrontEnd.cpp:67`). Only a
   won level updates: the node is marked complete, its ranking raised, and
   `ReCalcLinks` (`0x0041bdf0`) copies the survivor list into World 110's node
-  bitmap (`Career.cpp:379-530`). Level 100 has no secondary target.
+  bitmap (`references/Onslaught/Career.cpp:379-530`). Level 100 has no secondary target.
 - **World 110 gate.** For each BSWD row *i* the loader calls
   `CCareer::DoesBaseThingExist(current world 0x008a9ac8, i)` (`0x0041bb20`, at
   `0x0050cf8f`). When the row's trailing world number is not −1 it also asks

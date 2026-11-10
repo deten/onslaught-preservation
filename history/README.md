@@ -22,7 +22,7 @@ This folder holds the history around the game and this documentation rather than
 
 Most of the older static findings were first worked out in a Ghidra project of the retail executable, with
 function names, signatures and comments refined over many passes. Since October 2026 the byte-matching
-decompilation is the naming and behaviour authority; the Ghidra project and the records of those passes are
+decompilation ([onslaught-decomp](https://github.com/dlprentice/onslaught-decomp)) is the naming and behaviour authority; the Ghidra project and the records of those passes are
 kept privately as history and are not published, and nothing in this repository depends on them.
 
 ## Notable Contributors
@@ -36,4 +36,4 @@ kept privately as history and are not published, and nothing in this repository 
 
 ## See Also
 
-- [Lore](https://github.com/dlprentice/Onslaught-Career-Editor/tree/main/lore) in the companion repository: full team roster, development history and community history
+- [Lore](https://github.com/dlprentice/Onslaught-Career-Editor/tree/main/lore) in Onslaught-Career-Editor (the companion app's repository): full team roster, development history and community history

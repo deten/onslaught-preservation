@@ -1,11 +1,11 @@
 # `CPCSoundManager` DirectSound backend semantic recovery
 
-Status: active, bounded semantic recovery
-Last updated: 2026-10-22 (VALIDATION citations pinned to sections)
+Status: active — bounded semantic recovery
+Last updated: 2026-11-06 (source commit named as the README pins it; the Evidence line carries no volatile count; earlier: VALIDATION citations pinned to sections)
 Evidence: SOURCE — pinned `pcsoundmanager.cpp`/`.h` and the first-party GDC
 shared/platform architecture; MEASURED — complete pristine retail bodies,
-DirectSound calls, formats, tables, constants, and twenty normalized-identical
-PC demo twins; UNKNOWN — device-driver timing and audible parity.
+DirectSound calls, formats, tables, constants, and normalized-identical
+PC demo twins (counted in the dated August 11 comparison); UNKNOWN — device-driver timing and audible parity.
 Verdict: DeviceInit's identity, interface and selected startup branches are
 re-grounded below. The dated wider backend analysis remains bounded evidence;
 it is not a claim of complete semantic recovery or audible parity.
@@ -23,7 +23,7 @@ named it `CPCSoundManager__Init`). Its complete body is `[0x005169b0,0x00516ec4)
 `db30b041040db86e32370676d6ab9ea4f6769fdff61811704a20a804363871f8`.
 The wave-reader allocation, device setup, primary-buffer format and listener
 acquisition identify the counterpart at pinned `pcsoundmanager.cpp:36–109`
-(source commit `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`). The embedded
+(source commit `c3d8ac464259942b83fa8aa7f867c856e77b734d`, the README's pin). The embedded
 retail allocation line 229 belongs to this operation. In the pinned version,
 line 229 falls inside `PlaySound`; that numeric coincidence was a misleading
 audit lead, not evidence that this body plays an event.

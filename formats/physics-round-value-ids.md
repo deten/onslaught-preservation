@@ -1,12 +1,13 @@
-# PhysicsScript round and weapon-mode value ids — resolved
+# PhysicsScript round and weapon-mode value ids: mapping and open items
 
 Status: active static contract
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Date: 2026-07-25
+Last updated: 2026-11-06 (value-id names aligned with the decompilation, function names in the decompilation's spelling; C-style conditions restated in words; the compared-pin statement, the reproduction steps, the unavailable trace receipts and the header claims corrected; earlier: research-campaign records and decompiler-style code removed)
 Summary: which record offset each round, weapon-mode, explosion and weapon value id writes, the damage chain for the tutorial rounds, and what stays open.
-Evidence: MEASURED — RTTI descriptors, vtable slots and apply bodies read from the pristine specimen, and the value ids present in the shipped `default physics.dat`; runtime sections cite their own captures; INFERRED where marked.
+Evidence: MEASURED — RTTI descriptors, vtable slots and apply bodies read from the pristine specimen, and the value ids present in the shipped `default physics.dat`; runtime sections cite their own captures, except sections 3.2.1 and 3.2.2, whose receipts are unavailable publicly; INFERRED where marked.
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`; `data/default physics.dat` SHA-256 `e1fb3dedbeb29b4b4151da2c8cbbdc940b716b1a2321e1d6a9ba1542c74ada14`.
 
-> Date: 2026-07-25. Scope: what the previously unnamed value ids in
+> Scope: what the previously unnamed value ids in
 > `data/default physics.dat` Round and WeaponMode records mean, and which
 > record offset each one writes.
 > Updated 2026-08-12 with the recovered `CRound` primary virtual surface, an
@@ -18,7 +19,7 @@ Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.origina
 > `MOV`/`FSTP` in that class's apply body, and — for the closure check — the
 > value ids actually present in the shipped `.dat`. No class name is invented.
 > No claim here rests on a code path alone; where a *behavioural* claim is
-> made it cites a measurement recorded elsewhere in the repository.
+> made it cites a measurement recorded elsewhere.
 
 Prior status: `CPhysicsScriptStatements.cpp.md` (in the decompilation notes, not yet published)
 stated for every factory that "exact value classes/layouts remain unproven."
@@ -27,8 +28,8 @@ and for the weapon (type-3) and explosion (type-7) factories as a by-product.
 
 ## 1. Method
 
-1. `CPhysicsScriptStatements__CreateStatementType5` (`0x00437490`) and
-   `...Type4` (`0x00435010`) were read statically. Each `case N` allocates
+1. `CreateRoundValue` (`0x00437490`) and
+   `CreateWeaponModeValue` (`0x00435010`) were read statically. Each `case N` allocates
    a leaf object and stores one vtable pointer, giving a complete
    **value id → vtable** map (38 round ids `0x1..0x26`; 37 weapon-mode ids
    `0x1..0x26`, id `0x7` absent).
@@ -141,6 +142,8 @@ work done by a different method on a different day.
 
 ### 3.1 The layout is corroborated by the live projectile class
 
+The names in this section are descriptive semantic labels recovered from callers and visible state changes rather than claimed original source symbols. At three of these addresses [onslaught-decomp](https://github.com/dlprentice/onslaught-decomp) holds only placeholder names; at the target-assignment body it names `CRound__SetTarget`.
+
 `CRound` (the runtime projectile actor) holds its round-definition record at
 `this+0xf0` (`CRound__ctor 0x004d81e0`, `CRound__Init 0x004d8410`). The reads
 off that pointer line up with the table above:
@@ -155,11 +158,11 @@ off that pointer line up with the table above:
   `config+0x50` (`CRoundBeam`) at `0x004db2bd` selects how the second factor
   is computed. So the check is not a time × speed = range product; its
   factors are not traced here.
-- `CRound__SetTargetReaderIfAllowed` (`0x004daab0`) and
-  `CRound__SelectBestTargetReaderAndSyncAimState` (`0x004dac90`) both gate
-  target acquisition on `config+0x48 != 0 || config+0x1c < 0.0`, i.e. on
-  `CRoundSeek` or on **negative `CRoundDamage`** — the repair-weapon case
-  (`Repair Pulse Gun` exists in the same file).
+- `CRound__SetTarget` (`0x004daab0`; section 3.3 labels it `CRound__SetTargetReaderIfAllowed`) and
+  `CRound__SelectBestTargetReaderAndSyncAimState` (`0x004dac90`) both gate target
+  acquisition when the `CRoundSeek` field (`+0x48`) is nonzero or **`CRoundDamage`
+  (`+0x1c`) is negative**: the repair-weapon case (`Repair Pulse Gun` exists in the same
+  file).
 - `CRound__Init` branches on `config+0x50` (`CRoundBeam`), `+0x6c`
   (`CRoundTorpedo`), `+0x70` (`CRoundMissile`), `+0xa0`, `+0xa4`
   (`CRoundTreeCollision`), `+0x8c` (`CRoundRadius`), `+0x98` (`CRoundLength`),
@@ -180,8 +183,8 @@ do not assert that the stripped retail linker retained an original symbol.
 
 | slot | retail -> PC demo | resolved operation | bytes | bounded retail contract |
 | ---: | --- | --- | ---: | --- |
-| 0 | `0x004D9910` -> `0x004D97F0` | `CRound__HandleEvent` | 1,078 | Switches on `event+4`: 4000 creates/schedules the configured launch path, 4001 updates impact state and conditionally dies, 4002 spawns the configured projectile then clears `+0x120` and dies, 4003 selects/synchronizes the target reader; other events delegate to `CActor::HandleEvent`. |
-| 2 | `0x004D8DC0` -> `0x004D8CA0` | `CRound__Shutdown` | 121 | Removes optional grid-of-fear/reader registrations, clears the particle/effect link and active reader, then delegates to `CComplexThing::Shutdown`. |
+| 0 | `0x004D9910` -> `0x004D97F0` | `CRound__HandleEvent` | 1,078 | Switches on `event+4`: 4000 creates/schedules the configured launch path, 4001 updates impact state and conditionally dies, 4002 spawns the configured projectile then clears `+0x120` and dies, 4003 selects/synchronizes the target reader; other events delegate to `CActor__HandleEvent`. |
+| 2 | `0x004D8DC0` -> `0x004D8CA0` | `CRound__Shutdown` | 121 | Removes optional grid-of-fear/reader registrations, clears the particle/effect link and active reader, then delegates to `CComplexThing__Shutdown`. |
 | 7 | `0x004D8290` -> `0x004D8170` | `CRound__GetClassNameString` | 6 | Returns the literal class string `CRound`; the independently linked demo returns the same string from its relocated address. |
 | 15 | `0x004D82A0` -> `0x004D8180` | `CRound__GetMaxVelocity` | 43 | Calls the round's gravity virtual; returns `160.0f` when gravity is nonzero, otherwise returns configured `CRoundVelocity` from `roundConfig+0x2c`. |
 | 16 | `0x004D8AC0` -> `0x004D89A0` | `CRound__GetRadius` | 28 | Returns `CRoundRadius + CRoundVelocity * 0.05f * 0.5f`: the authored radius plus half of one established 20 Hz movement step. |
@@ -191,21 +194,21 @@ do not assert that the stripped retail linker retained an original symbol.
 | 45 | `0x004DB600` -> `0x004DB4E0` | `CRound__Gravity` | 40 | Returns zero for the active torpedo-state branch; otherwise returns `CRoundGravity * 0.025f`. |
 | 47 | `0x004D82D0` -> `0x004D81B0` | `CRound__BounceFactor` | 10 | Returns `roundConfig+0x30` (`CRoundBounce`). |
 | 49 | `0x004D8330` -> `0x004D8210` | `CRound__CanGoUnderWater` | 10 | Returns `roundConfig+0x5c` (`CRoundUnderWater`). |
-| 50 | `0x004DB130` -> `0x004DB010` | `CRound__StartDieProcess` | 18 | Delegates to `CComplexThing::StartDieProcess` only while `this+0x120` is clear; otherwise returns false. |
+| 50 | `0x004DB130` -> `0x004DB010` | `CRound__StartDieProcess` | 18 | Delegates to `CComplexThing__StartDieProcess` only while `this+0x120` is clear; otherwise returns false. |
 | 66 | `0x004D8E40` -> `0x004D8D20` | `CRound__Move` | 2,757 | Owns per-tick beam/round movement, target-relative and velocity/config branches, transform-history updates, effect transforms, reader cleanup, and contact/lifetime dispatch. Individual branch semantics remain bounded to the visible fields and callees. |
-| 68 | `0x004D9DD0` -> `0x004D9CB0` | `CRound__DeclareOnGround` | 282 | Bouncing rounds delegate to `CActor::DeclareOnGround`; a non-bouncing, non-fire round traces/corrects the ground contact, applies effect mode 1, then enters the virtual death path. |
+| 68 | `0x004D9DD0` -> `0x004D9CB0` | `CRound__DeclareOnGround` | 282 | Bouncing rounds delegate to `CActor__DeclareOnGround`; a non-bouncing, non-fire round traces/corrects the ground contact, applies effect mode 1, then enters the virtual death path. |
 | 69 | `0x004D9EF0` -> `0x004D9DD0` | `CRound__DeclareInWater` | 60 | Arms the projectile/trail link and updates the `+0xd0` timestamp; when neither underwater nor torpedo behavior is configured, applies effect mode 2 then enters the virtual death path. |
 
 The independent input is the 2,510,848-byte PC demo `BEA.exe`, SHA-256
 `d8637dd755b21c720c0cb8f71923f94d2a04a184d90f5343c2e868ce8606e5c2`;
 the retail baseline remains
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-For all twelve compared bodies (the pin list below has fifteen; which three
-were not compared is not recorded), complete x86-32 decoding produced the same instruction
-count, offsets, sizes, mnemonics, register forms, relative branches, and literal
-constant shapes. Normalizing only relocated address/displacement encodings left
-zero instruction differences. The demo thus independently corroborates the
-entire interface, not just a shared RTTI label.
+Twelve of the fifteen pinned bodies below were compared; which three were not
+compared is not recorded. For those twelve, complete x86-32 decoding produced the same
+instruction count, offsets, sizes, mnemonics, register forms, relative branches, and
+literal constant shapes. Normalizing only relocated address/displacement encodings left
+zero instruction differences. The demo thus independently corroborates the interface of
+those twelve bodies, not just a shared RTTI label.
 
 Retail body SHA-256 pins, in the table's address order:
 
@@ -229,6 +232,8 @@ Retail body SHA-256 pins, in the table's address order:
 
 ### 3.2.1 Slot-66 runtime placement
 
+The two trace sessions are retained privately by the maintainer. Their receipts are unavailable publicly, and no path or hash for them is recorded here, so the counts and placements below cannot be checked from this repository.
+
 Two retained retail trace sessions independently reach `0x004D8E40` through
 the inherited actor slot-66 dispatcher at `0x00401AEA`. Level 522 contributes
 231 call-entry pairs over 21 session-local receivers; Level 741 contributes
@@ -250,6 +255,8 @@ Move/contact/lifetime/effect behavior. The function keeps its slot name
 `VFuncSlot_66_004d8e40`.
 
 ### 3.2.2 Slot-0 runtime routing
+
+The two recordings are retained privately by the maintainer. Their receipts are unavailable publicly, and no path or hash for them is recorded here, so the counts and placements below cannot be checked from this repository.
 
 Two retained retail recordings independently reach `0x004D9910` through the
 slot-0 caller at `0x0044B68A`. Level 521 contributes 2,531 call-entry-arm paths
@@ -405,7 +412,7 @@ explosion   Mech Pulse Hit Medium @0x4718
 ```
 
 This chain was derived, not assumed, and it is confirmed from the other end by
-an existing measurement: `SimulationConstants.ProjectileSpeedPerTick` records
+an existing measurement: [`SimulationConstants.ProjectileSpeedPerTick`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Core/SimulationConstants.cs#L660) in onslaught-godot records
 that fresh copied-Steam Level 100 runs saw pulse rounds carrying "definition
 speed 35" and moving 1.75 units per 20 Hz update. `35 / 20 = 1.75` exactly.
 
@@ -447,9 +454,9 @@ strong indication the inaccuracy unit is radians; the Mech Pulse Cannon's
 
 ### 6.2 The `0.8 + 1.0 = 1.8` chain: conditional same-receiver path closed
 
-Status: **retail `CRound::Hit` creates the configured `CExplosion`; the small
+Status: **retail `CRound__Hit` creates the configured `CExplosion`; the small
 explosion registers and scans synchronously during initialization, reaches
-`CExplosion::Hit` on the surviving original receiver when the explicit filters
+`CExplosion__Hit` on the surviving original receiver when the explicit filters
 pass, and composes the two authored values.**
 
 What changed:
@@ -468,14 +475,14 @@ What changed:
   - round damage to the struck part + explosion damage to the body → predicts
     1.8 direct and 1.0 glancing. **Both measurements survive.**
 
-Resolved on 2026-08-10: [`CRound::Hit @ 0x004D8AE0`](../mechanics/cround-hit-damage-path.md)
+Resolved on 2026-08-10: [`CRound__Hit @ 0x004D8AE0`](../mechanics/cround-hit-damage-path.md)
 loads `roundData+0x1C` at `0x004D8CE3` and passes it as the first argument to
 the struck thing's slot-40 `Damage` call at `0x004D8CEF`. The joined
 RTTI/apply-body table identifies that field as `CRoundDamage`; two replicated
 Level-521 observations preserve the same callsite and raw `0.05f` carrier.
 This kills the old concern that no round-damage consumer had been located.
 
-The same 2026-08-10 pass resolves the explosion consumer. `CExplosion::Hit`
+The same 2026-08-10 pass resolves the explosion consumer. `CExplosion__Hit`
 at `0x0044BF10` reads configured `CExplosionDamage` from `config+0x38` and
 dispatches target slot-40 `Damage` with radial falloff. For radius `R`,
 effective distance `d`, damage `D`, and explosion time `T`, retail computes
@@ -483,21 +490,21 @@ effective distance `d`, damage `D`, and explosion time `T`, retail computes
 `((R-d)*(D/T))/R`. The body is independently instruction-identical in the
 distinct PC demo after relocation normalization.
 
-The missing factory join is now resolved. `CRound::Hit` passes mode `3` to
+The missing factory join is now resolved. `CRound__Hit` passes mode `3` to
 `CRound::ProcessImpactExplosionAndEffects`; jump-table mode 3 reaches
 `0x004DA502`, reads `CRoundExplosion` from `roundData+0x08`, resolves its
 ordinal in `0x008553F8`, calls
 `CWorldPhysicsManager::CreateExplosion` at `0x004DA521`, and invokes the new
-object's slot-9 `CExplosion::Init` at `0x004DA670`.
+object's slot-9 `CExplosion__Init` at `0x004DA670`.
 
 The post-factory edge is now resolved too. Mode 3 constructs a source-shaped
 `CExplosionInitThing` with `mColType = kCollideThing`, null `mAttachedTo`, and
-false `mUseAttachedRadius`. `CExplosion::Init` therefore does not ignore the
+false `mUseAttachedRadius`. `CExplosion__Init` therefore does not ignore the
 original target by attachment identity. It installs a passive immediate
 collision configuration and, for `R <= 3`, makes the full configured radius
-live before inherited `CThing::Init` runs.
+live before inherited `CThing__Init` runs.
 
-`CThing::InitCollisionSeekingThing` allocates `CCSPersistentThing`; its slot-3
+`CThing__InitCollisionSeekingThing` allocates `CCSPersistentThing`; its slot-3
 initializer retains ready bit `0x400` because `mStartCollideOnNextFrame` is
 false and immediately scans the surrounding 3x3 MapWho sectors. The pair
 dispatcher handles an existing overlap synchronously. Persistent slot 6 then
@@ -510,15 +517,15 @@ independently corroborates that its released path passes those filters.
 
 The Twin Vulcan's `Mech Bullet Hit` explosion cannot hit anything, so the
 static prediction is the round alone, `0.08`, not `0.08 + 0.001`.
-`CExplosion::Init` (`0x0044b930`) compares the configured damage
+`CExplosion__Init` (`0x0044b930`) compares the configured damage
 (`config+0x38`) with the double `0.0015` (`0x005db298`) at `0x0044b9f1`; when
 the radius is at or below 0, or the damage at or below `0.0015`, it clears
 `TF_IN_MAP_WHO` (`0x2`) in `+0x2c` and sets the init's `mNotSeekCollisionWithBF` (`+0x70`, the
-`CInitCSThing` field at `+8`, `InitThing.h:98`) to `0xffffffff`
-(`0x0044b9fe-0x0044ba02`). `CCollisionSeekingThing::Init` copies that mask to
+`CInitCSThing` field at `+8`, `references/Onslaught/InitThing.h:98` at `c3d8ac4`) to `0xffffffff`
+(`0x0044b9fe-0x0044ba02`). `CCollisionSeekingThing__Init` copies that mask to
 the component's `+0x10` (`0x004261a9`), and the collision filter `0x00426900`
-passes only when `(other type & mask) == 0`. `Mech Bullet Hit` has damage
-`0.001` (`0x3a83126f`), so it never reaches `CExplosion::Hit`; `Mech Pulse Hit
+passes only when the other thing's type shares no bit with the mask. `Mech Bullet Hit` has damage
+`0.001`, so it never reaches `CExplosion__Hit`; `Mech Pulse Hit
 Small` (damage `0.0`) is gated the same way. A runtime hit on a Twin Vulcan
 target would still corroborate the static result. `Mech Pulse Bolt Small` remains a control in
 the other direction: `CRoundDamage 1.5` with `CExplosionDamage 0.0`.
@@ -527,7 +534,7 @@ Note also that `Mech Pulse Bolt Small` is **not** the tutorial round, despite
 `Mech Pulse Cannon` (the mode that fires it) having a very similar name. Any
 future measurement must go through `Pulse Cannon Pod`.
 
-## 7. What I could not resolve
+## 7. Open items
 
 - **The second damage call's exact mesh part and runtime trace.** Section 6.2
   closes the static same-receiver order for immediate small explosions. A
@@ -553,7 +560,7 @@ future measurement must go through `Pulse Cannon Pod`.
   class names as part of the closure check but their record offsets were not
   transcribed here; the raw export is listed below and the work is
   mechanical. Five unit ids were transcribed on 2026-09-26 from the unit
-  factory (`CPhysicsScriptStatements__CreateStatementType2`, `0x00431bb0`,
+  factory (`CreateUnitValue`, `0x00431bb0`,
   jump table `0x00432908` indexed by id − 1) and each class's slot-1 apply body:
 
   | Id | Class (vtable RTTI) | Apply body | Writes |
@@ -568,11 +575,12 @@ future measurement must go through `Pulse Cannon Pod`.
 
 ## 8. Reproduction
 
-Against the pristine specimen, read-only: read the two statement factories, resolve the
+Reproducing these steps needs a lawfully obtained copy of the pristine specimen and of the shipped `data/default physics.dat`, which this repository does not hold. The Specimen line above gives the SHA-256 values to check a copy against. Against the pristine specimen, read-only: read the two statement factories, resolve the
 type descriptor of each of the 75 vtables they install, list each vtable's five slots, and
-disassemble `0x00431b00..0x0043e700` to follow every slot-1 apply body to its terminating
-write. Then parse `data/default physics.dat` as in section 2 and check every value id it uses
-against the factory maps.
+disassemble `0x00431b00..0x0043e700` with an x86-32 disassembler to follow every slot-1 apply
+body to its terminating write. Then parse `data/default physics.dat` as in section 2 and check
+every value id it uses against the factory maps. Function names follow
+[onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), the naming authority.
 
 Consolidated id/class/offset table and the `.dat` parse output are in the
 ignored lab path `<maintainer evidence>/physics-value-ids-2026-07-25/`.

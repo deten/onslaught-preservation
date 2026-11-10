@@ -1,7 +1,7 @@
 # Event-manager scheduler semantic recovery
 
 Status: active, bounded semantic recovery
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (source commit named on the pinned-source lines; earlier: research-campaign records and decompiler-style code removed)
 Evidence: MEASURED — complete pristine retail bodies, constants, branch
 predicates, call order, state writes, and fourteen normalized-identical PC demo
 twins; SOURCE — pinned `eventmanager.cpp`, `eventmanager.h`, `event.h`, and
@@ -26,14 +26,14 @@ displacement spans. The machine-readable result is
 That 3,622-byte table has SHA-256
 `73587c4b138a6310a3139012ec6db2384aa6903acb3a63d5b52e2fa9c970c7b6`.
 
-The retained implementation is `references/Onslaught/eventmanager.cpp`, 14,523
+The retained implementation is `references/Onslaught/eventmanager.cpp` at `c3d8ac4` (the README's pin; byte-identical at `5352a81`), 14,523
 bytes, SHA-256
 `613f4628471bbc3206f61dcfa9718dc6799f56e759fa7776a5fad204ba7af893`.
-Its interface is `references/Onslaught/eventmanager.h`, 3,491 bytes, SHA-256
+Its interface is `references/Onslaught/eventmanager.h` at `c3d8ac4`, 3,491 bytes, SHA-256
 `57f39c8c9b3c413c16d0fc2b75237b1b045cd1754fd7245f871639b7518f5afc`.
 The event-record setters/destructor are independently fixed by
-`references/Onslaught/scheduledevent.cpp`, 907 bytes, SHA-256
-`510107937400260de4bb233483da6b01a6dd5da4b1584bd3c2e8f32118ad447e`.
+`references/Onslaught/scheduledevent.cpp` at `c3d8ac4`, 907 bytes, SHA-256
+`510107937400260de4bb233483da6b01a6dd5da4b1584bd3c2e8f32118ad447e`. The three files have the same SHA-256 at `5352a81`.
 
 ## Released scheduler law
 

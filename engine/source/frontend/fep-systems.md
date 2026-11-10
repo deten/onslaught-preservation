@@ -1,7 +1,7 @@
 # Frontend System
 
 Status: active source map with retail cross-checks
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (startup observations marked unconfirmed; uncited and contradicted claims corrected)
 Summary: frontend pages, save/load pages, cheats, autosave, transitions and input constants from the pinned source, cross-checked against the retail executable where an address is given.
 Evidence: SOURCE — pinned `references/Onslaught` files cited by line; MEASURED — retail addresses read from the pristine specimen; the startup-input observations below have no recorded capture.
 Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -10,14 +10,14 @@ Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766
 
 The retained static analysis below describes the normal input and `-skipfmv`
 paths. Its copied-runtime observations lack recorded captures and remain
-unconfirmed; this label correction does not revalidate them:
+unconfirmed:
 
-- Front-end page `12` is the object at `CFrontEnd + 0x4034` (retail runtime
+- Frontend page `12` is the object at `CFrontEnd + 0x4034` (retail runtime
   address `0x008A178C`) with vtable `0x005E49B4`. Its button handler at
   `0x0051B660` accepts virtual action `0x2C` while the page substate at `+0x0C`
   is zero. Its process function at `0x0051B6B0` also dispatches that action for
   a full-window mouse click and otherwise can time out to attract state `-3`.
-  The vtable's RTTI is `.?AVCFEPIntro@@`. Some saved names still call this
+  The vtable's RTTI is `.?AVCFEPIntro@@`. Some saved names from the earlier label set (see [how the findings were made](../../../history/README.md#how-the-findings-were-made)) still call this
   subobject `CFEPMultiplayerStart` (for example `0x0051b610`); they are wrong.
   The process function also dispatches `0x2C` by itself after 3.0 s when
   `[0x00662df4]` is nonzero (`0x0051b6d4`), and the timeout to attract is
@@ -40,21 +40,23 @@ full-screen FMV group. The lower video-open path at `0x00541173` also avoids
 `BinkOpen` while the flag is set. The flag is shared with the level-intro gate
 in `CGame__RunIntroFMV` (`0x0046D890`); it is not limited to that function.
 
-In a fresh app-owned Enhanced Copy, the generated launch plan and live process
-command line were `-res 1600 900 -skipfmv`, and a runtime read confirmed
-`0x00663050 == 1` (no capture or log of this run is recorded either). No input was sent to the game. The first captured retail
-frame after the window became available was already `click to start`. Thus the
-checked Steam build's `-skipfmv` path skips startup and level-intro FMV
-playback, but it does not bypass the click-to-start frontend interaction.
+In a fresh app-owned Enhanced Copy (a copy of the game that the app owns, of the kind the retired WinUI app used; see
+[the local multiplayer runtime contract](../../../platforms/local-multiplayer-static-runtime-contract.md)), the generated
+launch plan and live process command line were `-res 1600 900 -skipfmv`, and a runtime read reported
+`0x00663050 == 1` (no capture or log of this run is recorded either). No input was sent to the game. Unconfirmed: an
+unrecorded observation says the first retail frame after the window became available was already `click to start`.
+If that holds, the checked Steam build's `-skipfmv` path skips startup and level-intro FMV playback but does not bypass
+the click-to-start frontend interaction, as the controlled Steam-copy runs summarised in
+[the launch-option table](../../../platforms/command-line/cli-parameters.md) also state. A recorded capture or input log
+of this launch, with the input sent, would settle the frame observation.
 
-Without `-skipfmv`, the deterministic manual path remains: focus and observe,
+Without `-skipfmv`, the manual path the source suggests remains (unconfirmed): focus and observe,
 Space, observe the startup movie, Space, observe `click to start`, then click.
 This does not claim identical input tables or timing in other releases.
 
 ## Save/Load Frontend Pages (FEPLoadGame.cpp/h, FEPSaveGame.cpp/h, PCFEPLoadGame.cpp/h, PCFEPSaveGame.cpp/h)
 
 > Analysis added December 2025
-> **Updated December 2025**: Added critical PCFEPLoadGame/PCFEPSaveGame stub analysis
 
 The frontend save/load system reveals critical details about save validation, cheat code implementation, and **why Stuart's source code does NOT contain the retail PC save implementation**.
 
@@ -125,7 +127,7 @@ version word. There is no CRC, checksum or magic-number check.
 
 ### CRITICAL: Cheat Codes are NAME-based
 
-**Scope note:** The strings below are from the **source/internal build**. The Steam PC port uses different XOR-decrypted cheat strings (`MALLOY`, `TURKEY`, `V3R5IOF`, `Maladim`, `Aurore`, `latête`). Later Steam-build testing confirmed `Maladim` exposes a visible `God OFF` / `God ON` toggle and normal combat-damage effect; `V3R5IOF` and some exact behavior boundaries remain open. See `cheat-codes.md` (to be published here after review) for PC-port details. (Path repaired 2026-07-28 — this read `../game-mechanics/cheat-codes.md`, which from `source-code/frontend/` resolves to `source-code/game-mechanics/`, a directory that does not exist.)
+**Scope note:** The strings below are from the **source/internal build**. The Steam PC port uses different XOR-decrypted cheat strings (`MALLOY`, `TURKEY`, `V3R5IOF`, `Maladim`, `Aurore`, `latête`). Later Steam-build testing confirmed `Maladim` exposes a visible `God OFF` / `God ON` toggle and normal combat-damage effect; `V3R5IOF` and some exact behavior boundaries remain open. See [CFEPSaveGame__IsCheatActive](../../../mechanics/cheats/IsCheatActive.md) for PC-port details.
 
 **Source/internal behavior (FEPSaveGame.cpp):** Cheat codes are checked against the save game **NAME** using `strstr()`, so the code can appear anywhere in the name.
 
@@ -193,7 +195,7 @@ Save/load operations use these error codes (from MemoryCard.h):
 
 Stuart's source code is from the **internal PC development build** used during development. The retail/Steam build is a later retail build (console-port lineage) with a different **persistence layer** and a different **on-disk layout** for `.bes` (true dword view is `file_off = 0x0002 + career_off`).
 
-Encore Software was the **publisher** for the Windows release. Per Stuart (Discord, Dec 2025), the Windows retail release work was done **in-house at Lost Toys** by Jan (ex-Mucky Foot) and possibly others.
+Encore Software was the **publisher** for the Windows release.
 
 #### Evidence: PCFEPLoadGame / PCFEPSaveGame Stubs (Internal Source)
 
@@ -262,7 +264,7 @@ public:
 | `MAX_PC_SAVES` | N/A | Unlimited (file system) |
 | `SAVE_GAME_SIZE` | ~10004 | Steam retail observed (not guaranteed cross-build/platform) |
 
-Xbox had a hard limit of 4096 saves due to memory card constraints. The retail Windows build removes this limitation entirely.
+Xbox had a hard limit of 4096 saves due to memory card constraints. The retail Windows build does not remove that limit: its save-creation path enforces a maximum of 4,095 existing saves before creation (measured in the retail bodies; see [frontend save/load semantics](../../../saves/frontend-save-load-semantics.md)).
 
 #### Summary: Why This Matters
 
@@ -310,7 +312,7 @@ if (CAREER.Load(buffer, bytesread) == TRUE) {
 AutoSave modes (from `Frontend.h:155-160`):
 | Mode | Value | Description |
 |------|-------|-------------|
-| `AUTO_SAVE_NOT` | 0 | Disabled |
+| `AUTO_SAVE_NOT` | 0 | AutoSave disabled |
 | `AUTO_SAVE_NORMAL` | 1 | Standard autosave |
 | `AUTO_SAVE_PRETEND` | 2 | Debug mode (simulate) |
 
@@ -322,7 +324,7 @@ AutoSave modes (from `Frontend.h:155-160`):
 |------|---------|
 | `FEPLoadGame.cpp` | Load game frontend page (Xbox/PS2 implementation) |
 | `FEPLoadGame.h` | Load game class definition |
-| `FEPSaveGame.cpp` | Save game frontend page, **cheat code array**, Jan's debug generator |
+| `FEPSaveGame.cpp` | Save game frontend page, **cheat code array**, the internal debug generator |
 | `FEPSaveGame.h` | Save game class definition |
 | `PCFEPLoadGame.cpp` | **EMPTY STUB** - no implementation |
 | `PCFEPLoadGame.h` | **EMPTY STUB** - all methods commented out |
@@ -352,7 +354,7 @@ CFrontEnd : IController (base class - implements controller interface)
 - `CPCFrontEnd` and `CDXFrontEnd` are sibling `CFrontEnd` subclasses in the
   pinned headers; `CPCFrontEnd` does not derive from `CDXFrontEnd`
 - Xbox builds use `CDXFrontEnd` directly
-- PS2 builds use `CPS2FrontEnd` (not provided)
+- PS2 builds are inferred to use `CPS2FrontEnd`; the identifier is absent from the pinned source drop (INFERRED).
 
 ---
 
@@ -419,7 +421,7 @@ unverified:
 
 | Mode | Value | Purpose |
 |------|-------|---------|
-| `AUTO_SAVE_NOT` | 0 | Explicit save only (user must save manually) |
+| `AUTO_SAVE_NOT` | 0 | AutoSave disabled |
 | `AUTO_SAVE_NORMAL` | 1 | Auto-save after level completion |
 | `AUTO_SAVE_PRETEND` | 2 | Simulate save for stress testing (debug) |
 
@@ -557,7 +559,7 @@ All frontend rendering uses a **fixed 640x480 virtual coordinate system**, regar
 
 ### Platform-Specific Differences
 
-| Setting | PC (CPCFrontEnd) | Xbox/DX (CDXFrontEnd) |
+| Setting | Alternate source lane: CPCFrontEnd (absent from the checked Steam image) | Xbox/DX (CDXFrontEnd) |
 |---------|------------------|----------------------|
 | Texture filtering | `D3DTEXF_NONE` unless built for Xbox (`PCFrontend.cpp:44-50`) | `D3DTEXF_NONE` unless built for Xbox (`DXFrontend.cpp:111-117`) |
 | Clear color | `0x000f0f2f` | `0x001f1f3f` |
@@ -572,7 +574,7 @@ All frontend rendering uses a **fixed 640x480 virtual coordinate system**, regar
 
 ### GeForce 3 GPU Requirement
 
-The game was designed targeting GeForce 3 hardware. On other GPUs, it forces windowed mode as a fallback for compatibility.
+The game was designed targeting GeForce 3 hardware, as the pinned source's GPU check shows: on other GPUs, unless the source's forced-card option is set, it forces windowed mode and shows a GeForce 3 warning (SOURCE: `PCPlatform.cpp:43-62`; the Steam build is not checked for this).
 
 ### Debug Keys (PC Build Only)
 

@@ -1,7 +1,7 @@
 # Save functions
 
 Status: active — folder index
-Last updated: 2026-10-22 (summaries filled, titles in sentence case)
+Last updated: 2026-11-06 (one label set to the function-name table; the sentence-case note removed)
 Summary: Function-level contracts for writing, reading and sizing career saves and the options file.
 
 ## Documents
@@ -12,7 +12,7 @@ Summary: Function-level contracts for writing, reading and sizing career saves a
 | [CCareer__SizeOfSaveGame](CCareer__GetSaveSize.md) | counts initialized active binding rows; this is allocation sizing, not loader validation. |
 | [CCareer__Load](CCareer__Load.md) | raw career copy, version admission and distinct load modes; size validation belongs to callers. |
 | [CCareer__Save](CCareer__Save.md) | serializes career, active bindings and runtime tail; tail construction also refreshes the packed display-mode global. |
-| [CCareer__SaveWithFlag](CCareer__SaveWithFlag.md) | sets the live progress word before serialization; Load does not clear that word. |
+| [CCareer__SaveAndMarkInProgress](CCareer__SaveWithFlag.md) | sets the live progress word before serialization; Load does not clear that word. |
 | [CCareer__UpdateGoodieStates](CCareer__UpdateGoodieStates.md) | original reset produces nine instruction states; canonical progression reads and separate pending/count bookkeeping matter. |
 | [CCareer__UpdateThingsKilled](CCareer__UpdateThingsKilled.md) | Adds each mission's kill counts to the career totals, except on the training level. |
 | [CFEPLoadGame__StartLoad](CFEPLoadGame__DoLoad.md) | original menu-load composition preserves live volumes and conditionally forwards the entire read buffer to default-options persistence. |

@@ -1,22 +1,21 @@
 # BattleEngine Target-Acquisition Static Contract v1
 
 Status: **accepted static contract; not runtime proof**
-Last updated: 2026-10-22 (research-campaign records removed)
+Last updated: 2026-11-06 (Specimen line added; source pin set to the README commit; slice label removed; earlier: removed private-evidence references)
 Summary: the player Battle Engine lock-acquisition path from source vocabulary to retail addresses; static only.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 Schema: `battleengine-target-acquisition-static-contract.v1`
 
-Slice: `M2.3-target-acquisition-static-contract`
-
 This contract consolidates the player BattleEngine lock-acquisition path. It
 uses pinned Onslaught commit
-`5352a81cdb838b145a57f7febc5d9fc4b0129ebb` for source vocabulary while keeping
+`c3d8ac464259942b83fa8aa7f867c856e77b734d` (the README pin) for source vocabulary while keeping
 Steam-static evidence authoritative for the retail addresses and structure.
 
 ## Evidence classes
 
 - `reviewed-retail-static`: accepted current identity or structure from the
-  reviewed 2026-07-13 correction closeout.
+  2026-07-13 review of the retail identities and structures.
 - `saved-retail-structure`: address-bound structure whose saved semantic name
   is descriptive or dependent and not accepted as exact source identity.
 - `pinned-source-hypothesis`: source vocabulary or behavior that still requires

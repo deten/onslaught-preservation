@@ -1,9 +1,9 @@
 # CBattleEngine__EnableWeapon
 
 Status: active static contract
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (source pin set to the README commit; earlier: removed private-evidence references and decompiler-style code)
 Summary: source identity and ordered Walker/Jet byte-string forwarding re-derived from pristine instructions; failure and runtime limits remain open.
-Source File: `references/Onslaught/BattleEngine.cpp:3229-3234` at `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`. | Binary: BEA.exe.original.backup, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: `references/Onslaught/BattleEngine.cpp:3229-3234` at `c3d8ac464259942b83fa8aa7f867c856e77b734d`. | Binary: BEA.exe.original.backup, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 Evidence: MEASURED — complete pristine bodies and actual caller/argument transport, compared with the pinned source; static identity and structure only.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
@@ -29,7 +29,7 @@ DWORD at `+0x9c` to one.
 
 The wrapper adds no pointer validation, transaction or rollback. No claim is made
 about corrupt strings/lists, concurrent mutations or failure recovery. The
-September recheck is static; the absence of a recorded execution is not
+September 2026 recheck is static; the absence of a recorded execution is not
 evidence that the function is dormant.
 
 ## Evidence and falsifier

@@ -96,7 +96,7 @@ connects `COggLoader`, `OggVorbisStream`, `COggFileRead`,
 the DirectSound backend. It intentionally does not claim runtime decode or
 playback behavior.
 
-Part A identifies the pristine codec DLLs:
+[`platforms/pc/game-binaries.md`](../platforms/pc/game-binaries.md) identifies the pristine codec DLLs:
 
 - `ogg.dll`: 44 public libogg exports;
 - `vorbis.dll`: 35 analysis/encode/synthesis exports and 11 imports from

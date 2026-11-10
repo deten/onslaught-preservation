@@ -1,7 +1,7 @@
 # Named waypoint paths: loading, start node and following
 
 Status: active static contract for the rebuild's Level 100 and World 110
-Last updated: 2026-10-22 (private evidence paths generalised for the onslaught-preservation layout)
+Last updated: 2026-11-06 (landing craft rows corrected, test and seeds sources stated, sampler wording without a public commit, unpublished function name marked; earlier: private evidence paths generalised for the onslaught-preservation layout)
 Summary: how the loader builds each named waypoint path, which node `FollowWaypointWait`
 starts from, and how following advances and ends. It also gives the resulting routes
 for the units that follow paths from their authored positions.
@@ -28,7 +28,7 @@ level pass's per-row thing array. It reads a uint16 path count, then each path
 - Before version 33, an ordinal counted along the global waypoint list `0x00855120`
   instead (`0x00505a4c-0x00505aa4`).
 
-A waypoint (`CWaypoint::InitAndLink`, `0x005057b0`):
+A waypoint (`CWaypoint::InitAndLink` (in the decompilation notes, not yet published), `0x005057b0`):
 - has collision mask −1;
 - joins `0x00855120`;
 - binds its row's target as its next node, `+0x3c` (`0x005057f9-0x00505803`).
@@ -50,11 +50,10 @@ The result is the highest of the authored z, the ground and the water level. Ste
 cannot change it, since step 1 already raised z to the ground. The heightfield sample
 excludes water; water is the separate global.
 
-In Level 100 the lift is not small. The rebuild's Core sampler (commit `4516b7a1` on the
-rebuild branch) puts Flyby node 42, authored at z −15 inside the hillside, at the ground
+In Level 100 the lift is not small. An unpublished sampler run on retail terrain data (held as maintainer evidence) puts Flyby node 42, authored at z −15 inside the hillside, at the ground
 height −18.10, and every node over the sea at the water level −8.84: Flyby 43, Transporter
-44 and all four drone nodes. The start choices below still win by wide margins. These
-heights are the rebuild's measurement; this page has not re-sampled them.
+44 and all four drone nodes. Reproducing them needs retail terrain data, which this repository does not publish. The start choices below still win by wide margins. These
+heights are that run's output; this page has not re-sampled them.
 
 ## Following
 
@@ -104,13 +103,12 @@ heights are the rebuild's measurement; this page has not re-sampled them.
 
 - **Target chains:** 3→4; 6→7; 10→11→15; 21→22→24; 26→29; 27→30→33; 28→31→32. The
   others end the chain.
-- **Landing craft.** Both `Lander` scripts follow Lander Path 1 from the craft's
-  authored position:
+- **Landing craft.** The craft at rows 8 and 20 (script `Lander`; see [construction order](../levels/world-110-construction-order.md) lines 275-278) fly Lander Path 1 from their authored positions:
   - row 8 at (215, 422, −20) starts at row 10 (squared distance 725, against 7,782.5 for
     row 11) and flies 10 → 11 → 15;
   - row 20 at (170, 505, −25) starts at row 21 (706, against 12,942 for row 10) and flies
     21 → 22 → 24.
-  Row 23 is on the list but neither craft reaches it.
+  Row 23 is on the list but neither craft reaches it. Row 12 (`Lander2`) does not follow this path: it calls `Land()`, which lands the craft where it is. The positions of rows 8 and 20 are in the [seeds document](../levels/world-110-initial-constructor-seeds.md), lines 844 and 847. The squared distances 725 and 7,782.5 for row 8 are stated in [onslaught-godot's World110 test](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Client.Tests/World110StaticWorldManifestTests.cs#L88), which cites this page; the values 706 and 12,942 for row 20 are in none of the three onslaught-godot test files and cannot be recomputed here, because the other node positions are not published in this repository.
 - **Fighters.** Fighter Path 1 holds three separate chains. A fighter scripted to follow
   it (`MuspellFighter`, `MuspellFighter1`; no World 110 row carries either script)
   takes the chain of its nearest node.
@@ -130,9 +128,9 @@ heights are the rebuild's measurement; this page has not re-sampled them.
 
 - **Air Trainer.** The Air Trainer (row 40, `Flyby`) at (265.5, 392.5, −15) starts at
   row 42 (10,430.8, against 21,186.1 for row 41) and flies 42 → 43. It never visits
-  row 41.
+  row 41. Its position is stated in [onslaught-godot's Level100AmbientAircraftTests.cs](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Client.Tests/Level100AmbientAircraftTests.cs#L46) (line 46), and the squared distances 10,430.8 and 21,186.1 in [Level100AirTrainerFlybyTests.cs](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Core.Tests/Level100AirTrainerFlybyTests.cs#L25) (line 25); that test cites the waypoint-paths page as its source.
 - **U-17.** The U-17 (row 21, `Transporter`) at (218.5, 297.5, −15) starts at row 22
-  (846.3, against 3,486.0 for row 23) and flies 22 → 23 → 44.
+  (846.3, against 3,486.0 for row 23) and flies 22 → 23 → 44. Its position is stated in [Level100AmbientAircraftTests.cs](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/OnslaughtRebuild.Client.Tests/Level100AmbientAircraftTests.cs#L30) (line 30); the distances 846.3 and 3,486.0 are in none of the three onslaught-godot test files and have no source here.
 - **Spawned units.** Target tanks, trucks and drones follow from the point where they
   are spawned.
 

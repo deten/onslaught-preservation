@@ -7,9 +7,9 @@ raw range. `.data` VirtualSize is far larger than SizeOfRawData, so most
 runtime globals (including `g_bGodModeEnabled`, the mapping table, and
 the script objective / goodie arrays) are BSS and are not file-patchable.
 Evidence: MEASURED — PE section table and VA-to-file map re-read from the
-named specimen on 2026-08-22; hash matched. A later pass added the
+named specimen on 2026-08-22; hash matched. Later additions recorded the
 impostor / debris / mesh-LOD CVar dwords as file-backed `.data` (not BSS;
-not rewritten by SetQualityLevel). Another added the six
+not rewritten by SetQualityLevel). Further additions recorded the six
 `g_dash_*` dests (file-backed `.data`; not rewritten by
 ResetConfiguration) and `cg_meshsurfacelodbias` `0x00631EA0`.
 Specimen: `<maintainer evidence>/pristine-verification-2026-07-26/pristine-target/BEA.exe`
@@ -35,11 +35,12 @@ file bytes. A naive `VA − 0x400000` landing past `0x00261000` hits
 
 ## Consequence for the first-cut census
 
-The first-cut census rowed `g_bGodModeEnabled` `0x00662AB4` as a file-born TRUE
+An earlier first-cut census (archived research record, not published) listed
+`g_bGodModeEnabled` `0x00662AB4` as a file-born TRUE
 patch. That VA maps into `.data` BSS (`delta 0x40AB4` ≥ raw `0x3F000`).
 The zeros previously read at file `0x262AB4` are `.rsrc` bytes, not the
 flag. File-patching them would corrupt resources and would not set god
-mode. A later pass retracts that TSV row.
+mode. A later check retracted that row.
 
 Same BSS class (not file-patchable):
 
@@ -73,18 +74,11 @@ Same BSS class (not file-patchable):
 | `0x009C7558` | `SetQualityLevel` lod-table dest | 6 |
 | `0x00809598` | occupancy bitplane scratch | — |
 
-A later pass added the last five after the IScript / SendButtonAction
-pin. Another added the GetPlayer / MessageBox / GameTime /
-GetWaterHeight / HighlightHud / GetGoodieState-view VAs.
-Another added `Rand`/`GetFloatRand` `0x008A9D9C`, `GetMapHeight` `0x006FADC8`,
-the `GetNumUnits` tables `0x008551C0` / `0x00855228`, lookup
-`this` `0x00855090`, and event-manager `this` `0x00672FC8`. A final pass
-added CRTTree 45-override flag `0x00662F10`, quality-table dest
-`0x009C7558`, and occupancy scratch `0x00809598`. Same rule: never
-promote those VAs to a file row; patch the `.text` store or the
+Several rows above were added in later additions. The rule for them is the
+same: never promote those VAs to a file row; patch the `.text` store or the
 `.text` jcc that consumes them.
 
-Private `.rdata` added this cut (file-backed, patch the dword /
+Further `.rdata` rows (file-backed, patch the dword /
 qword — they are not BSS):
 
 | VA | role | address refs |

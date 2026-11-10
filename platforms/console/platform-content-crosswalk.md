@@ -2,7 +2,7 @@
 
 Status: active, bounded platform/content finding
 Date: 2026-08-22
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
+Last updated: 2026-11-06 (the Xbox table's 34-ID difference stated as a lack, placeholders replaced, PS2 receipt location stated; earlier: links updated for the onslaught-preservation layout)
 Summary: PS2's six canonical language tables are byte-identical to PC, all three
 platforms carry the same 43 mission titles, and the English character profiles
 agree; PS2-only `000` and `888` and PC/Xbox-only `201` are three distinct world
@@ -20,7 +20,7 @@ Xbox Europe/Korea/USA extracted-game ZIP members; PS2 Europe/USA inner ISOs
 SHA-256 `060d883b…9da52` / `3e1fffa9…7ce6`; PS2 USA text PDF SHA-256
 `cc4b1e0fc79517ac55f21a0fdf2be17c20d7bb878c413b7bd72c641798163ccb`.
 Verdict: the 43-title and six-language PC tables are exact authored data inside
-both PS2 retail regions, while Xbox retains a 34-ID subset. PS2 `000` is a real
+both PS2 retail regions, while the Xbox table lacks 34 of the 2,571 PC/PS2 IDs. PS2 `000` is a real
 mode-0 world-0 container of still-unknown purpose; PS2 `888` is a real mode-2
 multiplayer world; PC/Xbox `201` is a real mode-0 world absent from PS2's numeric
 resource shelf. None is an alias for another member of this three-ID family.
@@ -35,9 +35,9 @@ The inputs were read-only:
 
 - all six pristine PC retail `data/language/*.dat` files;
 - the six corresponding members inside each Xbox Europe, Korea, and USA
-  extracted-game ZIP under `<maintainer archive>`;
+  extracted-game ZIP under `<maintainer evidence>/…`;
 - the already-anchored PS2 Europe and USA retail ISO members under
-  `<maintainer archive>`, streamed from ZIP without mounting or executing them;
+  `<maintainer evidence>/…`, streamed from ZIP without mounting or executing them;
 - the installed PC English manual HTML; and
 - the PS2 USA manual's 2,412,322-byte text PDF in the read-only archive.
 
@@ -45,7 +45,7 @@ Every language table was decoded as the documented v3 layout. Comparison used
 numeric text ID, UTF-16 text, and audio-name fields independently. Token names
 came from the 2,571-row `text.stf` after signed decimal IDs were normalized to
 unsigned 32-bit values. That last step is deliberately independent of the
-known unsigned-only regex bug in `tools/language_dat_decode.py`; this result does
+known unsigned-only regex bug in `tools/language_dat_decode.py` in Onslaught-Career-Editor (commit `51129bab`); this result does
 not close that tool bug.
 
 For PS2, the language-table pass parsed the ISO9660 primary volume descriptor
@@ -53,13 +53,12 @@ and root, hashed each `DATA*.NYO` extent, then parsed the package's `RCDF` heade
 and tail index.
 The index is exact and self-bounding: a count followed by 264-byte
 path/offset/size rows. At that stage only the six canonical
-`\data\language\*.dat` members were extracted into ignored local-lab and
+`\data\language\*.dat` members were extracted into a private workspace and
 decoded; the later bounded world-role follow-up is described below.
 
 The original PC/Xbox/manual receipt is
 [`platform-content-crosswalk.tsv`](platform-content-crosswalk.tsv).
-The 13-row PS2 package/member receipt is
-`ps2-packed-content-parity-2026-08-22.tsv` (to be published here after review).
+The 13-row PS2 package/member receipt is `ps2-packed-content-parity-2026-08-22.tsv`. It is not published in this repository yet; the copy is in [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/reverse-engineering/ps2-packed-content-parity-2026-08-22.tsv) at commit `51129bab`.
 The six-row no-payload world-role receipt is
 [`resource-id-roles-000-888-201.tsv`](resource-id-roles-000-888-201.tsv).
 Raw decoded strings, extracted language members, RCDF indexes, and the page
@@ -155,6 +154,8 @@ The second pass resolves the container roles without inventing normal reach:
 | PS2 `888` | 17,638,345 bytes, SHA-256 `a3a2f8fc…eea96`; `WDAT=(-1,888)`; RLWD version 50, header id 888, mode field 2; Standard/Laser/Blaster; 3 compiled scripts | A real multiplayer world-888 AYA. The 272 logical asset occurrences include `fenrir-multiplayer.msh` and the `f_ventura*` family; the six-file loose shelf names Fenrir, Venturer, and opposing win events. | Retail `CWorld__IsMultiplayerMode` accepts mode 1 or 2, and `CGame__IsMultiplayer` accepts levels 850..899. The normal multiplayer frontend is narrower at 850..879, so 888 is not proved normally selectable. |
 | PC/Xbox `201` | PC/Xbox both carry `WDAT=(2,201)`, RLWD version 50, header id 201, mode field 0, Aquila Prototype, and 13 compiled scripts | A real world-201 container on both platforms, not a set marker. PC also installs a 16-file `level201` source shelf whose `LevelScript.msl` reuses `Level200/text.stf`. | It is absent from the 43-node career graph. The retail PC parser accepts `-level N`, but normal PC/Xbox frontend reach and PS2 routing are not proved. |
 
+Across these rows, `WDAT=(a,b)` gives the raw pair in the world's `WDAT` entry: `b` equals the RLWD header id in each row, and `a` (-1 or 2) is not identified in this repository. In each row `a` differs from the RLWD mode field.
+
 The PS2 paths remain exact RCDF facts: `000` is at package offset
 1,666,965,504 and `888` at 329,324,544. Their `WRES`, world IDs, modes,
 configurations, script counts, hashes, and logical-asset multisets all differ
@@ -163,7 +164,7 @@ from PC/Xbox `201`; neither has an exact `WRES` match anywhere in the complete
 three-member packaging-alias classifications. It does **not** prove that PS2
 lacks the authored scenario represented by world 201 under some other route.
 
-Presence is not cross-platform byte equality. The existing regional hash matrix
+Presence is not cross-platform byte equality. The existing regional hash matrix (`BUILD_AND_DUMP_MATRIX.md`, archived research record, not published)
 proves that Xbox Europe has different bytes for worlds 612, 856, and 863 while
 Korea and USA match for those resources. It also differs in `goodie_124` and
 cutscene `24.bik`. A rebuild may share campaign semantics while still selecting
@@ -231,7 +232,7 @@ spelling differences likewise do not establish divergent lore.
   inner ISOs only.
 - Xbox Korea versus USA content equality outside the 18 language members and
   already hashed exception set remains at the ZIP CRC triage boundary described
-  in `BUILD_AND_DUMP_MATRIX.md`.
+  in `BUILD_AND_DUMP_MATRIX.md` (archived research record, not published).
 - The five English content-facing edits need source chronology or a design
   reference before one wording can be called later, corrected, or canonical.
 - Language-table equality does not imply voice-file or video-stream equality.

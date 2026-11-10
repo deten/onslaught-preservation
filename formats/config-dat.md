@@ -3,14 +3,14 @@
 Status: active format contract — three unrelated DAT schemas plus one RAW asset;
 never use a generic `.dat` parser
 Date: 2026-08-28
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (function names taken from the public decompilation table; the rebuild materializer named by repository, path and commit; backslash paths corrected; earlier: research-campaign records and decompiler-style code removed)
 Verdict: worldheaders and the hash-pinned Battle Engine configuration baseline
 are byte-exact; the other two root files retain bounded, unrelated contracts.
 Evidence: MEASURED — all nine mirror-index `.dat` rows and the one `.raw` row
 were rechecked. Six DATs belong to
 [localization-text.md](localization-text.md); this file owns the remaining three
 root DATs plus `Dial.raw`.
-Specimen: `<maintainer evidence>\bea-asset-mirror\INDEX.jsonl`, SHA-256
+Specimen: `<maintainer evidence>/bea-asset-mirror/INDEX.jsonl`, SHA-256
 `c45722aeed52e77788c7886cb30b813900d3516b1c387983c442d2b02d4fe4b9`;
 retail VAs cite `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -24,8 +24,7 @@ retail VAs cite `BEA.exe.original.backup`, SHA-256
 | `worldheaders.dat` | 4,783 | `34f2f45027a165fedde0e306b61fbabf64332724ced1e7a763103248fea07524` | byte-exact parser/re-encoder |
 | `Dial.raw` | 8,192 | `2c57b657b92cd8bd73ca8c8986e8ce60aaffb065fdde09940053a2dd6d59671c` | exact bounded HUD input; general layout open |
 
-This corrects the earlier summary error: the non-localization count is **three
-`.dat` files**, not four. `Dial.raw` is separate and must not be counted as DAT.
+The non-localization root data is **three root `.dat` files plus `Dial.raw`**. `Dial.raw` is a separate RAW asset and must not be counted as DAT.
 
 ## `worldheaders.dat` exact layout
 
@@ -52,7 +51,7 @@ Strings are not NUL-terminated, padded, or aligned. In all records,
 Battle Engine configuration file; the four trailing integers remain deliberately
 unnamed.
 
-Retail routes: `CWorld__LoadWorldHeader @ 0x0050D4C0`, configuration list
+Retail routes: `CWorld__LoadHeader @ 0x0050D4C0`, configuration list
 load/skip at `0x0040F180` / `0x0040F260`, and lookup at `0x0040F2F0`.
 
 ## `battle engine configurations.dat`
@@ -70,7 +69,7 @@ scalar/name/store spans cite existing shipped-byte owners; unadjudicated strings
 and the final integer remain explicit `UNKNOWN` spans with offset, width,
 raw-byte preservation, and a cheapest falsifier.
 
-`CBattleEngineData__LoadFromMemBuffer @ 0x0040F980` is a 1,939-byte static field
+`CBattleEngineData__Load @ 0x0040F980` is a 1,939-byte static field
 consumer with 42 `CDXMemBuffer__Read` calls. Its unchecked legacy-version and
 malformed-input behavior is not reproduced: this public tool fails closed on
 wrong version, truncation, trailing slack, invalid framing, and exact-mode hash
@@ -97,7 +96,7 @@ The complete shallow framing consumes all 175,603 bytes:
 Header value 18 precedes 6,803 field/value nodes covering 185 unique type/field
 pairs and 73,796 payload bytes. The stream ends with `-1` and no unconsumed
 bytes. This is outer framing, not full field meaning. The static reload owner is
-`CWorldPhysicsManager__ReloadDefaultPhysicsAndBattleEngineData @ 0x00510800`;
+`UPhysicsManager__Reload @ 0x00510800`;
 individual value factories and consumers require their own contracts.
 
 Record and field multiplicity are now explicit. The 777 ordered records contain
@@ -108,10 +107,7 @@ field-7 effect/timeline strings differ. The two `Boat Sabre Spawner` records
 begin at `0x18C48` and `0x18E1F`; field 1 names `AV-14B Sabre Pulse Tank` in the
 first and `M-1 Broadsword Main Battle Tank` in the second. In addition, 147
 records repeat at least one field id. A parser that indexes either level with a
-plain dictionary therefore loses released data. The rebuild materializer's
-ordered parser now retains both multiplicities: its record accessor refuses an
-ambiguous name, and its field accessor refuses an ambiguous field id instead of
-silently selecting one.
+plain dictionary therefore loses released data. The rebuild materializer's ordered parser retains both multiplicities (onslaught-godot, [`rebuild/tools/materialize_retail_assets.py`](https://github.com/dlprentice/onslaught-godot/blob/e758f35179cb51d8173b170f1b3045c3327da8b6/rebuild/tools/materialize_retail_assets.py), where the change landed at commit `e758f35`): its record accessor refuses an ambiguous name, and its field accessor refuses an ambiguous field id instead of silently selecting one.
 
 ### Unit behaviour and Spawner join
 

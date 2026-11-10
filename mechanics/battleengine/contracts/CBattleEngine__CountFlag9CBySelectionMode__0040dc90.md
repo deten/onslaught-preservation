@@ -1,9 +1,9 @@
 # CBattleEngine__CountActiveWeapons
 
 Status: active static contract
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (source pin set to the README commit; the earlier audit named as private; earlier: removed private-evidence references and decompiler-style code)
 Summary: mode-selected active-weapon count re-derived from the main dispatcher and complete Jet/Walker callees.
-Source File: `references/Onslaught/BattleEngine.cpp:3245-3251` at `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`. | Binary: BEA.exe.original.backup, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: `references/Onslaught/BattleEngine.cpp:3245-3251` at `c3d8ac464259942b83fa8aa7f867c856e77b734d`. | Binary: BEA.exe.original.backup, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: `0x0040dc90`
@@ -22,7 +22,7 @@ callee's EAX is returned unchanged.
 The Jet callee counts list entries whose weapon active DWORD at `+0x9c` is
 nonzero. It uses a local iterator, leaving the shared cursor unchanged; an empty
 list yields zero. It counts active entries, not all weapons or admitted shots.
-The Walker count identity was separately re-derived in its preceding audit.
+The Walker count identity was separately re-derived in an earlier private audit (archived research record, not published).
 
 Complete bytes, source and actual receiver/callee links settle the earlier identity and
 component questions. They do not prove corrupt-list safety,

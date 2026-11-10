@@ -1,7 +1,7 @@
 # CBattleEngine__SetCollisionShape
 
 Status: active measured contract
-Last updated: 2026-10-22 (research-campaign records removed; findings unchanged)
+Last updated: 2026-11-06 (source commit named on the Source line, developer build path removed, Core paragraph cites the live Parity owner, undefined confidence number and unnamed coverage figure dropped; earlier: removed private-evidence references; findings unchanged)
 Summary: exact pristine instructions and independently matching source identify `0x004063b0` as
 `CBattleEngine::SetCollisionShape`; the former weapon-effect label is retired.
 Evidence: MEASURED — exact body, instruction-level calls/stores, compiler
@@ -9,7 +9,7 @@ file/line allocation marker, `CCylinder` RTTI/vtable, direct caller census, and
 retained source correspondence.
 Specimen: pristine `BEA.exe.original.backup`, 2,506,752 bytes, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-Source File: `references/Onslaught/BattleEngine.cpp` | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+Source File: `references/Onslaught/BattleEngine.cpp` at `c3d8ac464259942b83fa8aa7f867c856e77b734d` | Binary: BEA.exe, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 
 > Address: `0x004063b0`
 
@@ -59,7 +59,7 @@ transitive callees are side-effect-free.
 
 1. Call `this` virtual `+0x40` (`GetRadius`) and retain its float result.
 2. Allocate 32 bytes with category 21 (`MEMTYPE_BATTLEENGINE`), source path
-   `C:\dev\ONSLAUGHT2\BattleEngine.cpp`, compiled line 501.
+   `BattleEngine.cpp` (the full path string is omitted), compiled line 501.
 3. On success, call virtual `+0xc0` (`COfGHeight`), multiply it by exact
    `0.5f`, construct the `CCylinder` object with vtable `0x005d88cc`, radius
    at `+0x14`, radius squared at `+0x18`, and half-height at `+0x1c`.
@@ -74,8 +74,8 @@ interpretations are superseded.
 
 ## Callees relied on / callers
 
-Direct `.text` callers are exactly `0x0040c1db` and `0x0040c27f` in
-`CBattleEngine::HandleEvent`, after accepted 6000/6001 completion writes. The
+Direct [`.text`](../../README.md#shorthand-used-in-these-notes) callers are exactly `0x0040c1db` and `0x0040c27f` in
+`CBattleEngine::HandleEvent`, after accepted [6000/6001](../../README.md#shorthand-used-in-these-notes) completion writes. The
 retained Init source call is an exact inline twin at
 `[0x004054cb,0x0040554b)`, SHA-256
 `ef650b3bfe5f31fbec7da07daabe94f7eb8e92b20c1b7ab4b8ac35001edaf332`.
@@ -83,7 +83,7 @@ retained Init source call is an exact inline twin at
 The default receiver at `0x00426370` deletes the previous shape, owns the
 incoming pointer, and refreshes its owner-relative centre. Because the caller
 still submits null on allocation failure, that default path deletes the former
-shape and then faults during centre refresh rather than preserving it. The
+shape and then, on the static path, dereferences the null pointer during centre refresh (static reading; no runtime observation), rather than preserving it. The
 `CCylinder` collision-resolver prefix at `0x0043fe20` separately proves that
 `+0x14` is radial extent and `+0x1c` is axial half-extent.
 
@@ -101,9 +101,9 @@ on PC and Xbox.
 
 - Allocation failure produces a null shape pointer, but the body still invokes
   `mCollisionSeekingThing->SetShape(NULL)`.
-- The default receiver deletes the former shape, stores null, then faults while
-  refreshing the centre through the null pointer; it does not preserve the old
-  collider or return an error.
+- The default receiver deletes the former shape, stores null, then the static path
+  dereferences the null pointer while refreshing the centre (static reading; no runtime
+  observation); it does not preserve the old collider or return an error.
 - `mCollisionSeekingThing` and `this` are unchecked. A nondefault derived
   collision component could override slot `+0x24`; its behavior is not inferred
   from the default implementation.
@@ -112,17 +112,19 @@ on PC and Xbox.
 
 ## Runtime corroboration (bounded)
 
-A historical execution-coverage trace observed 166 of the 169 body bytes in its named
-capture. That proves execution only; it does not establish argument values,
-shape ownership, allocation success, or the post-call collision response. The
+No runtime capture of this body is cited in this record: an earlier [TTD](../../README.md#shorthand-used-in-these-notes)
+coverage trace has no receipt that can be named here, so it is not relied on. Execution coverage proves execution only;
+it does not establish argument values, shape ownership, allocation success, or the post-call collision response. The
 semantic identity and transaction here rest on pristine instructions,
 allocation/type metadata, callers, consumers, and independently matching
 retained source, not on an overstated runtime envelope.
 
-Core now consumes the collision consequence needed by Level 100 inbound actor
-rounds: a world-vertical cylinder of radius 400 mm and half-height 950 mm,
+The superseded Core reference project implements the collision consequence needed by Level 100 inbound actor
+rounds (Core is kept only as a reference; the live simulation owner is OnslaughtRebuild.Parity in onslaught-godot,
+whose `CylinderLineTests` and the [PARITY.md "Pilot-win projectile contact (2026-10-28)" entry](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/PARITY.md)
+record the retail magnitude order of `CCylinder::CollideWithLine` for the player's cylinder): a world-vertical cylinder of radius 400 mm and half-height 950 mm,
 centred 760 mm below the Core pose origin after retail Z-down is mapped to Core
-Y-up. `Level100ActorMechanics.TryResolveBattleEngineCylinderContact` first
+Y-up. `Level100ActorMechanics.TryResolveBattleEngineCylinderContact` (defined in Core only, not in Parity) first
 uses exact rational comparisons so the finite-cylinder prefilter retains side
 and cap equality without a floating tolerance. It then reproduces released
 mode 1's unusual response: candidate parameters equivalent to
@@ -137,7 +139,7 @@ other actor classes.
 The three measured Xbox builds match this response for ordinary finite inputs
 and move the marked line owner before callbacks. On a generated zero-length
 line, however, Xbox retains unordered NaN roots and writes NaN XYZ, whereas PC
-clamps the roots to zero and selects finite `P0`. Core deliberately follows the
+clamps the roots to zero and selects finite `P0`. The Core reference deliberately follows the
 pristine PC behavior. The Round producer makes a zero-length line structurally
 reachable when old and current positions are equal; occurrence in an
 unmodified play trace remains unestablished.
@@ -151,7 +153,7 @@ x87 threshold or exceptional-input equivalence is not promoted.
 
 ## Evidence
 
-- Retained source owner: `BattleEngine.cpp:495-502`; allocation expression at
+- Retained source owner: `references/Onslaught/BattleEngine.cpp:495-502`; allocation expression at
   retained line 500 versus compiled marker 501 is a one-line revision skew.
 - Direct caller pair and body bytes were independently reproduced from the
   pristine specimen.
@@ -174,8 +176,7 @@ x87 threshold or exceptional-input equivalence is not promoted.
   zero-displacement lines. The canonical 91-Round census is `19` beam + `11`
   sphere + `61` line, with line lengths `51 × 0` and `10 × 0.5f`; every
   definition has positive speed.
-- Historical coverage of 166 body bytes proves execution in its named
-  capture only; it is not needed for the semantic identity.
+- The earlier TTD coverage trace is not cited, because its capture cannot be named; the semantic identity does not need it.
 - An older source-crosswalk `NO_MATCH_FOUND` row for this address is a bounded
   historical result, not current counterevidence.
 
@@ -185,7 +186,7 @@ or final `[this+0x38]` `SetShape` submission.
 
 ## Confidence
 
-4 - exact pristine body, independently matching retained source, RTTI/layout and
+Exact pristine body, independently matching retained source, RTTI/layout and
 caller/consumer closure agree on the identity and transaction.
 
 - **High/static-exact:** PC body/range/hash, ABI, calls and stores, allocation

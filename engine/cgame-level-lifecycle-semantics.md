@@ -1,13 +1,12 @@
 # `CGame` level-lifecycle semantic recovery
 
-Status: active, bounded semantic recovery
-Last updated: 2026-10-29 (the Platform.h digest's dropped last digit restored, rehashed at the pinned commit; earlier: research-campaign records and decompiler-style code removed)
+Status: active — bounded semantic recovery
+Last updated: 2026-11-06 (volatile counts left out of the header; demo RunLevel status stated once; earlier: the Platform.h digest's dropped last digit restored, rehashed at the pinned commit; earlier: research-campaign records and decompiler-style code removed)
 Evidence: MEASURED — pristine retail bodies, direct calls, state writes, strings,
-and three normalized-identical demo twins plus one independently fixed demo
-entry plus two semantically bounded demo bodies; SOURCE — pinned `game.cpp`,
+and demo bodies (counted and stated in the body); SOURCE — pinned `game.cpp`,
 `game.h`, and `Platform.h`; UNKNOWN — exact source-revision identity and runtime
 failure paths.
-Verdict: the complete six-function level/restart lifecycle has recovered source
+Verdict: the complete level/restart lifecycle has recovered source
 identities, ownership boundaries, return codes, and bounded released behavior.
 
 Specimen: pristine PC retail `BEA.exe`, SHA-256
@@ -101,7 +100,8 @@ one-to-one source statement.
 
 The direct-call owner is
 `<maintainer evidence>/console-callback-atomic14-post-campaign-20260803-v1/post-direct-calls.tsv`.
-All six demo entries are now recovered; `RunLevel` still needs an independently
-bounded complete demo CFG beyond its exact 26-target direct-call sequence.
+Six demo entries have located bodies. Demo `RunLevel` is kept address-only
+rather than declared equal (see Recovered ownership and order), and it still needs
+an independently bounded complete demo CFG beyond its exact 26-target direct-call sequence.
 Actual disc/read failures, allocation failures, demo timeout behavior, and
 platform-specific PS2/Xbox branches remain runtime or cross-platform questions.

@@ -1,7 +1,7 @@
 # CFrontEnd__SetPage
 
 Status: active — caller transport and complete dispatch body rechecked
-Last updated: 2026-10-22 (research-campaign records removed; findings unchanged)
+Last updated: 2026-11-06 (caller names follow the published function table; findings unchanged)
 Summary: exact receiver/stack transport and immediate/timed notification order; runtime callback effects stay open.
 Evidence: MEASURED — static pristine instructions freshly decoded and source/caller correspondence. No SetPage runtime execution is claimed.
 Specimen: pristine `BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -68,19 +68,19 @@ unvalidated.
 The body makes four indirect calls, at `0x00466b12`, `0x00466b29`, `0x00466b3c` and `0x00466b8a`, in the
 order described above. Its direct callers:
 
-- Caller `CFrontEnd__HandleModalPanelButton` `0x0044dd60`, 2 sites.
+- Caller `CFEMessBox__ButtonPressed` `0x0044dd60`, 2 sites.
 - Caller `CFEPBEConfig__ButtonPressed` `0x00450090`, 2 sites.
 - Caller `CFEPBriefing__ButtonPressed` `0x00451c20`, 2 sites.
 - Caller `CFEPDebriefing__ButtonPressed` `0x004568a0`, one site.
 - Caller `CFEPDemoMain__DoAction` `0x00457ee0`, one site.
-- Caller `CFEPDevelopment__RefreshWorldListCore` `0x00458710`, one site.
-- Caller `CFEPDevSelect__VFunc_3_00458a10` `0x00458a10`, one site.
-- Caller `CFEPDevSelect__VFunc_2_00458e00` `0x00458e00`, 2 sites.
-- Caller `CFEPMultiplayerStart__SubObj8848__Process` `0x00459b00`, one site.
-- Caller `CFEPMultiplayerStart__SubObj8848__ButtonPressed` `0x00459c10`, 2 sites.
+- Caller `CFEPDevSelect__UseDevice` `0x00458710`, one site.
+- Caller `CFEPDevSelect__ButtonPressed` `0x00458a10`, one site.
+- Caller `CFEPDevSelect__Process` `0x00458e00`, 2 sites.
+- Caller `CFEPE3LevelSelect__Process` `0x00459b00`, one site.
+- Caller `CFEPE3LevelSelect__ButtonPressed` `0x00459c10`, 2 sites.
 - Caller `CFEPLevelSelect__ButtonPressed` `0x004606b0`, 2 sites.
 - Caller `CFEPLoadGame__ButtonPressed` `0x00461c60`, one site.
-- Caller `CFEPLoadGame__DoLoad` `0x00461e20`, 2 sites.
+- Caller `CFEPLoadGame__StartLoad` `0x00461e20`, 2 sites.
 - Caller `CFEPMain__DoAction` `0x004623e0`, 5 sites.
 - Caller `CFEPMain__Process` `0x00462640`, 2 sites.
 - Caller `CFEPSaveGame__ButtonPressed` `0x00464630`, one site.
@@ -91,14 +91,14 @@ order described above. Its direct callers:
 - Caller `CFEPCredits__Process` `0x0051a820`, one site.
 - Caller `CFEPDirectory__ButtonPressed` `0x0051aaf0`, 2 sites.
 - Caller `CFEPDirectory__RefreshSaveFileList` `0x0051ad30`, one site.
-- Caller `CFEPMultiplayerStart__SubObj4034_T3_0051b660` `0x0051b660`, one site.
+- Caller `CFEPIntro__ButtonPressed` `0x0051b660`, one site.
 - Caller `CFEPLanguageTest__ButtonPressed` `0x0051c090`, one site.
-- Caller `CFEPMultiplayer__VFunc_3_0051ccb0` `0x0051ccb0`, 2 sites.
-- Caller `CFEPMultiplayer__VFunc_2_0051d020` `0x0051d020`, one site.
+- Caller `CFEPMultiplayer__ButtonPressed` `0x0051ccb0`, 2 sites.
+- Caller `CFEPMultiplayer__Process` `0x0051d020`, one site.
 - Caller `CFEPMultiplayerStart__ButtonPressed` `0x0051de60`, one site.
 - Caller `CFEPOptions__SaveDefaultOptions` `0x0051f500`, 2 sites.
 - Caller `CFEPOptions__Process` `0x0051f600`, one site.
 - Caller `CFEPScreenPos__ButtonPressed` `0x0051fa00`, 2 sites.
 - Caller `CFEPVirtualKeyboard__ButtonPressed` `0x00520370`, one site.
-- Caller `CFEPVirtualKeyboard__HandleKeyToken` `0x00520cc0`, one site.
+- Caller `CFEPVirtualKeyboard__HandleKey` `0x00520cc0`, one site.
 - Caller `CFEPWingmen__ButtonPressed` `0x00521d20`, one site.

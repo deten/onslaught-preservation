@@ -1,8 +1,8 @@
-Status: active quick reference
-Last updated: 2026-04-29
-Source: migrated from archived Onslaught skills during the skill clean-slate pass.
-Summary: BattleEngine default config and combat/movement constants.
 # BattleEngine Default Configuration Values
+
+Status: active — quick reference for BattleEngine default configuration values
+Last updated: 2026-11-06 (header in the repository format; the Level 710 script and unreceipted values marked; earlier: migrated into this repository)
+Summary: BattleEngine default config and combat/movement constants.
 
 Default values set in `CBattleEngineData::Initialise()`:
 
@@ -20,7 +20,8 @@ Default values set in `CBattleEngineData::Initialise()`:
 These values are Stuart-source initialization defaults, not the active Steam
 Level 100 profile. Copied-runtime Level 100 observation instead establishes a
 `0.15` velocity cap, `0.7` retention, and equal forward/strafe response for that
-specific released configuration.
+specific released configuration. No receipt for that observation is published here, so these
+Level 100 observations are unreproduced in this repository.
 
 | Property | Default Value | Description |
 |----------|---------------|-------------|
@@ -121,8 +122,9 @@ This snapshot is derived evidence only. It does not prove that a runtime session
 
 ## Level 710 Configuration Evidence
 
-Read-only inspection of `data/Resources/710_res_PC.aya` and the tracked
-`Level710script.msl` provides the level-710 evidence below.
+Read-only inspection of `data/Resources/710_res_PC.aya` and the retail script
+`Level710script.msl` (in the game data, not in this repository) provides the level-710
+evidence below. The receipt for that inspection is not published here.
 
 Derived findings:
 
@@ -158,3 +160,5 @@ Current derived findings:
 
 This narrows the next copied-profile cloak observer target list. It does not
 prove runtime configuration selection or cloak activation.
+
+The scan that produced these counts is not published here, so they are unreproduced in this repository.

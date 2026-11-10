@@ -1,5 +1,9 @@
 # Core Systems Index
 
+Status: active — folder index
+Last updated: 2026-11-06 (status header added; index links checked against this folder)
+Summary: the core subsystem notes in this folder (actor, engine, platform and thing) and what each covers.
+
 Core engine subsystems and base object model.
 
 | File | Description |

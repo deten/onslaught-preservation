@@ -1,7 +1,7 @@
 # Quick reference
 
 Status: active — compact lookup tables
-Last updated: 2026-10-22 (research-campaign counts removed)
+Last updated: 2026-11-06 (the unpublished struct-layouts citation removed and the command-line section renamed; earlier: research-campaign counts removed)
 Summary: dense lookup tables (AYA tags, save structures, MSL commands, command-line options, source layout) and where each one is documented in full.
 
 These are compact lookup tables. When a table is corrected, update the detailed document it summarises as well.
@@ -34,7 +34,7 @@ For format facts use [formats/aya-tags.md](formats/aya-tags.md) and [formats/aya
 | [engine/source/source-key-functions.md](engine/source/source-key-functions.md) | Important source function signatures |
 | [engine/source/source-hierarchy.md](engine/source/source-hierarchy.md) | Class hierarchy and thing-type flags |
 
-## Controls / Mission Scripts
+## Command Line and Mission Scripts
 
 | File | Use |
 | --- | --- |
@@ -49,7 +49,6 @@ Use these quick tables for lookup speed, then verify or expand findings in the d
 - [Mapped systems](engine/mapped-systems.md) - Current static system owners and claim boundaries
 - [formats/game-assets-index.md](formats/game-assets-index.md)
 - [saves/save-format.md](saves/save-format.md)
-- `struct-layouts.md` (archived research record, not published)
 - [formats/aya-asset-format.md](formats/aya-asset-format.md)
 - [levels/scripting/msl-scripting.md](levels/scripting/msl-scripting.md)
 - [engine/source/README.md](engine/source/README.md)

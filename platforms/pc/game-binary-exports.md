@@ -6,6 +6,9 @@ Summary: complete named ordinal/RVA export appendix for the four non-main DLLs.
 Evidence: MEASURED — read-only `pefile` export-directory parse of pristine-copy inputs
 listed in [game-binaries.md](game-binaries.md). `Message.exe` has no export
 directory and therefore no rows. RVA is relative to the exporting image base.
+Specimen: the four DLLs of the pristine-copy set named in [game-binaries.md](game-binaries.md), each with its SHA-256 in that file's identity table.
+
+Within each DLL the rows are sorted by symbol name, so the `zlib.dll` ordinals appear out of order.
 
 | File | Ordinal | RVA | Symbol |
 | --- | ---: | ---: | --- |

@@ -1,7 +1,7 @@
 # Game binaries contract — DLLs and helper executable
 
 Status: active static identity/ABI census
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (ledger wording corrected, a campaign folder name dropped from a receipt path; earlier: research-campaign records and decompiler-style code removed)
 Verdict: all five non-main PE files have exact identities, version/import/export
 censuses, and bounded evidence-based roles; invocation/load-time behavior stays
 open.
@@ -14,7 +14,7 @@ with per-file SHA-256 below; retail VAs cite `BEA.exe.original.backup`, SHA-256
 
 ## Inventory and specimen boundary
 
-The tracked root ledger in
+The root ledger in
 `installed-corpus-census.md` (archived research record, not published) contains the main
 `BEA.exe`, helper `Message.exe`, and four DLLs. Part A excludes the main game
 executable (owned by the pristine `74154bfa…` binary-analysis corpus) and covers
@@ -66,7 +66,7 @@ fidelity.
 
 There is no version resource or export directory. Its only non-CRT UI import is
 `USER32!MessageBoxA`; the other 38 imports are KERNEL32 startup/runtime support.
-Static inspection in the installed-corpus owner shows it scans the command line
+Static inspection in the installed-corpus census (archived research record, not published) shows it scans the command line
 for three `~` delimiters, copies caption and message into fixed 400-byte buffers,
 and calls `MessageBoxA` with type `0x11000`; a practical accepted shape is
 `<ignored>~caption~text~`. No literal/direct reference exists in pristine
@@ -128,7 +128,7 @@ whole-install hash pass or new archive unpacking was performed.
 `import-thunks.md` (in the decompilation notes, not yet published)
 pins the zlib/Ogg/Vorbis IAT thunks in the pristine image. The Bink import-name
 cluster is in the executable's string table. Read it with a string inventory
-generated locally from your own copy of `BEA.exe`; retail text is never committed.
+generated locally from your own copy of `BEA.exe` (for example, with `strings` from GNU binutils); retail text is never committed.
 Together with the DLL export tables, these establish that the required external
 names are present. This pass did not perform a loader-time bind trace, call every
 export, or claim ABI compatibility beyond the measured symbols.
@@ -141,7 +141,7 @@ version strings, every import name/ordinal, and every export name/ordinal/RVA.
 
 Ignored receipt paths:
 
-- `<maintainer evidence>/hermes-kanban-campaign-2026-08-22/gamefolder-deep/dll-scan.json`
+- `<maintainer evidence>/gamefolder-deep/dll-scan.json`
   — SHA-256
   `56630182de3f164e667dd62023356efd7e385e8f16884a0ce7253b80c15d7da6`;
 - the census receipt in the same directory records the read-only run boundary.

@@ -1,10 +1,23 @@
 # HUD / frontend overlay static contract
 
-Status: bounded retail static evidence; not visual proof
-Last updated: 2026-10-22 (neutral evidence wording)
+Status: bounded — static contract for the frontend HUD overlay; not visual proof
+Last updated: 2026-11-06 (process terms defined; private-correction and public-export status stated; earlier: neutral evidence wording)
 Summary: specimen-bound frontend input, color and coordinate corrections; complete function matches and isolated calculations remain distinct from player acceptance.
 Evidence: MEASURED — October 1 native compass and font fragments, isolated menu runs and full-section/relocation matches, plus September 30 font and scale-menu readback; August HUD claims were not reverified in this pass.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+
+## Terms used here
+
+- **Exact control**: a function section that already matched retail byte for byte before a change, rechecked after it to show the change left that section as it was.
+- **Callable section**: a compiled function's code section in the object file; the checks count these as callables and compare them with retail.
+- **Relocation**: a link-time address fix-up recorded for a section; a match counts the relocations as well as the section bytes.
+- **Match**: the compiled section's bytes and relocations equal retail's, as each section states. The receipt that records the comparison is named in the same section.
+- **Authored case**: a test input the maintainer wrote out for a check (chosen values and ranges, not drawn from play).
+- **Native i386**: the 32-bit x86 code runs directly on the test machine, not in a simulator.
+- **Readback**: values a run read back from memory or device state and recorded, to compare with the expected result.
+- **Receipt**: the machine-written record of a check (hashes, counts and results), kept in the maintainer's private evidence and not published.
+- **Root**: a word in the names of the private evidence (for example `debrief-root-readback.json`); it marks a run's receipt and carries no claim by itself.
+- **PC24, PC53 and PC64**: the x87 precision-control settings for 24-, 53- and 64-bit significands (single, double and extended precision).
 
 ## Debriefing bracket scale — October 1
 
@@ -157,8 +170,8 @@ The next falsifier is a complete caller invocation spanning trigonometry and the
 At `0x0042cd4b`–`0x0042cd67`, the loading-screen renderer reads the byte at
 `0x0066e8c0`. Zero selects text ID `0x003848a7`; any nonzero byte selects
 `0x07dea02c`. The authored text-name table identifies these as `IG_LOADING2`
-and `FETX_PRESS_START`. The private reconstruction had mistyped the second ID
-as `0x07dae02c` and now uses the retail value.
+and `FETX_PRESS_START`. The maintainer's private working tree (not public) had mistyped the second ID
+as `0x07dae02c` and now uses the retail value. onslaught-decomp's public export (76e277d) selects the string by its name in `src/FrontEndText.cpp`, which holds no numeric ID; the mistyped value appears only in `notes/compiler-findings.md`.
 
 All six inspected version-three language tables contain the correct ID at record
 327 and loading ID at record 1897; none contains the mistyped ID. English resolves
@@ -200,8 +213,8 @@ The Goodies renderer at `0x0045e0d0` passes text flags `0x10` at `0x0045fe3d` to
 the font wrapper `0x00540640`. That wrapper forwards the flags to `0x00540010`.
 At `0x0054018c`, bit `0x10` selects the path that skips flooring the Y coordinate;
 with the bit clear, `0x0054019e` calls the CRT floor routine `0x0055dfe7`. The
-private reconstruction previously omitted the flags argument and therefore requested
-the default rounding. Its call now passes `0x10`. The complete Goodies renderer
+maintainer's private working tree (not public) previously omitted the flags argument and therefore requested
+the default rounding. Its call now passes `0x10`. onslaught-decomp's public export (76e277d) was not compared at this level, so whether it carries this change is not established here. The complete Goodies renderer
 remains unmatched, so this correction does not close the rest of that body.
 
 The maintainer reproduced 18 bounded original-code cases: two wrapper argument-forwarding
@@ -232,8 +245,8 @@ non-selected-item path first copies committed to current and calls the value-cha
 Within the blend, the retail alpha computation multiplies two complementary factors separately by
 the **float32** 255.0 constant, then adds them (`0x004a39a7`, `0x004a39af`, `0x004a39b5`). Preserve that
 operation structure; factoring the products or substituting a double-width constant did not reproduce
-the compiled instructions. The private reconstruction now matches the complete 848-byte section
-(843-byte body plus alignment) and all 42 relocations. Maintainer reproduction retained every earlier match
+the compiled instructions. The maintainer's private working tree (not public) now matches the complete 848-byte section
+(843-byte body plus alignment) and all 42 relocations; onslaught-decomp's public export (76e277d) was not compared at this level, so whether it carries this change is not established here. Maintainer reproduction retained every earlier match
 in the affected objects and full integrated score; receipts are
 `<maintainer evidence>/menu-render-root-check-20260930.txt` and
 `<maintainer evidence>/root-score-menu-namedmesh-20260930.log`.
@@ -328,8 +341,7 @@ missing remapper and excluded texture initialization refuse execution.
 The subsequent direct texture-lookup entry correction now matches all 448 compiled
 section bytes and six relocations (433 body bytes plus padding), preserving all 14
 earlier exact controls and the other 17 callable sections. The maintainer reproduced this
-stock build in `font-render-reconnect-console-root-readback.json` under the private
-`geometry-gate-resume-20261001` owner. The earlier 87-position mismatch is closed.
+stock build in `<maintainer evidence>/geometry-gate-resume-20261001/font-render-reconnect-console-root-readback.json`. The earlier 87-position mismatch is closed.
 The cases do not establish behavior for arbitrary remappers, aliases, malformed
 strings, nonfinite coordinates or actual font assets. Missing texture enters
 initialization, which was excluded rather than modeled as a false return.

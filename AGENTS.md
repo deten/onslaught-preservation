@@ -1,7 +1,7 @@
 # Onslaught preservation: agent guide
 
 Status: active — the single instruction file for this repository; `CLAUDE.md` only points here
-Last updated: 2026-11-06 (contributors pointed to CONTRIBUTING.md; earlier: commit messages: keep Co-Authored-By, no Claude-Session line, name no agent or role)
+Last updated: 2026-11-06 (the references folder's absence and the maintainer named; contributors pointed to CONTRIBUTING.md; earlier: commit messages: keep Co-Authored-By, no Claude-Session line, name no agent or role)
 Summary: what this repository is, the document header convention, and the evidence and content rules for edits.
 
 ## What this is
@@ -18,7 +18,7 @@ carries the content and commit rules below that apply to them.
 
 The [Onslaught Toolkit goal](https://github.com/dlprentice/Onslaught-Career-Editor/blob/main/GOAL.md#how-progress-is-measured)
 defines progress, and its [program](https://github.com/dlprentice/Onslaught-Career-Editor/blob/main/PROGRAM.md#cross-project-progress-and-priorities)
-owns the dated cross-project chart and queue. Check current product evidence and follow David's current direction;
+owns the dated cross-project chart and queue. Check current product evidence and follow the maintainer's current direction (see the Toolkit's GOAL.md and PROGRAM.md);
 preservation findings and their history stay in this repository.
 
 ## Document headers
@@ -41,7 +41,9 @@ documents link to its anchors.
 
 - Every behaviour claim cites a controlled runtime capture, a byte comparison against a named specimen, a focused
   test, or a pinned source file and line (`references/Onslaught/<file>:<line>` means Stuart's source at the commit
-  named in the README).
+  named in the README). This repository has no `references/` folder: the README's
+  [How to read a finding](README.md#how-to-read-a-finding) section links the pinned tree, and a document that cites
+  it links that tree on first use.
 - Never quote decompiler output or paste retail bytes. Disassembly is described in words or as mnemonics without the
   byte column; a patch document may give only the patch site's original and patched bytes.
 - Static evidence establishes identities and structures; only controlled runtime evidence establishes causality and

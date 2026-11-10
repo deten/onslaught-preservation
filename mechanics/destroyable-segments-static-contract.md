@@ -1,18 +1,18 @@
 # Destroyable Segments Static Contract
 
-Status: active contract with a dated inherited subsystem map
-Last updated: 2026-10-22 (neutral evidence wording)
+Status: active — static contract with a dated inherited subsystem map
+Last updated: 2026-11-06 (name and spelling corrections; unpublished sources named neutrally; earlier: neutral evidence wording)
 Summary: retail segment-break ordering and complete Break/SpawnRubble code matches; the broader June 7 map retains its earlier limits.
 
-The October 1 section below is a fresh instruction read and bounded original-code
-comparison. The broader map retains its June 7 evidence and labels; it has not been
+The 2026-10-01 section below is a fresh instruction read and bounded original-code
+comparison. The broader map retains its 2026-06-07 evidence and labels; it has not been
 revalidated wholesale and is not gameplay, rubble, pickup or reconstruction proof.
 
 ## Break snapshots and callbacks — October 1
 
 Specimen: pristine `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
-The base Break body at `0x00442b20` is 534 bytes, ending at `0x00442d36`.
+The base Break body (read 2026-10-01) at `0x00442b20` is 534 bytes, ending at `0x00442d36`.
 
 After setting the segment's `+0x38` flag, clearing health `+0x0c` and setting the
 controller's changed flag, retail obtains the render mesh. It captures the selected
@@ -21,7 +21,7 @@ and the later spawner walk keep that captured part; each iteration still reloads
 that part's children-array pointer. A callback changing the mesh's part table or
 the segment's part index therefore differs from changing the captured part itself.
 
-The private source formerly repeated the part-table lookup. It now preserves the
+The maintainer's earlier source (not published) repeated the part-table lookup. Its corrected version now preserves the
 retail snapshot, snapshots the owner before the temporary-set constructor, reads
 the spawner mount before `MapMountName` (`0x00442c5c` before `0x00442c62`), and
 walks the temporary removal set through its own cursor at `+8`
@@ -58,7 +58,7 @@ Maintainer evidence under `<maintainer evidence>/`:
 
 ## Base rubble code match — October 1
 
-The same pristine specimen's base `SpawnRubble` at `0x00442f60` now matches its
+The same pristine specimen's base `CDestroyableSegment__VFunc_10_SpawnRubbleEffects` at `0x00442f60` now matches its
 complete 1,168-byte compiled section, including padding, and all 43 relocations;
 the instruction body is 1,153 bytes. The reconstructed source retains the
 bounding-box reloads after each random-number call, uses the existing engine
@@ -69,8 +69,8 @@ helper is a reconstruction interface, not a recovered original source name.
 The maintainer rebuilt and read back both targets against retail. All 98 other baseline
 callable sections in the segment/controller objects retain their bytes and
 recursive relocation identities. Two newly emitted helper copies were already
-matched elsewhere and receive no additional unique-function credit. The integrated
-corpus preserves earlier exact matches. This is static executable-backed evidence;
+matched elsewhere, so they add no newly matched function. Earlier exact matches
+remain matched in the maintainer's combined set (not published). This is static executable-backed evidence;
 no rubble rendering, random distribution in a live world, pickup behavior or
 gameplay acceptance was measured in this pass.
 
@@ -81,7 +81,7 @@ Private root receipts in `<maintainer evidence>/`:
 
 ## Inherited static map — June 7
 
-The retail static evidence maps destroyable segments as a vtable-driven damage/break/rubble subsystem under `DestructableSegmentsController.cpp`. The source-file inventory contains the debug path name, but the matching Stuart source body is not present in the current reference tree, so source-body identity remains unproven.
+The retail static evidence (2026-06-07) maps destroyable segments as a vtable-driven damage/break/rubble subsystem under `DestructableSegmentsController.cpp`. The source-file inventory contains the debug path name, but the matching Stuart source body is not present in the current reference tree, so source-body identity remains unproven.
 
 Observed field roles stay conservative:
 
@@ -101,9 +101,11 @@ Do not promote these to final C++ field names until exact layout proof exists.
 
 ## Damage And Break Flow
 
+The controller and its motion controller are spelled `CDestructable…`, and the segment classes `CDestroyable…`; both spellings belong to one subsystem (see the inherited static map below). Some names here, including the `VFunc_NN` names, differ from the names that the public inventory gives the same addresses ([onslaught-decomp `config/functions.tsv` at `76e277d`](https://github.com/dlprentice/onslaught-decomp/blob/76e277d4145cef793b489de7702bf6b9d1c4e977/config/functions.tsv)); this note does not reconcile them.
+
 | Path | Static contract |
 | --- | --- |
-| Child registration | `0x00442700 CDestructableSegment__RegisterChild` adds child segments to the parent child `CSPtrSet` at `this+0x24`; its callers are the controller's init and process paths, which does not make this global monitor membership. |
+| Child registration | `0x00442700 CDestroyableSegment__RegisterChild` adds child segments to the parent child `CSPtrSet` at `this+0x24`; its callers are the controller's init and process paths, which does not make this global monitor membership. |
 | Core-child state gate | `0x004433f0 CDestroyableCoreSegment__AreCoreChildrenDestroyed` walks the core child list, preserves the missing-first-child warning path, and returns false while a child still reports the checked vfunc-slot state and field `+0x38` remains clear. |
 | Controller dispatch | `CDestructableSegmentsController__DamageSegmentByIndexAndUpdateThreshold` is the indexed controller entry and updates the controller's threshold/callback state. |
 | Base damage | `0x00442960 CDestroyableSegment__VFunc_03_ApplyDamage` subtracts damage from `+0x0c`, records `+0x18/+0x14`, and clamps below-zero state. |

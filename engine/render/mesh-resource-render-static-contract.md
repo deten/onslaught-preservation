@@ -1,14 +1,15 @@
 # Mesh, resource, and render static contract
 
 Status: active static map
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense; neutral evidence wording)
+Last updated: 2026-11-06 (pin labels, code expressions, receipt labels and corpus names corrected; earlier: retired AppCore/WinUI tools in the past tense; neutral evidence wording)
 Summary: specimen-bound rendering and collision contracts, with bounded corrections to arithmetic association, float stores and ordered admission.
-Evidence: MEASURED — specimen instructions, whole-section/relocation matches and bounded native calculations and buffer comparisons; older slices were not reverified in this pass.
+Evidence: MEASURED — specimen instructions, whole-section/[relocation](README.md#glossary) matches and bounded native calculations and buffer comparisons; older slices were not reverified in this pass.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 This contract consolidates the retained engine/frame, render-state, resource,
 mesh geometry, and collision bridges used by asset tooling and rebuild planning.
-Current function names are those of the decompilation notes (not yet published).
+Current function names follow [onslaught-decomp](https://github.com/dlprentice/onslaught-decomp),
+the naming authority in the README; its per-function notes are not published.
 Static evidence does not by itself establish runtime rendering or layout parity.
 
 ## Landscape-shadow renderer — October 1
@@ -19,30 +20,28 @@ the projected V coordinate with the negative Y scale removes one internal
 compiler node and puts the fourth device-pointer push in the preceding
 scheduling region, recovering retail's push at `0x00553e31`.
 
-The maintainer freshly compiled the correction and bound every reference: 109
-placements witnessed by other exact code, 73 references to already exact
-callees, eleven literal payloads and four proven library references. All 43
-other callable graphs and 31 existing focused matches survive. An isolated
-logging compiler preserves the stock output and confirms the region change;
-no production compiler flags changed. This proves compiled identity under
-the checker contract, not original source spelling, actual draw submissions
-or visual parity. No game or graphics device ran.
+The maintainer freshly compiled the correction and bound every reference: 109 placements witnessed
+by other exact code, 73 references to already exact callees, eleven literal payloads and four proven
+library references. All 43 other [callable graphs](README.md#glossary) and 31 existing [focused
+matches](README.md#glossary) survive. An isolated logging compiler preserves the stock output and
+confirms the region change; no production compiler flags changed. This proves compiled identity
+under the checker contract, not original source spelling, actual draw submissions or visual parity.
+No game or graphics device ran.
 
-Private root evidence in
-`<maintainer evidence>/geometry-gate-resume-20261001/shadow-transform-order-root/`:
-`final/readback.json` and `scheduler-readback.json`.
+Maintainer evidence in `<maintainer
+evidence>/geometry-gate-resume-20261001/shadow-transform-order-root/`: `final/readback.json` and
+`scheduler-readback.json`.
 
 ## Mesh surface detail and interface identities — October 1
 
-`CRTMesh::Render` (`0x004dcba0`) uses camera zoom in the surface-detail divisor,
-not camera-to-object distance. Let `E` be ESP after the prologue's two register
-pushes. The camera result is stored at `E+8` (`0x004dcc2b`), optionally replaced
-with `1.0f`, and read again for LOD at `0x004dccf9`. Distance occupies `E+0xc`.
-After the additional push at `0x004dcd57`, the detail load `[esp+0xc]`
-(`0x004dcdcc`) therefore reads camera zoom. The reconstruction now uses
-`100 - MESH_SURFACE_LOD_BIAS / (zoom * 10) * lod` before the existing conversion
-and clamp. The earlier explanation as merely swapped compiler stack slots was
-incorrect. Live camera values and the active floating-point mode remain unmeasured.
+`CRTMesh::Render` (`0x004dcba0`) uses camera zoom in the surface-detail divisor, not
+camera-to-object distance. Let `E` be ESP after the prologue's two register pushes. The camera
+result is stored at `E+8` (`0x004dcc2b`), optionally replaced with `1.0f`, and read again for LOD at
+`0x004dccf9`. Distance occupies `E+0xc`. After the additional push at `0x004dcd57`, the detail load
+`[esp+0xc]` (`0x004dcdcc`) therefore reads camera zoom. The reconstruction now takes the surface-LOD
+bias divided by ten times the zoom, multiplies it by lod, and subtracts the result from 100 before
+the existing conversion and clamp. The earlier explanation as merely swapped compiler stack slots
+was incorrect. Live camera values and the active floating-point mode remain unmeasured.
 
 The same function's two virtual calls (`0x004dce40`, `0x004dce4c`) use
 `IRenderableThing` slot 24 (`+0x60`), publish the second result at `0x009c68d0`,
@@ -51,25 +50,22 @@ then render with flag `0x10`. Retail registration strings at `0x00631fa8` and
 selects an imposter frame: calls at `0x00488aad` and `0x0055a66a` index 24-byte
 frame records. CThing's interface table (`0x005df550`) has the same zero-return
 body in both slots; CTree's (`0x005dd960`) distinguishes slot 27 with
-`0x004f6540`, which clears its orientation-selection flag and returns
-`((complete_object_address >> 4) & 3)`.
+`0x004f6540`, which clears its orientation-selection flag and returns bits four and five of the
+complete-object address.
 
-The reconstructed source had transposed the two method identities. Declarations,
-the CTree override and the frame-index callers now consistently name slot 24
-`GetSnowDensity` and slot 27 `GetRenderImposterNo`. Physical slots and established
-call targets are preserved. Stuart's pinned `5352a81c` `thing.h` supplies both
-names, but its missing base-interface header prevents a claim about the original
-identifier spelling.
+The reconstructed source had transposed the two method identities. Declarations, the CTree override
+and the frame-index callers now consistently name slot 24 `GetSnowDensity` and slot 27
+`GetRenderImposterNo`. Physical slots and established call targets are preserved. Stuart's `thing.h`
+at `5352a81c` (byte-identical at `c3d8ac4`, the pin the README names) supplies both names, but its
+missing base-interface header prevents a claim about the original identifier spelling.
 
-The maintainer freshly built the two caller corrections separately and together:
-46 other callable graphs and all 35 ordered reference meanings survive. The
-coordinated identity rename preserves 556 callable graphs and 214 exact results
-across eight focused objects, after the explicit symbol-name substitution. The
-whole renderer remains unmatched. Its corrected arithmetic still omits retail's
-otherwise-unread square-root store at `0x004dcce9`; exception/status effects of
-that store remain open. No renderer or game ran, and actual receiver/branch
-reachability remains unproved. Private root receipts under
-`<maintainer evidence>/geometry-gate-resume-20261001/render-map-root/`:
+The maintainer freshly built the two caller corrections separately and together: 46 other callable
+graphs and all 35 ordered reference meanings survive. The coordinated identity rename preserves 556
+callable graphs and 214 exact results across eight focused objects, after the explicit symbol-name
+substitution. The whole renderer remains unmatched. Its corrected arithmetic still omits retail's
+otherwise-unread square-root store at `0x004dcce9`; exception/status effects of that store remain
+open. No renderer or game ran, and actual receiver/branch reachability remains unproved. Maintainer
+receipts under `<maintainer evidence>/geometry-gate-resume-20261001/render-map-root/`:
 `mesh-root-v1/readback.json` and `identity-swap/readback.json`.
 
 ## Map trace fallback logging — October 1
@@ -93,24 +89,23 @@ from retail, including the length reload before step multiplication, a nested
 vector-constructor call and return scheduling. No logger, file write or game
 execution occurred. The remaining falsifier is a controlled trace comparison
 that observes the rounded step, recursive result and logging arguments together.
-Private root receipt: `map/root-reproduction/readback.json` under the owner above.
+Maintainer receipt: `map/root-reproduction/readback.json` under the owner above.
 
 ## Buffered resource reads — October 1
 
-Reconstructed `CDXMemBuffer::Read` (`0x00548570`) now matches its complete
-688-byte section, 686-byte body and all sixteen relocations. The source seeded
-from Stuart's pinned `5352a81c` file retained a permanently disabled `if (0)`
-direct/DMA-read branch. Removing that block changes VC6 register allocation and
-scheduling while preserving the executable buffered copy, refill, check-byte
-and EOF paths. It does not establish the original source spelling.
+Reconstructed `CDXMemBuffer::Read` (`0x00548570`) now matches its complete 688-byte section,
+686-byte body and all sixteen relocations. The source seeded from Stuart's `DXMemBuffer.cpp` at
+`5352a81c` (byte-identical at `c3d8ac4`) retained a permanently disabled `if (0)` direct/DMA-read
+branch. Removing that block changes [VC6](README.md#glossary) register allocation and scheduling
+while preserving the executable buffered copy, refill, check-byte and EOF paths. It does not
+establish the original source spelling.
 
-The maintainer freshly compiled both forms and checked ten references through prior
-exact controls, five through PE imports and one through the exact `.aya`
-literal. All 21 other callable graphs are unchanged; only Read and its FPO
-record change. `InitFromFile` still differs in twenty stack-slot byte positions.
-This closes a static byte-match gap, not Windows file-I/O or save-compatibility
-acceptance. Private root receipt:
-`<maintainer evidence>/geometry-gate-resume-20261001/dxmembuffer-read-root/readback.json`.
+The maintainer freshly compiled both forms and checked ten references through prior [exact
+controls](README.md#glossary), five through PE imports and one through the exact `.aya` literal. All
+21 other callable graphs are unchanged; only Read and its [FPO](README.md#glossary) record change.
+`InitFromFile` still differs in twenty stack-slot byte positions. This closes a static byte-match
+gap, not Windows file-I/O or save-compatibility acceptance. Maintainer receipt: `<maintainer
+evidence>/geometry-gate-resume-20261001/dxmembuffer-read-root/readback.json`.
 
 ## Render descriptors and texture initialization — October 1
 
@@ -130,12 +125,10 @@ compared directly with the pinned Microsoft libraries; their dependency graphs
 were not re-audited. All 44 other callable graphs survive. CTexture's mapping
 still reports no unique retail vtable; this match does not settle that question.
 
-These are compiled identities under the decompilation checker's stated contract,
-not device execution, successful asset loading or recovered source spelling.
-Private root receipts under
-`<maintainer evidence>/geometry-gate-resume-20261001/`:
-`resource-texture-root/PCRTID/readback.json` and
-`resource-texture-root/DXTexture/readback.json`.
+These are compiled identities under the decompilation checker's stated contract, not device
+execution, successful asset loading or recovered source spelling. Maintainer receipts under
+`<maintainer evidence>/geometry-gate-resume-20261001/`: `resource-texture-root/PCRTID/readback.json`
+and `resource-texture-root/DXTexture/readback.json`.
 
 ## Compressed texture format fallbacks — October 1
 
@@ -150,7 +143,7 @@ The maintainer checked all six retail branch values and the fresh compiled fallb
 switches. All 41 exact controls and 44 other callable graphs survive, including
 the newly matched initialization function. `LoadFrame` remains unmatched, and
 no texture conversion or device call ran. A controlled resource-load comparison
-with admitted DXT1/DXT2 inputs remains the runtime falsifier. Private root receipt:
+with admitted DXT1/DXT2 inputs remains the runtime falsifier. Maintainer receipt:
 `resource-texture-root/fallback/readback.json` under the owner above.
 
 ## Particle update and sphere-trigger containment — October 1
@@ -173,23 +166,22 @@ and fifteen Radar callables remain unchanged. The newly emitted shared iterator
 was already exact elsewhere and earns no extra unique-function credit.
 
 These are full compiled matches, not live particle or trigger acceptance.
-Private root receipts under the owner below are `particle-step-root-readback.json`
+Maintainer receipts under the owner below are `particle-step-root-readback.json`
 and `sphere-trigger-root/readback.json`.
 
 ## Palette darkening owner — October 1
 
-The darkening loop at `0x0054ed80`–`0x0054ee33` reads and writes the receiver's
-internal palette. Its source is `this + 4*k`; its three destination channels are
-at `this + 4*(colours+k)`. The later copy at `0x0054eeb5` exports that palette.
-The former reconstruction darkened the output buffer, which this copy would
-overwrite. The corrected operand follows the receiver slot, distinct from the
-output-pointer slot, throughout the loop.
+The darkening loop at `0x0054ed80`–`0x0054ee33` reads and writes the receiver's internal palette.
+Its source is palette entry k, at four bytes per entry; its three destination channels are at the
+entry that lies the colour count past k. The later copy at `0x0054eeb5` exports that palette. The
+former reconstruction darkened the output buffer, which this copy would overwrite. The corrected
+operand follows the receiver slot, distinct from the output-pointer slot, throughout the loop.
 
 The maintainer reproduced the static correction with a fresh build, preserving all
 26 target reference identities, eleven other callable sections and nine exact
 controls. The complete `Palletize` body remains unmatched; no image conversion
 ran. Complete compiled matching and a controlled conversion comparison remain
-separate open checks. Private root `palette-owner-root-readback.json` records
+separate open checks. Maintainer readback `palette-owner-root-readback.json` records
 the decoded operands and preservation checks.
 
 ## Hive-boss cylinder transforms — October 1
@@ -200,7 +192,7 @@ old/new Euler matrices in its six branches preserves the retail branch and
 multiplication orders. The maintainer freshly compiled it, bound each reference
 using baseline witnesses and preserved all 29 other callable sections and
 the controller vtable. This settles the compiled method, not live animation
-or the original spelling of its source. Private root `hive-copy-root-readback.json`
+or the original spelling of its source. Maintainer readback `hive-copy-root-readback.json`
 under the evidence owner below records the check.
 
 ## Non-mesh particle pass — October 1
@@ -216,7 +208,7 @@ extra temporary fails the complete match.
 The maintainer rebuilt and checked every reference; eleven other retained callable
 sections/references survive. The newly emitted math helpers were already exact
 elsewhere and add no unique credit. No device, particle scene or GPU ran.
-Private root `particle-other-root-readback.json` records this static result.
+Maintainer readback `particle-other-root-readback.json` records this static result.
 
 ## Shadow projection owner — October 1
 
@@ -233,10 +225,9 @@ identities/addends, 44 exact controls and 62 other callable sections across the
 shadow/patch objects. `RenderTextures` remains unmatched, with a 4,400-byte
 section and 108 relocations; this adds no whole-function credit. A complete
 match and a controlled receiver-identity observation remain separate falsifiers.
-Private root `shadow-projection-root-readback.json` records the evidence.
+Maintainer readback `shadow-projection-root-readback.json` records the evidence.
 
-The root receipts above are under
-`<maintainer evidence>/geometry-gate-resume-20261001/`.
+The maintainer receipts above are under `<maintainer evidence>/geometry-gate-resume-20261001/`.
 
 ## Buggy and tentacle root transforms — October 1
 
@@ -254,11 +245,10 @@ position interpolation. A basis helper alone leaves the latter constructor
 out of line; the paired initialization form closes both whole sections.
 These helper boundaries and names are reconstructed, not recovered source text.
 
-This does not close either controller's Init method or establish rendered
-motion, live timing or whole-controller parity. No game or renderer ran.
-Private root evidence under
-`<maintainer evidence>/geometry-gate-resume-20261001/`:
-`buggy-tentacle-root-readback.json` and `buggy-tentacle-root-check.log`.
+This does not close either controller's Init method or establish rendered motion, live timing or
+whole-controller parity. No game or renderer ran. Maintainer evidence under `<maintainer
+evidence>/geometry-gate-resume-20261001/`: `buggy-tentacle-root-readback.json` and
+`buggy-tentacle-root-check.log`.
 
 ## Declaration shader constants — October 1
 
@@ -275,7 +265,7 @@ products. A direct float-Y spelling fails the complete match. The accepted
 source reconstructs those boundaries; it is not claimed as original source text.
 
 This settles the admitted function's compiled bytes and references, not a GPU
-observation, visible snow result or complete graphics pipeline. Private root proof
+observation, visible snow result or complete graphics pipeline. Maintainer proof
 under `<maintainer evidence>/geometry-gate-resume-20261001/`:
 `trail-pulse-shader-root-readback.json`.
 
@@ -296,7 +286,7 @@ All 35 other callable sections and their references remain unchanged.
 
 The complete trail renderer remains unmatched. Non-ASCII text, nonzero locale
 and the real render flush remain untested; those are the next behavior falsifiers.
-Private root evidence under the owner below: `trail-name-root-native/receipt.json`
+Maintainer evidence under the owner below: `trail-name-root-native/receipt.json`
 and `font-render-reconnect-console-root-readback.json`.
 
 ## Trail basis normalization — October 1
@@ -308,22 +298,22 @@ draft rounded the magnitude before division and retained a different component
 intermediate. Existing in-place division restores the observed value boundaries.
 
 The maintainer rebuilt the source and reproduced both frozen arithmetic corpora.
-For 3,594 prepared float32 step vectors under PC24/53/64 nearest rounding,
-1,636 prior XYZ/exception differences become zero. Extending to 14,412 cases
+For 3,594 prepared float32 step vectors under [PC24/53/64](README.md#glossary) nearest rounding,
+1,636 prior XYZ/exception differences become zero. Extending to 14,412 cases (the four-mode corpus)
 over all four rounding modes leaves twelve inherited signed-zero differences,
 versus 7,490 before the change, with no new disagreements. Replacing the first
-division with multiplication changes 12,046 expanded-corpus results.
+division with multiplication changes 12,046 results in the four-mode corpus.
 
 The earlier signed-zero counterexample was: at CW `037f`, step bits
 `[80000000,3f800000,00000000]` produce side.Y `00000000` in retail and
 `80000000` in both drafts. A subsequent correction restores the actual cross
 product of the step with `(0,0,-1)` at `0x004c3910`, including zero subtractions
 that the expanded scalar spelling discarded. The maintainer's fresh compilation and
-native replay agree with retail across 19,296 prepared cases: the previous
+native replay agree with retail across 19,296 prepared cases (the twelve-mode corpus): the previous
 108 XYZ/exception-flag differences become zero, with no new disagreements.
-The expanded corpus includes signed zeros, threshold neighbors, subnormals,
+The twelve-mode corpus includes signed zeros, threshold neighbors, subnormals,
 large values, infinities and quiet NaNs under twelve precision/rounding modes.
-Changing the first divide to multiply produces 14,509 discrepancies.
+Changing the first divide to multiply produces 14,509 discrepancies in the twelve-mode corpus.
 
 The complete function remains unmatched; its 99 other callable sections and
 references, 80 exact controls and both vtables survive. Bounding stack canaries,
@@ -402,23 +392,21 @@ section offset `0x96`. Its retail function extent is 209 bytes. The earlier anal
 `CEngine__ConfigureParticleBurstForDistance` does not establish its owner or original
 source name.
 
-For the segment-length path, retail subtracts the frame's previous position
-(`+0x90/+0x94/+0x98`) from its current position (`+0/+4/+8`), combines the squared
-components as `(dz*dz + dy*dy) + dx*dx`, takes the square root and divides by descriptor
-`+0xa4`. The reconstruction had combined them as `(dz*dz + dx*dx) + dy*dy`.
-The integer conversion at `0x004c363a` is x87 `FISTP` into a 64-bit temporary;
-the following instructions use its low 32 bits and add three. Its rounding mode is
-inherited from the x87 control word, not established by a C# cast or a floor operation.
-The later allocation multiplies this count by 40. The experiment below executes the
-arithmetic only, not that allocation or the point-initialization loop.
+For the segment-length path, retail subtracts the frame's previous position (`+0x90/+0x94/+0x98`)
+from its current position (`+0/+4/+8`), combines the squared components by adding the Z and Y
+squares before the X square, takes the square root and divides by descriptor `+0xa4`. The
+reconstruction had added the Z and X squares first and the Y square last. The integer conversion at
+`0x004c363a` is x87 `FISTP` into a 64-bit temporary; the following instructions use its low 32 bits
+and add three. Its rounding mode is inherited from the x87 control word, not established by a C#
+cast or a floor operation. The later allocation multiplies this count by 40. The experiment below
+executes the arithmetic only, not that allocation or the point-initialization loop.
 
-The maintainer reproduced a frozen native ELF32 probe of the unchanged, relocation-free
-retail slice `[0x004c3602,0x004c363e)`, the old candidate and the corrected candidate.
-It uses 140 finite float32 input cases at PC24, PC53 and PC64 with nearest-even and
-toward-zero rounding: 840 executions per image. The old candidate differs in 36
-calculated integers, twelve at each precision under nearest-even. No difference occurs
-in the tested toward-zero cases. The corrected slice is byte-identical to retail and
-agrees on every case.
+The maintainer reproduced a frozen native ELF32 probe of the unchanged, relocation-free retail slice
+`[0x004c3602,0x004c363e)`, the old candidate and the corrected candidate. It uses 140 finite float32
+input cases at PC24, PC53 and PC64 with [nearest-even](README.md#glossary) and toward-zero rounding:
+840 executions per image. The old candidate differs in 36 calculated integers, twelve at each
+precision under nearest-even. No difference occurs in the tested toward-zero cases. The corrected
+slice is byte-identical to retail and agrees on every case.
 
 One PC24/nearest-even witness uses current-position float bits
 `[3f800000,39800001,39800001]`, previous position zero and segment length `2.0`.
@@ -429,15 +417,14 @@ The probe checks return, integer registers, stack canaries, preserved control wo
 an empty x87 stack. Five simple finite controls per mode, a divide-to-multiply mutation
 and truncated-input refusal also pass.
 
-Private reproducer:
-`<maintainer evidence>/build/trail-count-native-20260930/probe.py`
-(SHA-256 `a58ee0b5fb6aed5405aea7d371c5957ae660fd5b17d8582b009f4ddcbc6f6ccb`).
-Maintainer output: `<maintainer evidence>/build/trail-count-native-lead-20260930/result.json`
-(SHA-256 `221566301ee483bc306dd5e8eecaab514eb6c6e946710657eb8a046b508cb7df`).
-The full-section readback is in the adjacent `squad-trail-independent-readback-20260930.json`.
-The actual game's control word, allocation outcome and visible trail remain unmeasured.
-The cheapest runtime falsifier is to record the control word and these input fields at
-this call on an experimental game copy, then compare its stored point count.
+Private reproducer: `<maintainer evidence>/build/trail-count-native-20260930/probe.py` (SHA-256
+`a58ee0b5fb6aed5405aea7d371c5957ae660fd5b17d8582b009f4ddcbc6f6ccb`). Maintainer output: `<maintainer
+evidence>/build/…/result.json` (SHA-256
+`221566301ee483bc306dd5e8eecaab514eb6c6e946710657eb8a046b508cb7df`). The full-section readback is in
+the adjacent `squad-trail-independent-readback-20260930.json`. The actual game's control word,
+allocation outcome and visible trail remain unmeasured. The cheapest runtime falsifier is to record
+the control word and these input fields at this call on an experimental game copy, then compare its
+stored point count.
 
 ## Emitter and effect part pointers — September 30
 
@@ -484,16 +471,17 @@ non-null array pointer:
 
 Both call `CChunkReader::Read` at `0x00423960`; its instructions at `0x00423961`–`0x00423965`
 multiply the element size and count. The slot loop has **no bone-count multiplier**. Thus the
-pinned extractor's `numPVert * 4 * numBones * 3` skip at `AyaModelImporter.cs:321` disagrees
-with this consumer when the bone count is greater than one and positions are present. Its
-weight formula agrees within these static limits. The private reconstruction already used the
-retail dimensions before this recheck. A subsequent source-lifetime correction also makes the
-entire loader match: its five independent chunk-read indices now have separate lexical scopes,
+extractor's skip of position count times bone count times twelve
+(`references/AYAResourceExtractor/Code/AyaResourceExtractor/AyaModelImporter.cs:321` at commit
+`53b10b0`) disagrees with this consumer when the bone count is greater than one and positions are
+present. Its weight formula agrees within these static limits. The private reconstruction already
+used the retail dimensions before this recheck. A subsequent source-lifetime correction also makes
+the entire loader match: its five independent chunk-read indices now have separate lexical scopes,
 reproducing retail's reuse of dead argument homes. All 2528 compiled section bytes and every
 relocation match, covering 2514 retail function bytes. The maintainer recompiled this change and
-reproduced it in the complete integrated build with all earlier matched identities retained.
-Private receipts: `<maintainer evidence>/build/meshpart-load-stack-20260930/`
-and `<maintainer evidence>/source-interfaces-score-20260930.log`.
+reproduced it in the complete integrated build with all earlier matched identities retained. Private
+receipts: `<maintainer evidence>/build/meshpart-load-stack-20260930/` and `<maintainer
+evidence>/source-interfaces-score-20260930.log`.
 
 These are consumer/data-flow findings from the pristine specimen above, independently read
 from its instructions on September 30. The reader advances chunks without comparing the
@@ -600,9 +588,10 @@ retail continues only when the returned squared magnitude is ordered greater-or-
 limit. Unordered comparisons take the rejection path.
 
 The previous reconstruction squared the distance after the helper call, retaining excess precision,
-and admitted unordered comparisons. A reconstructed inline predicate taking the squared limit by
-reference, with `squaredLimit <= move.MagnitudeSq()`, restores the observed storage and branch
-semantics under the pinned compiler. No independent helper entry or original source spelling is claimed.
+and admitted unordered comparisons. A reconstructed inline predicate that takes the squared limit by
+reference and requires the move's squared magnitude to be ordered greater than or equal to it,
+restores the observed storage and branch semantics under the pinned compiler. No independent helper
+entry or original source spelling is claimed.
 
 The maintainer executed original, prior and corrected post-projection instruction fragments with the actual
 byte-matched magnitude helper. Across 54 explicit PC24/53/64 cases, the prior candidate differs in
@@ -640,7 +629,8 @@ displacement `(-3,3,3)` and float32 distance `1/3`, retail and corrected Y/Z are
 PC53/64, while the old calculation produces zero. PC24 and zero/unit/half-distance controls agree;
 adjacent float distances and mixed scales are also included.
 
-Three ordinary-entry retail runs with triangle `(0,-10,-10)`, `(0,20,-10)`, `(0,-10,20)`,
+Three ordinary-entry runs of the retail instruction slice, under the harness named in the evidence
+owner below, with triangle `(0,-10,-10)`, `(0,20,-10)`, `(0,-10,20)`,
 segment `(1,-1,-1)` to `(-2,2,2)` and a null report reach the compared contact state. They stop
 before prism admission. The slice comparison begins with an empty x87 stack and nonaliased finite
 inputs. It neither determines the game's actual FPU control state nor validates denominator rounding,
@@ -755,13 +745,14 @@ volume/movement records. The old candidate differed in final XYZ movement or pos
 cases (77 deep-response and 71 shallow-threshold cases, all PC24). Return and stopped flags agreed;
 the largest observed XYZ difference was approximately 0.02186.
 
-Retail combines XY squared distance before adding Z squared at `0x004e4f2d` and `0x004e52ca`.
-The old reconstruction's `MagnitudeSq()` emitted `(Y² + Z²) + X²`; using XY magnitude plus Z squared
-restores the retail association, including the compiler-reused deep-contact distance. Fresh native
-execution of the compiled correction removes all 148 observed differences with identical inputs and
-retail outputs. PC53/64 continue to agree in these samples. After that first correction, the unmatched
-1,552-byte section (1,537-byte retail body) retained 43 differing nonrelocation byte positions.
-The expanded comparison below exposes a further relative-speed defect in that candidate.
+Retail combines XY squared distance before adding Z squared at `0x004e4f2d` and `0x004e52ca`. The
+old reconstruction's `MagnitudeSq()` added the Y and Z squares before the X square; using XY
+magnitude plus Z squared restores the retail association, including the compiler-reused deep-contact
+distance. Fresh native execution of the compiled correction removes all 148 observed differences
+with identical inputs and retail outputs. PC53/64 continue to agree in these samples. After that
+first correction, the unmatched 1,552-byte section (1,537-byte retail body) retained 43 differing
+nonrelocation byte positions. The expanded comparison below exposes a further relative-speed defect
+in that candidate.
 
 The probe verifies nonvolatile registers, stack position/canaries, x87 stack/control-word preservation,
 and unchanged volume/report inputs. Defined XYZ outputs, stopped flags and return are compared;
@@ -784,12 +775,12 @@ arithmetic block exercised at its actual caller's measured precision and contact
 
 ### Expanded relative-speed comparison
 
-At `0x004e4fa3`, retail combines relative speed as `(X² + Z²) + Y²`; the earlier reconstruction
-emits `(Z² + Y²) + X²`. Asymmetric small Y/Z velocity components expose the difference. The maintainer
-reproduced 23,160 complete original/candidate calls with the same five retail vector helpers:
-132 defined-output differences in the baseline, all PC24, and none in the corrected candidate.
-Changing only the speed instruction block in a private diagnostic also removes all 132 differences;
-that diagnostic is evidence of cause, not a patch to the preserved specimen.
+At `0x004e4fa3`, retail adds the X and Z squares before the Y square; the earlier reconstruction
+added the Z and Y squares before the X square. Asymmetric small Y/Z velocity components expose the
+difference. The maintainer reproduced 23,160 complete original/candidate calls with the same five
+retail vector helpers: 132 defined-output differences in the baseline, all PC24, and none in the
+corrected candidate. Changing only the speed instruction block in a private diagnostic also removes
+all 132 differences; that diagnostic is evidence of cause, not a patch to the preserved specimen.
 
 The source uses the explicit speed association and the existing vector `Normalise` method. The shallow
 normalization's 81-byte block agrees with retail after resolving constants; the deep zero/reciprocal tail
@@ -822,11 +813,11 @@ off-axis tangency, shallow/deep cutoff, translated origins and radial/vertical d
 
 Retail stores Y squared before adding X squared at `0x0043ff2e..0x0043ff42` and reuses the stored
 squares in deep normalization. The reconstructed `MagnitudeXY()` expression did not preserve those
-rounding points. Using direct `sqrtf(X*X + Y*Y)` removes 76 of the 84 observed defined-output
-differences. Inputs, original outputs and controls are identical between runs; the remaining eight
-differences are unchanged. They concern translated-origin initial Z at PC53/64: retail stores Z at
-`0x0043ff1a` before subtracting height, while the candidate retains excess precision. This remains
-an explicit reconstruction defect, not an accepted approximation.
+rounding points. Taking the square root of the X and Y squares directly removes 76 of the 84
+observed defined-output differences. Inputs, original outputs and controls are identical between
+runs; the remaining eight differences are unchanged. They concern translated-origin initial Z at
+PC53/64: retail stores Z at `0x0043ff1a` before subtracting height, while the candidate retains
+excess precision. This remains an explicit reconstruction defect, not an accepted approximation.
 
 A broader depth-reordering draft initially agreed in 444 cases but failed additional moving-tie
 fixtures: with X=`0.6f` minus two float ULPs, Y=`0.8f`, Z=`1.125f` and Z movement=`0.125f`, retail
@@ -909,12 +900,12 @@ and capacity refusal controls.
 
 ## Imposter orientation and centre offset — October 1
 
-The per-imposter renderer `0x00543300` updates orientation after each of its first
-four faces. At `0x00543878` it forms the current-orientation argument; after two
-pushes, `0x00543888` forms the turn-matrix receiver. The actual matrix product
-`0x0040d320` computes receiver times argument. Thus the operation is `turn * ori`,
-whereas the former reconstruction used `ori * turn`. Matrix multiplication is not
-commutative; this is a source error, not merely register allocation.
+The per-imposter renderer `0x00543300` updates orientation after each of its first four faces. At
+`0x00543878` it forms the current-orientation argument; after two pushes, `0x00543888` forms the
+turn-matrix receiver. The actual matrix product `0x0040d320` computes receiver times argument. Thus
+the operation is the turn matrix times the orientation, whereas the former reconstruction took the
+orientation times the turn matrix. Matrix multiplication is not commutative; this is a source error,
+not merely register allocation.
 
 The maintainer freshly compiled the combined correction and reproduced 48 native cases
 using the original turn-construction block, its exact trigonometric constants,
@@ -924,11 +915,11 @@ in 36 cases; the corrected source agrees in every case. Identity and commuting
 orientations remain controls. Inputs, stack guards, expected registers, control
 word and empty x87 stack are checked; undefined matrix padding is excluded.
 
-A separate first-row error combined the box-centre terms as `X+(Y+Z)`. Retail uses
-`(X+Y)+Z` for each row (`0x0054342a`–`0x005434a7`). The corrected 125-byte block and
-its constructor relocation equal retail exactly. With the actual vector constructor,
-102 native finite fixtures expose twelve old cancellation differences, four at each
-selected precision; the corrected block has none.
+A separate first-row error summed the box-centre terms Y and Z first, then added X. Retail sums X
+and Y first, then adds Z, for each row (`0x0054342a`–`0x005434a7`). The corrected 125-byte block and
+its constructor relocation equal retail exactly. With the actual vector constructor, 102 native
+finite fixtures expose twelve old cancellation differences, four at each selected precision; the
+corrected block has none.
 
 The full renderer remains unmatched: 1,424 compiled bytes against a 1,467-byte
 retail body, with 25 relocations. All 26 earlier exact object controls and 29 other
@@ -968,7 +959,7 @@ A separate fresh static read finds three decoded direct calls, at `0x004e9fc9`,
 Its constructor installs vtable `0x005df0f4`, whose slot 52 points there.
 The selected-squad dispatch at `0x00470681` precedes the developer-mode check;
 PostRender reaches that dispatcher at `0x0053ef91`. This is real retained code,
-but ordinary stock-player activation has not been established.
+but it has not been established that an ordinary play session reaches it.
 
 The retail six-word index array also leaves element 4 unwritten. Its other elements
 are `[i0,i1,i2,i0,unknown,i3]` (`0x0053e1c3`–`0x0053e1f3`). Cached-buffer acquisition
@@ -993,7 +984,7 @@ No renderer ran.
 Fresh library-member and instruction comparison distinguishes intrinsic asin
 `0x0055dcb0` from intrinsic acos `0x0055f380`; both consume an x87 argument.
 Their conventional stack-argument entries are `0x0055dcc4` and `0x0055f394`.
-The pinned VC6 LIBCMT `asin.obj` and `acos.obj` code sections each match their
+The pinned VC6 [LIBCMT](README.md#glossary) `asin.obj` and `acos.obj` code sections each match their
 203-byte retail span outside relocation fields. Their distinct arithmetic,
 endpoint branches and linked operation-name strings establish which is which;
 swapped-member comparisons fail 47/51 nonrelocation bytes. Library SHA-256:
@@ -1072,21 +1063,22 @@ No renderer was opened.
 
 ## Engine And Frame Render Contract
 
-The CEngine constructor, lifecycle, resource, viewpoint and deserialise functions, and the path from the game render loop into the CDXEngine frame render:
+The CEngine constructor, lifecycle, resource, viewpoint and deserialize functions, and the path from
+the game render loop into the CDXEngine frame render:
 
-| Address | Static contract |
-| --- | --- |
-| `0x00449820 CEngine__ctor` | Installs engine vtable, seeds clip constants, clears owned resource pointers, and initializes viewpoint-adjacent state. |
-| `0x004499d0 CEngine__Init` | Registers render/mesh cvars and allocates major render resources: gamut, map textures, water, landscape, HUD/light resources, screen effects, shadows, and trees. |
-| `0x00449d50 CEngine__InitResources` | Loads zoom textures, blob shadows, highlight/hit/cloak textures, and landscape cloud-shadow texture resources. |
-| `0x00449dc0 CEngine__LoadAllNamedMeshes` | Reads named mesh entries, reports `Loading named meshes`, reuses existing names by case-insensitive compare, and calls `CMesh__FindOrCreate` for new entries. |
-| `0x00449ef0 CEngine__GetViewMatrixFromCamera` | Calls camera orientation vfunc, builds/transposes view basis terms, and copies the output view matrix block. |
-| `0x0044a020 CEngine__SetViewpoint` | Stores per-view viewport/player/camera wrapper state and allocates a `CInterpolatedCamera`. |
-| `0x0044a6e0 CEngine__Deserialize` | Reads `ENGN`/map-texture chunk data and dispatches map texture deserialize/init context. |
-| `0x0046e460 CGame__Render` | Coordinates split-screen/fullscreen viewport setup, `CEngine__SetViewpoint`, `CDXEngine__PreRender`, repeated `CDXEngine__Render`, and `CDXEngine__PostRender`. |
-| `0x0053e220 CDXEngine__PreRender` | Prepares per-frame engine/viewpoint state before per-view render loops. |
-| `0x0053e2e0 CDXEngine__Render` | Drives per-view world rendering and reaches render queue, particle texture, water, Kempy cube, overlay, and fullscreen effect paths. |
-| `0x0053ecc0 CDXEngine__PostRender` | Reaches HUD/viewpoint overlays including `0x00487d10 CHud__RenderBattleline`. |
+| Address | Function | Static contract |
+| --- | --- | --- |
+| `0x00449820` | `CEngine__ctor` | Installs engine vtable, seeds clip constants, clears owned resource pointers, and initializes viewpoint-adjacent state. |
+| `0x004499d0` | `CEngine__Init` | Registers render/mesh cvars and allocates major render resources: gamut, map textures, water, landscape, HUD/light resources, screen effects, shadows, and trees. |
+| `0x00449d50` | `CEngine__InitResources` | Loads zoom textures, blob shadows, highlight/hit/cloak textures, and landscape cloud-shadow texture resources. |
+| `0x00449dc0` | `CEngine__LoadAllNamedMeshes` | Reads named mesh entries, reports `Loading named meshes`, reuses existing names by case-insensitive compare, and calls `CMesh__FindOrCreate` for new entries. |
+| `0x00449ef0` | `CEngine__GetViewMatrixFromCamera` | Calls camera orientation vfunc, builds/transposes view basis terms, and copies the output view matrix block. |
+| `0x0044a020` | `CEngine__SetViewpoint` | Stores per-view viewport/player/camera wrapper state and allocates a `CInterpolatedCamera`. |
+| `0x0044a6e0` | `CEngine__Deserialize` | Reads `ENGN`/map-texture chunk data and dispatches map texture deserialize/init context. |
+| `0x0046e460` | `CGame__Render` | Coordinates split-screen/fullscreen viewport setup, `CEngine__SetViewpoint`, `CDXEngine__PreRender`, repeated `CDXEngine__Render`, and `CDXEngine__PostRender`. |
+| `0x0053e220` | `CDXEngine__PreRender` | Prepares per-frame engine/viewpoint state before per-view render loops. |
+| `0x0053e2e0` | `CDXEngine__Render` | Drives per-view world rendering and reaches render queue, particle texture, water, [Kempy cube](../source/stuart-source-synthesis.md#selected-source-render-pipeline), overlay, and fullscreen effect paths. |
+| `0x0053ecc0` | `CDXEngine__PostRender` | Reaches HUD/viewpoint overlays including `0x00487d10 CHud__RenderBattleline`. |
 
 ## Claim boundaries
 

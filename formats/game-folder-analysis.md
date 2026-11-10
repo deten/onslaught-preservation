@@ -1,5 +1,10 @@
 # Game Folder Analysis
-> Complete documentation of Battle Engine Aquila Steam release file structure
+
+Status: historical snapshot — the file layout of the Battle Engine Aquila Steam release as surveyed in December 2025; the format documents linked below hold the current measurements
+Last updated: 2026-11-06 (header added; level, video and resource counts, the level 800 category, the BEA.exe size, the speculative notes and the Tool cell corrected to the format documents)
+Summary: the files, folders and sizes of the Steam release as read in December 2025, with pointers to the level and format documents that now measure each family.
+
+> Historical snapshot (December 2025) of the Battle Engine Aquila Steam release file layout
 > Generated: December 2025
 
 ## Overview
@@ -19,7 +24,7 @@
 
 | File | Size | Type | Purpose |
 |------|------|------|---------|
-| `BEA.exe` | 2.5 MB | PE32 GUI | Main game executable |
+| `BEA.exe` | 2.4 MB | PE32 GUI | Main game executable |
 | `Message.exe` | 36 KB | PE32 GUI | Error dialog utility |
 | `binkw32.dll` | 367 KB | PE32 DLL | Bink video codec (RAD Game Tools) |
 | `ogg.dll` | 48 KB | PE32 DLL | Ogg container format |
@@ -79,22 +84,24 @@ game/
 
 ### Level Numbering System
 
-**97 level directories** with the following patterns:
+**95 numbered level folders** (`level000` to `level958`; five are spelt `Level`), grouped by number. [Level inventory](../levels/level-inventory.md) says which load: 66 are playable and 29 cannot load.
 
-| Range | Description | Count |
-|-------|-------------|-------|
-| 000-030 | Early campaign | ~10 |
-| 100-110 | Mid campaign (Island 1?) | ~5 |
-| 200-232 | Campaign branch A (x11/x12/x21/x22 variants) | ~15 |
-| 300-332 | Campaign branch B | ~15 |
-| 400-432 | Campaign branch C | ~15 |
-| 500-524 | Late campaign (includes Mission 500 branching) | ~10 |
-| 600-622 | Late game content | ~10 |
-| 700-742 | End game missions | ~15 |
-| 800, 850-866 | Bonus/Evo levels | ~8 |
-| 888 | Special level | 1 |
-| 900-905 | Multiplayer (901+ = versus/skirmish) | ~6 |
-| 956, 958 | Unknown special levels | 2 |
+| Range | Folders | What the folders are |
+|-------|---------|----------------------|
+| 000-030 | 21 | 15 empty shells and 6 early prototypes (003, 004, 010, 020, 021, 022); none loads |
+| 100-110 | 3 | campaign levels 100 and 110; 105 is an empty shell |
+| 200-232 | 8 | campaign episode 2, and 201, the playable demo's version of 200 |
+| 300-332 | 8 | campaign episode 3; 301 is an empty shell |
+| 400-432 | 7 | campaign episode 4 |
+| 500-524 | 8 | campaign episode 5; 520 is an empty shell |
+| 530 | 1 | an unfinished level; it cannot load |
+| 600-622 | 5 | campaign episode 6 |
+| 700-742 | 7 | campaign episode 7 |
+| 800 | 1 | campaign episode 8 |
+| 850-866 | 17 | two-player levels (co-operative, skirmish and versus); 856 and 858 are on no menu |
+| 888 | 1 | a flagship duel test; it cannot load |
+| 900-905 | 6 | 900 is an empty shell; 901-905 are the race levels |
+| 956, 958 | 2 | copies of 856's and 858's scripts; they cannot load |
 
 ### Level Directory Contents
 
@@ -142,7 +149,7 @@ Level500script.msl        # Special script for branching mission
 | `text/english.txt` | Global English strings |
 | `text/global.txt` | Language-neutral strings |
 | `text/text.stf` | Compiled string table |
-| `text/textlist.h` | String ID header (dev artifact!) |
+| `text/textlist.h` | String ID header from the text converter, with 16 IDs ([localization text](localization-text.md)) |
 
 ---
 
@@ -154,7 +161,7 @@ Proprietary archive format, extractable with AYAResourceExtractor.
 
 | Pattern | Count | Purpose |
 |---------|-------|---------|
-| `###_res_PC.aya` | ~80 | Level-specific resources |
+| `###_res_PC.aya` | 66 | Level-specific resources ([LVLR archive](lvlr-archive.md)) |
 | `goodie_##_res_PC.aya` | 232 | Gallery item resources |
 | `base_res_PC.aya` | 1 | Base game resources |
 | `Frontend_res_PC.aya` | 1 | Menu resources |
@@ -194,9 +201,7 @@ Proprietary archive format, extractable with AYAResourceExtractor.
 
 The supported PC archive begins with `PCXP`, followed by a record count and
 fixed `PSMP` records containing a 64-byte name, decoded byte count, and raw
-high-nibble-first IMA-ADPCM payload. The rebuild materializer implements only
-the three exact English-bank records currently consumed by Level 100; other
-banks and broader format semantics remain unverified.
+high-nibble-first IMA-ADPCM payload. The rebuild materializer ([onslaught-godot `rebuild/tools/materialize_retail_assets.py`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/tools/materialize_retail_assets.py) at `f44e31e`, checked 2026-11-06) decodes 41 exact records from this English bank (44 table entries, each checked against its WAV SHA-256), for the frontend, Level 100 and Aquila sound-effect outputs. It reads no other bank; other banks and broader format semantics remain unverified.
 
 ### MessageBox Voice Files
 
@@ -224,19 +229,19 @@ All videos use `.vid` extension (Bink video format).
 | `LTLogo.vid` | 1.8 MB | Lost Toys logo |
 | `FEBack128.vid` | 1.4 MB | Menu background |
 | `TWIMTBP_GefFX_640x480_Audio.vid` | 1.6 MB | NVIDIA logo |
-| `gill_m_on_a_fork.vid` | 2.9 MB | **Easter egg?** (investigate!) |
+| `gill_m_on_a_fork.vid` | 2.9 MB | Goodie 75's gallery video (see below) |
 
-### Briefings (29 files)
+### Briefings (28 files)
 
 Pattern: `PC_###_exact.vid` (1.4-4 MB each)
 
 Mission briefing videos for campaign levels.
 
-### Cutscenes (33 files)
+### Cutscenes (32 files)
 
 Pattern: `##.vid` (1-32 MB each)
 
-Story cutscenes numbered 01-33.
+Story cutscenes numbered 01 to 31 and 33; there is no 32 ([bink-video.md](bink-video.md)).
 
 ---
 
@@ -320,34 +325,25 @@ Contains rendering workarounds and capability flags for era-specific graphics is
 
 ### Save System Confirmation
 
-1. `defaultoptions.bea` proves our BES format understanding is correct
+1. `defaultoptions.bea` is consistent with the BES envelope described in [saves/](../saves/README.md)
 2. New games copy this template and modify it
 3. Same 10,004 byte format, same version stamp
 
 ### Level Numbering for Node Mapping
 
-The level directory numbers should map to `mWorldNumber` in CCareerNode:
-
-| Level Dir | Likely Node ID |
-|-----------|----------------|
-| level100 | 100 |
-| level110 | 110 |
-| level200 | 200 |
-| ... | ... |
-
-This could help decode the node structure in save files.
+Each of the 43 campaign nodes stores its level number as `mWorldNumber` (for example 100, 110 and 200), and the level folder carries that same number. This section once guessed node IDs from folder numbers; the measured mapping is in the [career graph](../saves/career-graph.md) and the [save structures](../saves/save-structs.md).
 
 ### Mission 500 Branching
 
-`Level500script.msl` exists - confirms this is where the rocket/submarine path split happens. Relevant to `SLOT_500_ROCKET` and `SLOT_500_SUB` tech slots.
+`Level500script.msl` is in the level 500 folder, beside `Submarine.msl` and `rocketbase.msl` ([MSL scripting](../levels/scripting/msl-scripting.md)). The career sends level 500 on to 511 or 512 by save slot: slot 61 (`SLOT_500_ROCKET`) for the rocket path and slot 62 (`SLOT_500_SUB`) for the submarine path ([level inventory](../levels/level-inventory.md); [MSL commands](../levels/scripting/msl-commands.md)). The script that tests the slot is not identified here.
 
 ### hack.msl Scripts
 
-Found in level741 and level742 - these levels have special "hacking" gameplay. May be relevant to understanding additional game mechanics.
+`hack.msl` is in the level 741 folder, where [MSL scripting](../levels/scripting/msl-scripting.md) lists it as a door-unlock trigger. This snapshot also listed it in level 742, which is not checked here. Open question: does level 742's `hack.msl` do more than unlock a door? Cheapest falsifier: read that script in the shipped level 742 folder.
 
-### Easter Egg Video
+### Gallery video `gill_m_on_a_fork.vid`
 
-`gill_m_on_a_fork.vid` - unusual name, possibly cut content or developer easter egg. Worth investigating.
+Goodie 75 plays this video from the gallery ([goodie-resources.md](goodie-resources.md)), so it is a gallery item rather than a stray file. Whether it is cut content is open. Open question: is it played from anywhere other than Goodie 75? Cheapest falsifier: search the shipped scripts and tables for its name.
 
 ---
 
@@ -355,11 +351,11 @@ Found in level741 and level742 - these levels have special "hacking" gameplay. M
 
 | Extension | Format | Tool |
 |-----------|--------|------|
-| `.bes` / `.bea` | Shared 10,004-byte CCareer envelope (`.bes` career saves; `defaultoptions.bea` global options baseline/snapshot) | Our patcher |
+| `.bes` / `.bea` | Shared 10,004-byte CCareer envelope (`.bes` career saves; `defaultoptions.bea` global options baseline/snapshot) | [Onslaught Companion](https://github.com/dlprentice/Onslaught-Career-Editor) (the AppCore patcher is retired) |
 | `.aya` | Resource archive | AYAResourceExtractor |
 | `.vid` | Bink video | RAD Video Tools |
 | `.ogg` | Vorbis audio | Standard players |
-| `.xap` | PCXP/PSMP sound bank; bounded IMA-ADPCM decode | `rebuild/tools/materialize_retail_assets.py` |
+| `.xap` | PCXP/PSMP sound bank; bounded IMA-ADPCM decode | [onslaught-godot `rebuild/tools/materialize_retail_assets.py`](https://github.com/dlprentice/onslaught-godot/blob/f44e31e6ff2c80dda1078fb2ab2a59bee66ecb29/rebuild/tools/materialize_retail_assets.py) at `f44e31e` |
 | `.msl` | Mission script | Text-based, readable |
 | `.stf` | String table | Binary |
 | `.dat` | Various binary data | Per-file analysis needed |
@@ -368,4 +364,4 @@ Found in level741 and level742 - these levels have special "hacking" gameplay. M
 
 ---
 
-*Document generated from automated analysis - December 2025*
+*Snapshot of December 2025, from automated analysis of the Steam folder.*

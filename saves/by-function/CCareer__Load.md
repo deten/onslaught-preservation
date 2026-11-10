@@ -21,7 +21,7 @@ and pops 8 bytes (two arguments) on return.
 ## Version Stamp
 - Rechecked retail expression: low 16 bits of `[00623e24] + 0x4bc0`; the pristine global is 17, yielding `0x4bd1`.
 - Location: first **2 bytes** of the `.bes` buffer (offset `0x0000`)
-- In many saves, the first 4 bytes *look like* `d1 4b 00 00` in 4-byte aligned hex views: 16-bit version word `0x4BD1` followed by the low-16 of `new_goodie_count` (often `0`).
+- In many saves, the first 4 bytes *look like* `d1 4b 00 00` in 4-byte aligned hex views: 16-bit version word `0x4BD1` followed by the low 16 bits of the pending extra-Goodies dword at the start of CCareer (often `0`).
 
 ## High-Level Flow (BEA.exe)
 1. Validate `*(uint16_t*)source == version_word`.
@@ -34,7 +34,7 @@ and pops 8 bytes (two arguments) on return.
 5. Else (`(char)flag == 0`, full load):
    - Apply audio values from absolute music/sound globals `00662ab0/00662aac`. These are fields of canonical CAREER `00660620`; an arbitrary receiver does not supply these values.
    - Load variable options entries into the table at `0x008892d8` (reads only entries whose table byte[0] is non-zero, matching the save format).
-   - Call `OptionsTail_Read` (`0x00420d70`) to load the final 0x56-byte tail snapshot.
+   - Call `CCareer__ReadOptions` (`0x00420d70`) to load the final 0x56-byte tail snapshot.
 
 This function has no length argument and checks neither a checksum nor node/link
 structure. Version mismatch returns before copying receiver state. The options
@@ -51,7 +51,7 @@ filesystem/page/latest-world actions intercepted. The
 executes those original callees together and confirms low-byte flag admission,
 canonical-global audio sourcing with an alternate receiver, and metadata effects
 on a later direct load in the same process. Changing the first serialized row
-to inactive shifts that second load's tail 32 bytes earlier; scheme 1 restores
+to inactive shifts that second load's tail 32 bytes earlier; control scheme 1 (which copies the preset rows; see [control bindings](../options-control-bindings.md#independently-rechecked-preset-behavior--september-19)) restores
 the tested row and stable size. An incoming first ID `-1` truncates subsequent
 table walks. Fresh startups initialize the table again; these controls do not
 establish cross-startup drift or safe admission of arbitrary altered saves.
@@ -62,10 +62,10 @@ on the boot route. Flag `0x100` selects the zero-byte branch, not career mode.
 - Critical for understanding save file format
 - Companion to CCareer__Save
 - Deep-pass verified callsites (2026-02-23):
-  - `0x00461f44` in `CFEPLoadGame__DoLoad` calls `CCareer__Load` after `PUSH 0x1` (`flag=1`, skip options/tail apply and preserve pre-load audio globals).
-  - `0x00512337` in `CLTShell__WinMain` calls `CCareer__Load` after `PUSH 0x0` (`flag=0`, full options/tail apply path).
+  - `0x00461f44` in `CFEPLoadGame__StartLoad` calls `CCareer__Load` after `PUSH 0x1` (`flag=1`, skip options/tail apply and preserve pre-load audio globals).
+  - `0x00512337` in `WinMain` calls `CCareer__Load` after `PUSH 0x0` (`flag=0`, full options/tail apply path).
 
 ## Related Functions
 - [CCareer__Blank](CCareer__Blank.md) - Called after settings Load on the startup route
 - [CCareer__Save](CCareer__Save.md) - Reverse operation
-- [CCareer__GetSaveSize](CCareer__GetSaveSize.md) - Returns expected buffer size
+- [CCareer__SizeOfSaveGame](CCareer__GetSaveSize.md) - Returns expected buffer size

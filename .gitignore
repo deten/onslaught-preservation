@@ -18,3 +18,6 @@ local-lab/
 *.aya
 *.bes
 *.iso
+
+# The local game folder used during analysis (a user-owned installation), never committed
+/game/

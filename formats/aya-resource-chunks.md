@@ -1,10 +1,10 @@
-Status: active quick reference
-Last updated: 2026-04-29
-Source: migrated from archived Onslaught skills during the skill clean-slate pass.
-Summary: Resource archive chunk IDs and top-level chunk lookup.
 # AYA Chunk Reference
 
-Complete list of chunk IDs found in Onslaught .aya resource files.
+Status: active — quick reference for AYA resource archive chunk IDs
+Last updated: 2026-11-06 (ENGN moved under ERES; BONS, CAMD and CCUS labels aligned with the settled notes; provenance line removed)
+Summary: Resource archive chunk IDs and top-level chunk lookup.
+
+Known chunk IDs (partial list) found in Onslaught .aya resource files. The mesh-stream tags that this list omits, such as the collision-grid and emitter tags, are in [cmsh-fields.md](cmsh-fields.md).
 
 ## Top-Level Resource Chunks
 
@@ -27,7 +27,12 @@ Complete list of chunk IDs found in Onslaught .aya resource files.
 | DMKR | 0x524B4D44 | Damage markers |
 | GDIE | 0x45494447 | Goodie data container |
 | PAGE | 0x45474150 | Page file header (PS2) |
-| ENGN | 0x4E474E45 | Engine state |
+
+## Engine Resource Sub-Chunks
+
+| ID | Parent | Description |
+|----|--------|-------------|
+| ENGN | ERES | Engine state. Nests seven map-texture chunks (MAPT) and a map chunk ([terrain note](../engine/render/terrain/terrain-per-node-colour-absent.md); [source synthesis ledger](../engine/source/stuart-source-synthesis.md)) |
 
 ## Mesh Sub-Chunks
 
@@ -48,7 +53,7 @@ Complete list of chunk IDs found in Onslaught .aya resource files.
 | HFOV | MESP | Hierarchy FOV frames |
 | BONE | MESP | Bone indices |
 | BONW | MESP | Bone weights per vertex |
-| BONS | MESP | Bone scale/transform data |
+| BONS | MESP | Bone skinning (extractor name; no BONS occurs in the 213-file mesh corpus, see [cmsh-matrix-palette-skinning.md](cmsh-matrix-palette-skinning.md)) |
 | PBKT | MESP | Part bucket (skip by size) |
 | CPOS | MESP | Current position (skip by size) |
 | CORI | MESP | Current orientation (skip by size) |
@@ -74,12 +79,12 @@ Complete list of chunk IDs found in Onslaught .aya resource files.
 | MDAT | GDAT | Mesh data reference |
 | TXTR | GDAT | Texture reference |
 
-## Camera/Misc Chunks
+## Animation-Mode and Misc Chunks
 
 | ID | Description |
 |----|-------------|
-| CAMD | Camera data |
-| CCUS | Custom camera settings |
+| CAMD | Animation-mode table, 36-byte records ([cmsh-fields.md](cmsh-fields.md)) |
+| CCUS | Meaning unresolved |
 
 ## Chunk Size Conventions
 

@@ -1,7 +1,7 @@
 # CBattleEngine__IsWalkerGroundedOrCollision
 
 Status: active static contract; contact callees re-derived from retail bytes
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (source pin set to the README commit; earlier: removed private-evidence references and decompiler-style code)
 Summary: mode-2 gate followed by short-circuit ground-or-object contact; the previous unknown virtual slot and timestamp predicate are resolved.
 Evidence: MEASURED — fresh static instructions, constants and RTTI; SOURCE — pinned definitions for the identified queries; UNKNOWN — complete-process contact observations and player acceptance.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, 2,506,752 bytes, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -33,8 +33,8 @@ Ground and object contact use elapsed time since the object's timestamps at
 `+0xcc` and `+0xd4`, respectively, against the event-time float at `0x00672fd0`.
 Both compare with stored `0.15f` at `0x005d8588` and return x87 C0: strict
 less-than for ordered comparisons, also true for a masked unordered comparison.
-Pinned Stuart source `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`,
-`actor.cpp:326-341` and `actor.h:45-47`, distinguishes the virtual ground query
+Pinned Stuart source `c3d8ac464259942b83fa8aa7f867c856e77b734d`,
+`references/Onslaught/actor.cpp:326-341` and `references/Onslaught/actor.h:45-47`, distinguishes the virtual ground query
 from the non-virtual object query.
 
 There are no object writes in this function. A valid receiver is required even

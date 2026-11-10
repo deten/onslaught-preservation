@@ -1,8 +1,8 @@
-Status: active quick reference
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
-Source: migrated from archived Onslaught skills during the skill clean-slate pass.
-Summary: BES/CCareer struct layout lookup.
 # BES Struct Layouts (Retail/Steam)
+
+Status: active — quick reference for BES and CCareer struct layouts
+Last updated: 2026-11-06 (code blocks replaced by prose with save-format.md pointers; attempt-counter wording, archived-record path and save-format date corrected; source named as Stuart Gillam's published source; earlier: links updated for the onslaught-preservation layout)
+Summary: BES/CCareer struct layout lookup.
 
 This is a concise reference for the **retail/Steam** `.bes` layout used by the current patchers in this repo.
 
@@ -10,19 +10,7 @@ This is a concise reference for the **retail/Steam** `.bes` layout used by the c
 
 ## CCareerNode (64 bytes)
 
-```c
-struct CCareerNode {
-    /* +0x00 */ uint32_t state;           // Flags/legacy (not fully mapped). Preserve unless experimenting.
-    /* +0x04 */ uint32_t mComplete;       // Raw BOOL/int (0/1 observed in retail saves)
-    /* +0x08 */ int32_t  mLowerLink;      // Link index (into CCareerNodeLink[200])
-    /* +0x0C */ int32_t  mHigherLink;     // Link index (into CCareerNodeLink[200])
-    /* +0x10 */ int32_t  mWorldNumber;    // Level ID (100, 110, 200...)
-    /* +0x14 */ int32_t  mBaseThingsExists[9];  // 288 persistence bits (level-specific; preserve)
-    /* +0x38 */ int32_t  mNumAttempts;    // Attempt counter
-    /* +0x3C */ uint32_t mRanking;        // Raw IEEE-754 float bits (rank)
-};
-// Total: 64 bytes
-```
+A node is 64 bytes. Its field offsets and sizes are in the [`CCareerNode` table](save-format.md#ccareernode-64-bytes) of save-format.md. The attempt-count field (`mNumAttempts`, `+0x38`) is zeroed by `Blank` and never incremented; every gold-save node holds 0.
 
 **Ranking bits (true view):**
 - S: `0x3F800000` (1.0)
@@ -35,13 +23,7 @@ struct CCareerNode {
 
 ## CCareerNodeLink (8 bytes)
 
-```c
-struct CCareerNodeLink {
-    /* +0x00 */ uint32_t mLinkType;  // Raw ECNLinkType: 0 NOT_COMPLETE, 1 COMPLETE,
-                                     // 2 COMPLETE_BROKEN; preserve unknown values
-    /* +0x04 */ int32_t  mToNode;    // Destination node index (0xFFFFFFFF for unused)
-};
-```
+A link is 8 bytes. `+0x00` is the raw link type (0 NOT_COMPLETE, 1 COMPLETE, 2 COMPLETE_BROKEN; preserve unknown values), and `+0x04` is the destination node index (0xFFFFFFFF for unused).
 
 A node whose parent links are **all** `COMPLETE_BROKEN (2)` reads as LOCKED at the
 retail `Career_IsWorldUnlocked` gate, which unlocks only on a parent link equal to
@@ -59,8 +41,8 @@ that backs it.
 That was true when written (this document's `Last updated` was 2026-04-29) and
 has since been overtaken. A third value is observed and is load-bearing for the
 campaign graph: [`save-format.md`](save-format.md)
-(last updated 2026-07-16) records `+0x00` as "the link type/state (`0`, `1`, or
-observed alternate-parent value `2`)", and `../save-file/struct-layouts.md` names
+(last updated 2026-10-22) records `+0x00` as "the link type/state (`0`, `1`, or
+observed alternate-parent value `2`)", and `struct-layouts.md` (archived research record, not published) names
 it `COMPLETE_BROKEN`. The enum is source-backed —
 `references/Onslaught/Career.h:58-62` declares `ECNLinkType` with
 `CN_NOT_COMPLETE`, `CN_COMPLETE`, `CN_COMPLETE_BROKEN`, written at
@@ -73,11 +55,7 @@ a `2`. What it failed to say is that a `2` *means* something: writing `1` over a
 
 ## CGoodie (4 bytes)
 
-```c
-struct CGoodie {
-    /* +0x00 */ uint32_t state;  // Raw 0/1/2/3 in true dword view
-};
-```
+A Goodie entry is 4 bytes, and its `state` is the raw value 0, 1, 2 or 3 in the true dword view.
 
 Goodie states (true view):
 - 0 = UNKNOWN
@@ -97,23 +75,12 @@ Preserve `meta` when patching.
 
 CCareer offset: `0x2408` (file offset `0x240A` in true view)
 
-```c
-// Set slot N:
-mSlots[N >> 5] |= (1 << (N & 31));
-// Test slot N:
-(mSlots[N >> 5] & (1 << (N & 31))) != 0;
-```
+Slot N is bit N modulo 32 of the `mSlots` word at index N divided by 32.
 
-Known slot meanings (from Stuart’s source):
+Known slot meanings (from Stuart Gillam’s published source, pinned as the [README](../README.md) describes):
 - 61: `SLOT_500_ROCKET`
 - 62: `SLOT_500_SUB`
 
 ## Constants
 
-```c
-#define NUM_LEVELS       43
-#define MAX_NODES       100
-#define MAX_LINKS       200
-#define MAX_NUM_GOODIES 300
-#define MAX_CAREER_SLOTS 32
-```
+The campaign has 43 levels, which the graph uses as 43 nodes and 86 links ([career-graph.md](career-graph.md)). The save reserves 100 node slots, 200 link slots, 300 Goodie slots and 32 `mSlots` words.

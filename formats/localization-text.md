@@ -3,7 +3,7 @@
 Status: active format contract — language DAT layout implemented; loose mission
 text/source relations bounded
 Date: 2026-08-22
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (the CText names follow the naming authority; the crosswalk is cited from the body; earlier: research-campaign records and decompiler-style code removed)
 Verdict: the six v3 DAT layouts and ID/audio-name census are closed; loose
 TXT/STF selection, signed-ID tooling, and language fallback remain open.
 Evidence: MEASURED — 227 mirror-index text-family rows plus six language DATs;
@@ -51,6 +51,8 @@ this v2/v3 layout. Its current STF regex accepts only unsigned decimal text, so
 it drops all 151 negative definitions; the byte decoder is useful, but its
 general STF-name export is not complete until that bug is fixed.
 
+The same six tables are compared with their Xbox and PS2 counterparts in [platform-content-crosswalk.md](../platforms/console/platform-content-crosswalk.md).
+
 ## Mission TXT and STF source shapes
 
 Nonempty mission TXT files begin bracketed keys such as
@@ -67,12 +69,14 @@ packed mission objects is unproved.
 
 | VA | Identity | Demonstrated boundary |
 | --- | --- | --- |
-| `0x004F21F0` | `CText__Init` | Selects five UI languages plus American-English override; parses versions 0–3. |
+| `0x004F21F0` | `CText__Load` | Selects five UI languages plus American-English override; parses versions 0–3. |
 | `0x004F2580` | `CText__GetStringById` | Linear v1/v2/v3 entry scan; returns UTF-16 pool pointer or fallback. |
-| `0x004F2500` | `CText__GetStringByIdAfter` | Relative/grouped lookup owner. |
+| `0x004F2500` | `CText__GetFollowingString` | Relative/grouped lookup owner. |
+
+Names follow [onslaught-decomp](https://github.com/dlprentice/onslaught-decomp), the naming authority, which gives each of these addresses the name shown above.
 
 The detailed loader contract is
-`CText__Init.md` (in the decompilation notes, not yet published); lookup
+`CText__Load.md` (in the decompilation notes, not yet published); lookup
 semantics are in
 `CText__GetStringById.md` (in the decompilation notes, not yet published).
 The installed files prove six filesystem tables; the UI selector still has five

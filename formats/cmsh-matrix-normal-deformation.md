@@ -2,7 +2,7 @@
 
 Status: active bounded retail contract — typed palette construction and linked-shader normal dataflow closed
 Date: 2026-08-23
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (the routine named as the decompilation names it; the Reproduce inputs defined and the capture logs written as maintainer evidence; earlier: research-campaign records and decompiler-style code removed)
 Verdict: **For each BONE entry, `CMeshRenderer__RenderMeshCore` samples the
 part at frame zero and at the current interpolated pose, stages row-major
 row-vector affine matrices, and constructs the unscaled bind-to-current palette
@@ -199,7 +199,7 @@ if any of these change:
 - exact position coefficients `(0, 2s, s)` for
   `s = float32(0x3EAAAAAB)`;
 - the 16-element scale owner is `CMeshRenderer__RenderMeshCore`;
-- `CVertexShader__ApplyCustomRenderStateShaderConstants` owns only the separate
+- `CVertexShader__SetCustomConstants` owns only the separate
   c7-c9 diagonal and c10+ upload.
 
 Focused negative controls reject a reversed matrix product, transpose for
@@ -209,18 +209,26 @@ opcode, and exact shader identity drift.
 
 ## Reproduce
 
+Run these from a checkout of [Onslaught-Career-Editor](https://github.com/dlprentice/Onslaught-Career-Editor) at commit [`51129bab`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50), which holds `tools/cmsh_matrix_normal_contract.py` and its tests; this repository does not. The placeholders name inputs this repository does not hold:
+
+- `<safe-copy>`: a read-only copy of the installed game, with its `data/` folder and `BEA.exe.original.backup` (the specimen hash above);
+- `<asset-mirror>`: the asset-mirror index `INDEX.jsonl`, whose SHA-256 is given above (a `<maintainer evidence>/…` receipt);
+- `<maintainer evidence>`: the maintainer's private folder for the three capture logs named above (see [how to read a finding](../README.md#how-to-read-a-finding)).
+
+Without those inputs, check the tracked [TSV receipt](cmsh-matrix-normal-deformation.tsv) against the SHA-256 given in the header instead.
+
 ```bash
-python ./tools/cmsh_matrix_normal_contract.py \
+python3 tools/cmsh_matrix_normal_contract.py \
   --data-root "<safe-copy>/data" \
   --mirror-index "<asset-mirror>/INDEX.jsonl" \
   --pristine-exe "<safe-copy>/BEA.exe.original.backup" \
-  --capture-log "<d3d9-capture>/vsdump-lvl800-20260731-132614/d3d9-draws.log" \
-  --capture-log "<d3d9-capture>/vskin-lvl800-20260731-133529/d3d9-draws.log" \
-  --capture-log "<d3d9-capture>/vsdump-lvl611-20260731-134131/d3d9-draws.log" \
+  --capture-log "<maintainer evidence>/captures/vsdump-lvl800/d3d9-draws.log" \
+  --capture-log "<maintainer evidence>/captures/vskin-lvl800/d3d9-draws.log" \
+  --capture-log "<maintainer evidence>/captures/vsdump-lvl611/d3d9-draws.log" \
   --json-out ".artifacts/cmsh-matrix-normal/report.json" \
   --tsv-out ".artifacts/cmsh-matrix-normal/report.tsv"
 
-python ./tools/cmsh_matrix_normal_contract_tests.py
+python3 tools/cmsh_matrix_normal_contract_tests.py
 ```
 
 Two independent runs were byte-identical. JSON SHA-256 was

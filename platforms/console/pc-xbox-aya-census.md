@@ -2,21 +2,21 @@
 
 Status: active measured cross-platform packaging and resource-selection finding
 Date: 2026-08-13
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (tool location and AYAD guard wording matched to the pinned sources; superseded record marked; reproduction inputs stated; earlier: research-campaign records and decompiler-style code removed)
 Verdict: The pristine PC shelf has 301 strict chunked-zlib AYA archives; the
 USA Xbox container has 302 strict raw-tag-stream AYA members. All 301 PC IDs
 pair, Xbox alone has `goodie_232`, and the 63 top-level sequence differences
 are completely explained by `TEXT`/`MESH` counts. Serialized size does not
 establish visual quality.
 Evidence: MEASURED — two byte-identical v3 corpus replays through
-`tools/aya_cross_platform_compare.py`, bound by the path-free manifests and
+`tools/aya_cross_platform_compare.py` in Onslaught-Career-Editor (commit 51129bab), bound by the path-free manifests and
 output hashes below; pinned source supplies only the cited field ownership.
 
 ## Bound inputs and deterministic receipts
 
 The comparison was run over one pristine PC resource shelf and one USA Xbox
 ZIP. Retail archives and generated rows remain under `<maintainer evidence>/`; this note
-promotes only the bounded aggregate facts.
+promotes only the bounded aggregate facts. Reproducing the comparison needs your own retail PC and USA Xbox copies, which this repository does not contain.
 
 | Identity | Value |
 | --- | --- |
@@ -35,10 +35,9 @@ promotes only the bounded aggregate facts.
 The two census files use
 `bea.pc-xbox-aya-logical-census.v3`. The unchanged chunk-row schema remains
 `bea.pc-xbox-aya-chunk-geometry.v2`; it accounts for 47,657 rows. The earlier
-`pc-xbox-aya-v2-a-census.json` is superseded: it used the same v2 identifier as
+`pc-xbox-aya-v2-a-census.json` (archived research record, not published) is superseded: it used the same v2 identifier as
 a later shape despite 737 recursive leaf-or-missing-key differences (602 pair,
-126 divergence, six summary, three source). Local
-`AYA-CENSUS-SCHEMA-SUPERSESSION-2026-08-13.md` owns that disposition.
+126 divergence, six summary, three source).
 
 The two canonical manifests bind different, explicit surfaces:
 
@@ -109,10 +108,11 @@ tag plus occurrence for other families.
 
 `LVLR` is 103 everywhere. `TARG` is uniformly 1 on PC and 2 on Xbox. `AYAD`
 is PC `(344,372,316,5084,92,1)` versus Xbox
-`(344,372,320,5084,92,1)`. Pinned source identifies these as version, target,
-and the six ABI/static-shadow guard fields in
-`references/Onslaught/ResourceAccumulator.cpp:43-53,324-347`; only
-`CMeshPart` differs in the measured guard, 316 versus 320 bytes.
+`(344,372,320,5084,92,1)`. Pinned source identifies these six values as the byte
+sizes of five engine types (texture, mesh, mesh part, heightfield and vertex shader)
+and the static-shadow flag, in `references/Onslaught/ResourceAccumulator.cpp:43-53,324-347`;
+the version and target are in the separate `LVLR` and `TARG` chunks. Only `CMeshPart`
+differs in the measured guard, 316 versus 320 bytes.
 
 `WRES` gives the strongest next field join: 46/66 are exact, level 611 alone is
 same-size/different-payload, and 19 change size. `ERES` is equal-size but

@@ -2,8 +2,10 @@
 
 Status: historical — controlled copied-runtime observations
 Date: 2026-07-26
-Last updated: 2026-11-02 (historical probe tooling availability clarified)
-Summary: four questions that static reading could not settle, settled by reading a running copy under CDB.
+Last updated: 2026-11-06 (Specimen and Evidence lines added, the capture target named, undefined terms glossed, withdrawn and superseded passages marked or removed, unreconciled counts flagged; earlier: historical probe tooling availability clarified)
+Summary: four questions (sections 1 to 4) that static reading could not settle, settled by reading a running copy under CDB (Microsoft's console debugger); section 5 follows up section 2.
+Specimen: `BEA.exe`, SHA-256 `e1436ef7e0ad9ccbddd43aaaca952f6e84d4b1a282835cead745efcfc32fadf4`, the capture target: pristine plus the four-byte `force_windowed` patch and nothing else. It is not the pristine specimen (`BEA.exe.original.backup`, SHA-256 `74154bfa…`); see the [retail specimen baseline](../platforms/pc/retail-specimen-baseline.md).
+Evidence: MEASURED — controlled runtime reads and device-call records of the capture target (sections 1 to 5); INFERRED — the section 3 attribution of the residual pixels to HUD overlay.
 
 Each had blocked for hours or days on a
 decompiler limitation, an unresolvable indirect call, or a constant whose units
@@ -12,13 +14,15 @@ are simply not present in the image.
 ## Specimen and safety
 
 Every observation below was taken from
-`<maintainer evidence>/safe-copy-bea-pristine/BEA.exe`, sha256
+`<maintainer evidence>/safe-copy-bea-pristine/BEA.exe`, the capture target named in the header (the folder is named for its purpose, not its contents), sha256
 `E1436EF7E0AD9CCBDDD43AAACA952F6E84D4B1A282835CEAD745EFCFC32FADF4`. The pristine
 original sits beside it as `BEA.exe.original.backup`, sha256 `74154BFA…`, and was
 never opened. The Steam install was never launched, attached to, or read.
-`lm m BEA` reports base `00400000`, so there is no VA translation anywhere below.
+The CDB module list (`lm m BEA`) reports base `00400000`, so every address below is already a virtual address (VA) with no translation needed.
 
 **Breakpoints and memory reads only. Nothing was ever written to the debuggee.**
+
+In this note, "retail" means the capture target, which differs from the pristine executable only by the four-byte `force_windowed` patch.
 
 Raw debugger logs are untracked by project rule and live under
 `<maintainer evidence>/cockpit-worldmatrix-2026-07-26/`,
@@ -97,13 +101,13 @@ This retired a blocking contradiction rather than resolving it: the earlier
 static claim that "both traceable world-matrix uploads are identity with zero
 translation" was true of the **reset** at `0x0053ebb6` and false of the draw.
 `CCockpit::Render` overwrites the matrix before any flush. See
-`cockpit-world-matrix-static-2026-07-26.md` (to be published here after review),
+`cockpit-world-matrix-static-2026-07-26.md` (not yet published; not in this repository),
 a hand stack-frame trace performed blind to this capture, which independently
 located the real upload at `0x004b697b` and agrees.
 
 **Two of the seven batches carry a negative-determinant (mirrored) world
 matrix** — `Rsidebit01` and `Lsidebit02`. The mirror is authored in the shipped
-`HORI` bytes and retail's tool pre-reverses the index order inside mirrored
+`HORI` data (hierarchy orientation; see [the tag notes](../formats/aya-tags.md#hori---hierarchy-orientation)), and retail's tool pre-reverses the index order inside mirrored
 instances, so it is handled correctly.
 
 Also confirmed: the cockpit root sits at the camera to **1.4e-4 units**, so
@@ -113,7 +117,7 @@ point.
 **Stated limit.** The camera does not move in Level 100 under any scripted input
 — relative mouse-look, held `A` and held right-arrow all produced bit-identical
 matrices. So this observes exactly **one** pose. It is the pose of the
-t0+25065 ms parity frame, but it cannot demonstrate the matrix *tracking* the
+t0+25065 ms parity frame ("parity" is the rebuild's comparison term; see [its parity record](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/PARITY.md)), but it cannot demonstrate the matrix *tracking* the
 camera; that rests on the structural facts above, not on observed variation.
 
 ## 2. The terrain light state — the two-light model is exact
@@ -173,36 +177,23 @@ excluded, and that is the only kind the residual could have had.
 > because the mesh draws run a *different rig*. That turned out to matter far more
 > than expected, and it is what §5 is about.
 
-**These light values were read at `0x0053e688`, the TERRAIN draw, and §3's own
-`SetRenderState` transition trace shows `D3DRS_LIGHTING = 0` at that draw.** The
-light state was therefore validated at one of the few draws in the frame that is
-explicitly *unlit*.
+*Withdrawn, as the scope correction above explains:* these light values were read at
+`0x0053e688`, the TERRAIN draw. The premise that this draw is unlit, and so that the
+values were validated at an unlit draw, is the one that correction withdraws.
 
-Two consequences, both live:
+Consequences of the withdrawn premise, superseded by section 5:
 
 1. **Do not carry these values to the lit mesh draws.** The world and tree draws
-   run with `D3DRS_LIGHTING = 1` and their light state was never read. The
-   correct site is `0x00549570`, not `0x0053e688`. Any argument that reasons from
-   §2's colours to the appearance of buildings, trees or the walker is currently
-   unsupported.
+   run with `D3DRS_LIGHTING = 1`, and section 5 reads their light state at the device.
+   The state-shadow site for the lit draws is `0x00549570`, not `0x0053e688`; section 5
+   gives the decisive reading. Any argument that reasons from §2's colours to the
+   appearance of buildings, trees or the walker is currently unsupported.
 
-2. **It sits in tension with the terrain ambient-light derivation** in
-   `terrain-ambient-light-applied-2026-07-26.md` (archived research record, not published),
-   which concluded that retail draws terrain with lighting **active** through a
-   terrain-only `D3DMATERIAL9` with ambient response 0.8. Both readings cannot be
-   right as stated. That derivation produced a large measured parity gain
-   (63.81 % → 52.20 % material), which is *not* evidence that its mechanism is
-   correct — a wrong mechanism that lands on the right number is precisely the
-   failure mode this project has hit before. **Unresolved and flagged rather than
-   reconciled by argument.**
-
-Three further quantities are unread at the lit mesh draws and any one of them
-changes the answer: the enable array and records at `0x00549570`; the
-`D3DLIGHT9` **Diffuse-versus-Ambient split** actually uploaded (the 0x5c-byte
-engine records are not `D3DLIGHT9`, and that mapping is static-only); and the
-`D3DMATERIAL9`, whose `EMISSIVE` and `SPECULARMATERIALSOURCE` are both
-`D3DMCS_MATERIAL`, leaving `Emissive`, `Specular` and `Power` live and entirely
-unmeasured.
+Section 5 reports, from the device, the `D3DLIGHT9` Diffuse and Ambient values as uploaded
+(Diffuse carries sun and anti-sun, and Ambient is zero on both lights at the mesh draws) and the
+`D3DMATERIAL9` channels (`Emissive` and `Specular` are zero, `Power` is 0.1). It gives the enable
+array only for the mode-4 draws, where it is all zero. The mapping from the engine's 0x5c-byte
+light records to `D3DLIGHT9` is not measured here.
 
 ## 3. Mesh lighting mode and stage-0 `COLOROP` — one fix falsified, one confirmed
 
@@ -215,6 +206,8 @@ Three launches, two level times, **4,393 mesh draws observed**.
 | 27 + 19 | **4** | **1** | `CRTMesh`, a later pass |
 | 7 | 0 | 1 | cockpit |
 | 4 | 0 | 0 | first draw of each frame, before the pass turns lighting on |
+
+The rows sum to 1,715 draws, not the 4,393 in the heading, and the table does not say whether its counts are per launch, per frame or per run. This total is an open question: the cheapest check is a recount of each row from the private record.
 
 The mode is **never 2, never 6, never 8**, and breakpoints planted on the mode-2
 and mode-6 draw calls at `0x0054a423`/`0x0054a466` **never fired once**. A
@@ -251,7 +244,7 @@ pixel.** It was recorded here as an open residual: batch 3, 366 px, wanting the
 doubling kept on pixels while reading `MODULATE` like the other six batches.
 
 The decisive instrument was a differential rather than a mask. Halving the
-stage-zero gain moved every positive-determinant batch by **1.79–2.24** and moved
+stage-zero gain of the reconstruction's build (not of the retail copy or the debuggee's memory) moved every positive-determinant batch by **1.79–2.24** and moved
 `Lsidebit02` by **1.000 / 1.002 / 1.001**, with **71.4 % of its pixels
 byte-identical** in a frame where 34 % of all pixels changed. `Rsidebit01`
 behaved the same way (0.998 / 0.993 / 0.981). That is exactly the two
@@ -268,7 +261,7 @@ This **reinforces** the `MODULATE` finding above, whose only counter-example
 turns out never to have been cockpit shading. Working note:
 `<maintainer evidence>/COCKPIT-SIDEBIT-RESIDUAL-2026-07-26.md`.
 
-The generalisable lesson is the instrument: **perturb one constant, capture
+The generalisable lesson is the instrument: **perturb one constant in the build under test, capture
 twice, and admit only the pixels that responded.** That is strictly stronger than
 a geometric mask, because it needs no model of what is drawn where.
 
@@ -304,6 +297,8 @@ engine time since launch (carrying the front end's 8.167 s), and a rate that had
 been "corrected" from 0.02/0.01 down to 0.001/0.0005 on the strength of the
 `.rdata` constants alone. **The original rates were right.** Only a runtime read
 could distinguish them.
+
+Conversion between the two bases: each terrain draw adds the per-advance rate, times the value at `[0x008a9e20]`, to `u`, and `v` takes its own rate the same way. The per-second change is therefore that step times the number of terrain draws per second. This section does not state the draw rate, so the per-advance constants alone do not fix the per-second rates.
 
 ## Method note
 
@@ -345,8 +340,8 @@ the frame.**
 sun and anti-sun as recorded. The `D3DMATERIAL9` at every non-terrain draw
 (`0x0083d248`, read at five sites in both runs) is `Diffuse = (1,1,1,1)`,
 `Ambient = (0,0,0,1)`, **`Specular = (0,0,0,0)`, `Emissive = (0,0,0,0)`**,
-`Power = 0.1`, with `SPECULARENABLE = 0`. That is a precise negative: the two
-channels flagged as "live and unmeasured" are both zero.
+`Power = 0.1`, with `SPECULARENABLE = 0`. That is a precise negative: `Specular` and
+`Emissive` are both zero.
 
 ### `D3DRS_AMBIENT` is not constant, and that is the answer
 
@@ -354,6 +349,8 @@ channels flagged as "live and unmeasured" are both zero.
 | ---: | --- | --- | --- |
 | 130 `CRTMesh` static world | `0x000d0f2b` | HFLD sun, as recorded | anti-sun |
 | **442 `CRTTree` close pines** | **`0x0039293e` = (57,41,62)/255** | **sun × 0.1, pointing straight DOWN `(0,0,+1)`** | **full anti-sun, pointing straight UP `(0,0,-1)`** |
+
+The static-world row above gives 130 draws from this section's two probe launches. Section 3 gives 493 and 134 for the static world, and the two sets are not reconciled here.
 
 The `0.1` is a shipped constant at `0x005d85c0`, applied in
 `CRTTree::BuildRenderOutputs` at `0x004ddcb8`–`0x004ddd2f` alongside `1/256`; the

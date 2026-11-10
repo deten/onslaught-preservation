@@ -1,11 +1,11 @@
 # CFEPLoadGame__StartLoad
 
 Status: active bounded retail contract; complete UI/filesystem acceptance pending
-Last updated: 2026-10-22 (VALIDATION citations pinned to sections)
+Last updated: 2026-11-06 (table names in the body; pending extra-Goodies field name; 0x prefixes added; volatile count removed from the header)
 Summary: original menu-load composition preserves live volumes and conditionally forwards the entire read buffer to default-options persistence.
 Source File: `references/Onslaught/FEPLoadGame.cpp` (`StartLoad`, partial analogue); Binary: pristine `BEA.exe.original.backup`.
-Evidence: MEASURED — selected pristine instructions and 20 isolated original-code controls; UI and filesystem services intercepted.
-Address: `0x00461e20`, body `[00461e20,004620bc)`.
+Evidence: MEASURED — selected pristine instructions and isolated original-code controls; UI and filesystem services intercepted.
+Address: `0x00461e20`, body `[0x00461e20, 0x004620bc)`, half-open (the end address is not part of the body).
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 ## Purpose
@@ -20,12 +20,12 @@ A `CFEPLoadGame` member with no explicit arguments and no return value.
 ## Independently rechecked behavior
 
 - Requires a selected save slot at `this+0x40`; if `-1`, calls the compiled
-  no-op trace at `0040c640` and returns without allocation or file operations.
+  no-op trace at `0x0040c640` and returns without allocation or file operations.
 - Copies the wide name at `this+0x44` into save/keyboard globals before reading.
   The original PC card-info body reports present/formatted regardless of index.
-- Allocates a temp buffer of `size = CCareer__GetSaveSize()`.
+- Allocates a temp buffer of `size = CCareer__SizeOfSaveGame()`.
 - Reads the save file into the buffer via:
-  - `PCPlatform__ReadSaveFile(device=0x008a9694, slot=this+0x40, save_name=this+0x44, out_buf, size, &bytesRead)`
+  - `CPCMemoryCard__ReadSave(device=0x008a9694, slot=this+0x40, save_name=this+0x44, out_buf, size, &bytesRead)`
   - Return convention: `0` indicates a full read, non-zero indicates failure.
 - Loads career state into the global `CAREER` via:
   - `CCareer__Load(&CAREER, out_buf, flag=1)`
@@ -33,7 +33,7 @@ A `CFEPLoadGame` member with no explicit arguments and no return value.
 - On successful load:
   - Transitions the frontend to the next page/state (success path).
   - Sets `0x008a9584 = 1` (frontend state flag used by save/load flows).
-  - After the page-transition call, tests only the **low byte** at `0082b5b0`.
+  - After the page-transition call, tests only the **low byte** at `0x0082b5b0`.
     If zero, calls `CFEPOptions__WriteDefaultOptionsFile(out_buf, size)` with
     the original read buffer. A nonzero higher byte alone does not suppress it.
 - Frees the temp buffer before returning.
@@ -77,8 +77,8 @@ in [`VALIDATION.md`, "Original menu load and next startup — September 19"](htt
 
 ### Read-path name conversion
 
-The composed original PC reader builds `savegames\\<name>.bes`, taking only the
-low byte of each wide code unit. `GoldA` and `Gold\u0141` therefore produce the
+The composed original PC reader builds `savegames\<name>.bes`, taking only the
+low byte of each wide code unit. `GoldA` and `GoldŁ` (the letter L with stroke, whose low byte is that of `A`) therefore produce the
 same intercepted path; a nonzero wide character whose low byte is zero truncates
 the converted name. These are authored boundary inputs, not proof that the real
 keyboard UI can generate those names. Device and slot changes leave this path
@@ -90,7 +90,7 @@ stream; short reads make one. No actual CRT double-close consequence was tested.
 | Offset | Size | Content |
 |--------|------|---------|
 | 0x0000 | 2 | Version word (0x4BD1) |
-| 0x0002 | 4 | `new_goodie_count` (CCareer +0x0000) |
+| 0x0002 | 4 | pending extra-Goodies dword (CCareer +0x0000) |
 | 0x0006 | 6400 | CCareerNode[100] |
 | 0x1906 | 1600 | CCareerNodeLink[200] |
 | 0x1F46 | 1200 | Goodies[300] |
@@ -102,7 +102,7 @@ stream; short reads make one. No actual CRT double-close consequence was tested.
 
 Known failure behaviors:
 - If the device/card is absent or unformatted, it routes through the frontend error/whinge path and returns. That shared storage-message helper is `CFEPSaveGame__RemovedMUWhinge` at `0x00464b30`.
-- If `PCPlatform__ReadSaveFile` fails, the original caller requests message
+- If `CPCMemoryCard__ReadSave` fails, the original caller requests message
   `0x41`, calls `SetPage(0,0)`, and frees the buffer under the intercepted UI.
 - If `CCareer__Load` rejects the version, it requests message `0x42`, calls
   `SetPage(0,0)`, and frees the buffer. Neither case invokes the options writer.

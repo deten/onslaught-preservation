@@ -1,7 +1,7 @@
 # `CRound::Hit`, configured explosion creation, and `CExplosion::Hit`
 
 Status: active, bounded semantic contract
-Last updated: 2026-10-29 (the binary64 constant given by value only; earlier: research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (earlier Core references labelled, byte runs removed, the Medium Pulse record named once, the 734-byte range kept inclusive; earlier: the binary64 constant given by value only; earlier: research-campaign records and decompiler-style code removed)
 Evidence: MEASURED — pristine retail bytes, strict RTTI/vtables, exact data
 records, dated static exports, replicated runtime carriers, and independent
 PC-demo normalized bodies; SOURCE — pinned `CThing`/init layouts and virtual
@@ -9,7 +9,7 @@ order; UNKNOWN — the narrowed gates listed below.
 Verdict: direct-round damage byte-provably precedes the synchronous small-
 explosion neighbor scan, but the explosion is spatial rather than bound to the
 original receiver. Its configured damage is a radial maximum, not an
-unconditional second call. The PC MapWho traversal/filter chain, four modeled
+unconditional second call. The PC [MapWho](README.md#shorthand-used-in-these-notes) traversal/filter chain, four modeled
 Level 100 serialized geometry inputs, Warehouse's ordered segmented report, and
 the terminal Target Tank's continued eligibility with part `-1` have bounded
 static contracts. Live resource selection,
@@ -75,7 +75,7 @@ Direct writes and ordered consequences visible in this body are:
 - a conditional increment of `[owner+0x574]+0x38`;
 - target `Damage`, followed by `CBattleEngine::Rearm` for Battle Engine
   targets;
-- an optional owner callback when the target newly becomes dying (`+0x2c` bit `0x4`, `TF_DYING`, `thing.h:43-45`; the shutdown flag is bit `0x1`, tested by `AddShutdownEvent` at `0x004f43d4`);
+- an optional owner callback when the target newly becomes dying (`+0x2c` bit `0x4`, `TF_DYING`, `references/Onslaught/thing.h:43-45`; the shutdown flag is bit `0x1`, tested by `AddShutdownEvent` at `0x004f43d4`);
 - impact-material sound and
   `CRound::ProcessImpactExplosionAndEffects(...,3,...)`;
 - for `CRoundBeam`, set `this+0x2C` bit 4 and schedule event `2000` at current
@@ -88,7 +88,7 @@ not a typed result.
 ## Runtime join
 
 The existing replicated Level-521 call-context proof records the call at
-`0x004D8CEF` in both replicas. The raw arguments are damage bits `0x3D4CCCCD`
+`0x004D8CEF` in both replicated runtime records. The raw arguments are damage bits `0x3D4CCCCD`
 (`0.05f`), the projectile pointer, `TRUE`, and mesh part `-1`. A second
 slot-39 invocation in the same bounded evidence does not contain the selected
 Damage call. Therefore this document proves a conditional damage path, not
@@ -160,13 +160,13 @@ instruction-identical after a single relocated global reference.
 
 ### Retained-trace slot-40 carrier proof (2026-08-12)
 
-Three independent retained TTD call-context sessions now join the two pristine
+Three independent retained [TTD](README.md#shorthand-used-in-these-notes) call-context sessions now join the two pristine
 internal call sites to ten concrete target dispatches. Eight small-arm calls
 leave `0x0044C08E`; two large-arm calls leave `0x0044C061`. The receivers are
 six `CUnit`, two `CTree`, and two `CBattleEngine` instances. In every observed
 call, the source stack argument equals the current `CExplosion*`,
 `applyShields=1`, and `meshPartIndex=-1`. Eight callee returns validate; the two
-large-arm returns remain raw orphans. The small arm carries float bits
+large-arm returns remain unvalidated. The small arm carries float bits
 `0x3F000000`; the two observed large-arm values are `0x3C9429EE` and
 `0x3BD92866`.
 
@@ -175,7 +175,7 @@ call on the same receiver. Their direct mesh parts are `8, 0, 1, 0, 0, 8`,
 while all six explosion calls carry `-1`. That refutes reuse of the direct-hit
 part for these pairs. A deliberately poisoned replay changed only the expected
 `CUnit` count from six to seven: it preserved the event projection, exited 10,
-failed its expectations/pairing/collector gates, and published no READY. This
+failed its expectations/pairing/collector gates, and produced no accepted result. This
 is the negative instrument control, not positive carrier evidence.
 
 The exact proof is
@@ -239,7 +239,7 @@ numeric-fit hypothesis.
 
 The formerly missing collision edge is now recovered for the small,
 immediate-radius case used by the tutorial pulse. The mode-3 arm constructs the
-source-shaped `CExplosionInitThing` retained in `InitThing.h`. Exact stack-field
+source-shaped `CExplosionInitThing` retained in `references/Onslaught/InitThing.h`. Exact stack-field
 writes show:
 
 - `mBehaviour` is the resolved `CRoundExplosion` definition;
@@ -259,8 +259,8 @@ copies `mAttachedTo` to `CInitCSThing::mIgnoreThing` and adds `0x01000000` to
 damage (`config+0x38`) at or below the double `0.0015` (`0x005db298`,
 `0x0044b9f1`), it then clears `TF_IN_MAP_WHO` and overwrites the mask with
 `0xffffffff` (`0x0044b9fe-0x0044ba02`), so that explosion never collides (see
-[the value-id note](../formats/physics-round-value-ids.md)). The Medium Pulse
-(radius 0.5, damage 1.0) takes the normal path. The body takes the
+[the value-id note](../formats/physics-round-value-ids.md)). The Medium Pulse (record `Mech Pulse Hit Medium`;
+radius 0.5, damage 1.0) takes the normal path. The body takes the
 configured radius from `config+0x34` and copies allegiance. Its collision payload retains desired
 `ECL_APPROX_GEOMETRY_SHAPES` and minimum `ECL_OUTER_SPHERE`, sets maximum
 `ECL_APPROX_GEOMETRY_SHAPES`, response `ECR_PASSIVE`,
@@ -339,8 +339,8 @@ alone therefore proves neither a collision callback nor damage.
 
 ### Serialized geometry and terminal Target Tank behavior
 
-The September 8 materializer review corrected this section's previous claim of
-exact normal-live radii. Its August 27 input note had recomputed geometry from
+The 2026-09-08 materializer review corrected this section's previous claim of
+exact normal-live radii. Its 2026-08-27 input note had recomputed geometry from
 part corners through the alternate `CMesh::Load` path and explicitly left live
 returned words open. Those static estimates differ by one float step from some
 stored CMSH words; they are not observed instance values. The raw inputs are:
@@ -365,7 +365,9 @@ stores the sphere radius; body SHA-256
 Plane and Building use the base sphere without that multiplier. This is the
 checked initialization path, not a new live resource-selection observation.
 
-The contact catalog preserves these raw words and the separate class scale in
+Below, *the earlier Core reference* means `rebuild/OnslaughtRebuild.Core` in onslaught-godot, which that repository's README describes as the earlier, reference-only rebuild. The live Parity project there does not contain the Core names marked as such in this note.
+
+The contact catalog preserves these raw words and the separate class scale in the earlier Core reference's
 `Level100ContactDefinition.FloatGeometry`. Instance position/basis and centre
 rounding remain separate work. The primary sphere controls collision admission;
 the ordinary part-`-1` falloff uses owner-position distance minus the distinct
@@ -384,15 +386,15 @@ The second call can lower stored life again but cannot dispatch death twice.
 The scanner also continues to other eligible receivers; the original target is
 neither guaranteed first nor unique.
 
-The September 8 Unit teardown readback (in the decompilation notes, not yet published)
+The 2026-09-08 Unit teardown readback (in the decompilation notes, not yet published)
 also binds the Tank/Truck script and physical lifetimes. Their StartedDying and
 Died callbacks run immediately, then the script is deleted; the object remains
-collision-eligible until SHUTDOWN 2000's START_OF_FRAME ring bucket. All five
+collision-eligible until SHUTDOWN 2000's START_OF_FRAME [ring bucket](README.md#shorthand-used-in-these-notes). All five
 admitted Tank/Truck scripts begin Died with `UnsetObjective`, so their objective
 clears before physical removal. Generic native objective removal occurs later
 in `CComplexThing::Shutdown`, at `0x004f41da..0x004f41eb`.
 
-`Level100DestructionRuntime` now carries that Tank/Truck interval through sparse
+In the earlier Core reference, `Level100DestructionRuntime` now carries that Tank/Truck interval through sparse
 ordered shutdown records, sharing `RetailEventScheduler`'s existing clock,
 relative-time and bucket arithmetic. `DiedAwaitingShutdown` preserves physical
 activation while allowing script teardown/restore. Further accepted whole-body
@@ -403,9 +405,8 @@ identity, admission frame, due word, delivery frame and insertion order enter
 the canonical snapshot/hash. Simulation drains the START lane after controller
 input and before actor/mission callbacks only when its event clock advanced.
 
-This corrects the lifetime in the existing quantized contact/renderer path. It
-does not integrate retail MapWho or the spatial explosion scan. Ground pending
-movement now retains the full/lite cadence described below. The Drone's
+This corrects the lifetime in the earlier Core reference's existing quantized contact/renderer path. It
+does not integrate retail MapWho or the spatial explosion scan. In the earlier Core reference, ground pending movement now retains the full/lite cadence described below. The Drone's
 immediate-terminal shortcut remains: its
 CAirUnit path can later request shutdown below negative maximum life or on
 permitted contact, and its script's Died event has a different tutorial role.
@@ -425,7 +426,7 @@ pending phase. Source correspondence: `references/Onslaught/actor.cpp:53–70,
 211–257`; Ground/Unit guide bodies are retail evidence.
 
 Ground vtable `0x005e297c` slot 44 returns ClipToGround=1; slot 48 returns
-COfGHeight=0.1. At Core's existing projection this is
+COfGHeight=0.1. In the earlier Core reference the existing projection is
 `Y = max(candidateY, terrainY + 100 mm)`, including equality, not a snap down
 from above terrain. The clamp does not replace velocity with displacement.
 
@@ -437,7 +438,7 @@ from above terrain. The clamp does not replace velocity with displacement.
 | Full Actor Move `0x004015e0..0x004018fa` | `083c7a029afed634fa4108036a3057355e7dc3b78f8716f5d6588d49f8505a23` |
 | COfG getter `0x0050e960..0x0050e967` | `78049bb48824b378995b546473c06510309e220b0017366478095dfe024c02bd` |
 
-`Level100ActorMechanics` now preserves that cadence, lite position-only capture,
+In the earlier Core reference, `Level100ActorMechanics` now preserves that cadence, lite position-only capture,
 retained velocity and conditional clamp until removal, without waypoint steering
 or completion. Its initial full-update phase alignment and Alive velocity still
 use the existing quantized model; Alive vertical velocity is currently terrain
@@ -448,7 +449,7 @@ and Tank/Truck clamp controls are deterministic checks, not a retail playthrough
 
 ### Warehouse segmented explosion report
 
-The September 8 pristine review closes the static carrier but not any particular
+The 2026-09-08 pristine review closes the static carrier but not any particular
 shot's selected parts. `CBuilding::Init` at `0x00417190` writes collision minimum
 and maximum level 2 at `0x004171b7/0x004171ba`. The shared resolver's OBB flag
 sets the selected Warehouse mesh-volume `+0x18` at `0x004265fd`. Mesh/sphere
@@ -458,7 +459,7 @@ eligible part in ascending native order. Passive bounds testing calls
 radius and stores the accepted signed distance at report `+0xc4`.
 
 That distance helper has a shipped corner quirk: with all three axes outside,
-`0x004798a4` is `dc c0` (`FADD ST0,ST0`). It computes
+`0x004798a4` is `FADD ST0,ST0`. It computes
 `sqrt((gapY*gapY + gapX*gapX) + (gapZ+gapZ))`, not the Euclidean three-square
 formula. The two-axis arms do square both gaps. Each gap is stored float32
 before these expressions, but its positive/inside classification uses the
@@ -471,16 +472,16 @@ It recomputes displacement from `position + displacement - position`, keeping
 X wide but storing Y/Z endpoints first. It enlarges radius by half the resulting
 displacement length, tests the shifted midpoint against each box axis, then
 accepts only a nonpositive signed distance before storing that distance.
-`Level100ContactMechanics.TryPassiveSphereBounds` implements this bounded
-already-local-space operation with per-instruction 24-bit/RN rounding, including
-the corner quirk. Device creation (`rebuild/DETERMINISM.md` in Onslaught-Career-Editor)
+In the earlier Core reference, `Level100ContactMechanics.TryPassiveSphereBounds` implements this bounded
+already-local-space operation with per-instruction 24-bit/[RN](README.md#shorthand-used-in-these-notes) rounding, including
+the corner quirk. Device creation ([`rebuild/DETERMINISM.md`](https://github.com/dlprentice/onslaught-godot/blob/main/rebuild/DETERMINISM.md))
 supports that precision intent; actual gameplay FPU state remains unmeasured.
 It does not select poses, parts or neighboring actors.
 The synthetic point `(2,2,4)`, zero displacement, origin zero, half-extents
 `(1,1,1)` and radius `3` distinguishes the shipped acceptance through `sqrt(8)-3`
 from conventional rejection through `sqrt(11)-3`. This is a numerical regression,
 not an observed Warehouse shot. A second discriminator at `(3,3,0)` with the
-same box and radius bits `0x403504f3` accepts after the PC24 square root rounds
+same box and radius bits `0x403504f3` accepts after the [PC24](README.md#shorthand-used-in-these-notes) square root rounds
 to that radius; the previous 53-bit root incorrectly rejected it under this
 model. Active/future collision branches and live FPU
 equivalence remain open.
@@ -492,7 +493,7 @@ signed distance into `report+0xac[i]`, and stops at six contacts. Referenced
 geometry does not replace the selected part's identity. This is an ordered
 multi-part report, not the direct projectile's single selected triangle/part.
 
-`Level100ContactMechanics.CollectWarehouseSphereBounds` now builds this bounded
+In the earlier Core reference, `Level100ContactMechanics.CollectWarehouseSphereBounds` now builds this bounded
 report from explicitly supplied world poses and collision eligibility. It
 retains flat part-array order and one-hop geometry references: helper
 `[0x004b0cd0,0x004b0cf1)` (SHA-256
@@ -501,8 +502,8 @@ returns self for types 1/3 and the reference for type 6; the scanner then
 requires resolved type exactly 1. Vertex count, preview `Collidable`, health
 and BBOX word 8 are not this gate. The original context selects both cache
 index and report identity; reference geometry supplies only the bounds.
-All 28 Warehouse contexts pass that initial type gate. Its Core/Extra variant
-methods both point to `0x005019c0` (`33 c0 c3`, return zero), so no context hop
+All 28 Warehouse contexts pass that initial type gate. Its core-segment/Extra variant
+methods both point to `0x005019c0` (returns zero: `XOR EAX,EAX`, then `RET`), so no context hop
 is needed. Contact schema v7 preserves original CMSP `+0xa0/+0xa4` words as
 `NumNmicWord/IsNmicWord`; both are zero in every Warehouse part. The helper
 rejects NMIC input rather than inferring a general controller contract.
@@ -511,7 +512,7 @@ The local query uses `F(currentCentre - displacement)`, then subtracts the
 selected cached part position and multiplies by the cached transpose. Every
 dot accumulates Z, then Y, then X. X/Y offsets are stored float32; the Z dot
 retains the unspilled Z subtraction while the other dots reload its float32
-store. Displacement is rotated separately, even when zero. This is implemented
+store. Displacement is rotated separately, even when zero. This is implemented in the earlier Core reference
 by `RetailMeshPartPose.ToLocalSphereQuery`; it does not reinterpret the native
 motion record as start/end positions. Initial stores
 `[0x004ac755,0x004ac786)` hash to
@@ -537,7 +538,7 @@ exists, even while dying. That controller's `[0x00444030,0x00444063)` entry
 (SHA-256 `581e797a9ab59bdbc2fb24c0ce3de629e9c003b3335196b728c8c3a49d9d5667`)
 sends part `-1` past segment damage and destruction evaluation to the later
 threshold check. Part `-1` therefore cannot stand in for aggregate Warehouse
-damage. The current combined Pulse amount assigned to one direct-hit part is
+damage. In the earlier Core reference, the combined Pulse amount assigned to one direct-hit part is
 still an approximation that this separate report operation must replace.
 
 Collision eligibility is the segment's completed-break latch at `+0x38`,
@@ -554,12 +555,12 @@ immediately breaks parts **1, 2–18, 21, 23 and 26** through child propagation.
 Parts **0, 19, 20, 22, 24, 25 and 27** remain eligible at that return boundary.
 The six Extra chimney children receive queued event 3000 instead; each queued
 child's delay calculation consumes a random draw. This is not a total count
-of break/effect randomness. A positive-health Core can also enter a pending
+of break/effect randomness. A positive-health core segment can also enter a pending
 collapse state at `+0x4c`, excluded from active-value sums while still collision
 eligible. Missing renderer/mesh suppresses child propagation after the current
 segment's latch changes.
 
-The current destruction state now implements that synchronous core2 cascade.
+The earlier Core reference's destruction state now implements that synchronous core2 cascade.
 Native construction traverses authored children forward and inserts each at the
 head of the segment list; the resulting detach order is **1, 26, 23, 21, 18,
 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2**. Each newly broken
@@ -578,7 +579,7 @@ unchanged; do not reverse that separate accumulation.
 A focused fixture applies supplied lethal amounts to real leaf parts in this
 order: **17, 9, 14, 15, 7, 13, 19, 3, 25, 12, 10, 16, 4, 27, 8, 11, 5**.
 Its first below-half event carries `0x4200da7d`; the old ascending sum produced
-`0x4200da7c`. Core2 survives and no queued-child behavior is required. These are
+`0x4200da7c`. The core2 segment survives and no queued-child behavior is required. These are
 component calls with real part data, not observed player shots or projectile
 collision acceptance.
 
@@ -586,17 +587,17 @@ The direct controller's multiply at `0x00444072` reads binary64 `0.3` at
 `0x005db0a0`, stores a double and uses strict
 less-than. Under the admitted PC24 model the real initial total produces
 threshold `0x419c23e9`; the former float32 coefficient produced `0x419c23ea`.
-A synthetic restored state at exact equality now survives; it does not establish
+In the earlier Core reference, a synthetic restored state at exact equality now survives; it does not establish
 an authored damage route at that boundary. A separate native x87 probe confirmed
 both coefficient results under explicitly selected PC24/RN, restored its own
 control word and executed no game code. Actual gameplay precision remains
 unmeasured. The half coefficient is exact `0.5` and remains unchanged.
 
-This correction is bounded to the admitted Warehouse's only damageable Core
-and its direct Extra children. Queued child events/RNG, positive-health Core
+The earlier Core reference's correction is bounded to the admitted Warehouse's only damageable core segment
+and its direct Extra children. Queued child events/RNG, positive-health core segment
 collapse, amount/time writes and the native frozen-report consumer remain
 unimplemented. Terminal/inactive/zero-health damage gates and immediate final
-death are still approximations. The existing threshold/terminal event projection
+death are still approximations. The earlier Core reference's existing threshold/terminal event projection
 order is not claimed to match native controller notification order.
 Relevant freshly checked half-open body pins are:
 
@@ -605,8 +606,8 @@ Relevant freshly checked half-open body pins are:
 | Segment initialization | `004425a0–0044263b` | `ba2dee042119b14a7f6d0850cd1de30c373f172c872b3b577cc0cc05d818bae1` |
 | Common break | `00442b20–00442d36` | `aa4d76922ceba24f3fc1bad7ca135cff2b10c7649debb9ce4be05e683a7dcb41` |
 | Child propagation | `004429a0–00442a7a` | `8b88d419553578bddd55b859eec026460a0f928be78218dec76cd0b56e41321d` |
-| Core damage | `004435f0–00443656` | `f219422051b4dcb5bc04a24c47be6abf901ec94baa1e7c454c3be1049baafe5b` |
-| Core break/pending collapse | `00443660–004436c5` | `8bf6a7196af14602e2e873e9e1806a47cb97d49e503b349c95e2d86b8385f0c2` |
+| Core segment damage | `004435f0–00443656` | `f219422051b4dcb5bc04a24c47be6abf901ec94baa1e7c454c3be1049baafe5b` |
+| Core segment break/pending collapse | `00443660–004436c5` | `8bf6a7196af14602e2e873e9e1806a47cb97d49e503b349c95e2d86b8385f0c2` |
 | Extra damage | `00443890–004439ba` | `d1931190e5ca78fec9571aea05c415192948f33ed8875687fa05961f2dd6b976` |
 | Extra break wrapper | `004439c0–004439e4` | `608b9ec2c64dd44d4dbd9dde02c7371429851499239aa2fbf8a3411e6f69778c` |
 | Create and attach child | `00444e2a–00444e55` | `ecd06bf007b22253f7b3052f44659b848769e085f7218568125542070130005b` |
@@ -614,7 +615,7 @@ Relevant freshly checked half-open body pins are:
 | Segment child-list attachment | `00442700–00442710` | `b40beed727fdc4831bb2e956f6688ee8dbd1eef70ae99db9a2fb0f59661ab531` |
 | List-head insertion | `004e5afa–004e5b1c` | `bfac642227179444912f054936f1dda88188ba687b80ee450d71ec978fa468de` |
 | Extra/base health initialization | `00442870–00442884` | `1a6ed815a122f0cf6945e94930bfda6cc696820b4f96d3c2c30cead0bce5f41e` |
-| Core health initialization | `00443590–004435bb` | `566fe30c70e8b9db39d7ad1a541dd62f1f8255185f64d9d111a55d5cf6790464` |
+| Core segment health initialization | `00443590–004435bb` | `566fe30c70e8b9db39d7ad1a541dd62f1f8255185f64d9d111a55d5cf6790464` |
 | Active initial-value sum | `00442890–004428fb` | `6edfd5544bf96509f88287c6e954d7cb5470ddc953cb1d5fbe3ddb192b752e93` |
 | Current-health sum / initial cached total | `00442900–0044295b` | `d04a75d129e94c85f4f9017fd0b37e9d1d32eec7f755bb1e7c9f6ea6d632a96e` |
 | Complete controller initialization | `00444660–0044493c` | `132b3b463a23a4472c75b311b1a0f4be4f7c12bf2c3d9071cb633e6a9faaa877` |
@@ -630,7 +631,7 @@ the fixed-transform flag at `+0x20`. `SetPartBounds` selects `0x004b4de0`, whose
 normal-cache branch evaluates the hierarchy through `0x004b5330` and then applies
 the owner pose. It does not simply read the serialized CPOS/CORI values.
 
-The original mesh pose arithmetic (`rebuild/OnslaughtRebuild.Core/RetailMeshPartPose.cs` in Onslaught-Career-Editor)
+The earlier Core reference's mesh pose arithmetic (`rebuild/OnslaughtRebuild.Core/RetailMeshPartPose.cs` in onslaught-godot)
 implements the bounded, single-frame normal-cache composition with per-operation
 24-bit round-to-nearest-even arithmetic. Hierarchy and owner matrix products have
 different accumulation orders. Both retain the X position dot through
@@ -698,14 +699,14 @@ per-shot damage bits.
 
 ## Bounded reconstruction mapping
 
-The pre-mapping Core path passed aggregate `PulseDamageBits = 1.8` through one
+In the earlier Core reference, the pre-mapping path passed aggregate `PulseDamageBits = 1.8` through one
 `ApplyRoundHit` call. That reproduced the final Target Tank life but erased the
 proved intermediate store: a first hit went directly from `6.0` to `4.2`
 instead of retaining the retail-ordered `6.0 -> 5.2 -> 4.2`. The focused
 falsifier `PulseHitPreservesDirectThenExplosionDamageOrder` failed against that
 collapsed model with one `SegmentDamaged` event where two were required.
 
-`rebuild/OnslaughtRebuild.Core/Level100Destruction.cs` currently owns a bounded
+In the earlier Core reference, `rebuild/OnslaughtRebuild.Core/Level100Destruction.cs` holds a bounded
 aggregate approximation:
 
 - `PulseDirectDamageBits = 0x3F4CCCCD` and
@@ -715,24 +716,24 @@ aggregate approximation:
 - this retains the two-call store shape for known full-damage examples, but it
   does not perform the released explosion-position backoff, neighbor scan,
   approximate-volume negotiation, or radial falloff; and
-- `Simulation.UpdateProjectiles` routes `MechPulseBoltMedium` through that
+- `Simulation.MovePlayerRound` routes `MechPulseBoltMedium` through that
   pulse-specific owner rather than the generic one-damage round path.
 
 The tests that pin an unconditional first/terminal pair are approximation
-tests, not retail parity proof. The contact catalog carries the original
+tests, not retail parity proof. The earlier Core reference's contact catalog carries the original
 global BBOX origin/radius, class scale and render-radius bits into each target
 definition. The remaining runtime correction needs a distinct synchronous explosion at
 `round.position - normalize(velocity)*0.1`, primary-volume admission, and
 per-candidate falloff after the direct `0.8` call. Target Tank is proven
-nonsegmented on this path. Warehouse keeps the aggregate fallback until the
+nonsegmented on this path. In the earlier Core reference, Warehouse keeps the aggregate fallback until the
 separately admitted per-part bounds report above is implemented and checked;
 that fallback must not be generalized to whole-body actors.
 
-The September 8 Large correction separately reads the `Mech Pulse Bolt Large`
+The 2026-09-08 Large correction separately reads the `Mech Pulse Bolt Large`
 record `[0xacda,0xad9b)` from the same pinned physics input (193 bytes, SHA-256
 `834147fb4e48235c950ae189c0bd2002567c267705d65e81e5496ee6d91c71e6`).
 Its speed/life/contact radius/direct damage are `20 / 7 / 0.20 / 8`.
-Simulation projects those values through its existing millimeter motion and
+In the earlier Core reference, Simulation projects those values through its existing millimeter motion and
 swept contact owner. It applies one direct `8.0f` store, without the Medium
 second stage or an unconditional Large `4.0f` addition. Production contact
 checks distinguish 70 mm and 200 mm terrain clearance and observe target life
@@ -747,7 +748,7 @@ sets inaccuracy field 1 at `0x135df` to positive zero. The apply body at
 random stream at `0x00506e0a` and `0x00506e3e` before multiplying by this field;
 there is no zero-value bypass. Its complete `[0x005069f0,0x005078ac)` body
 SHA-256 is `124b166f80acecc01ae2bf18b876c7c1202015aea1ba2b8303414fde973f8e5d`.
-Simulation now passes zero through the existing two-draw scatter owner. A
+In the earlier Core reference, Simulation now passes zero through the existing two-draw scatter owner. A
 charged-launch regression rejected the former Medium scatter and checks both
 the resulting direction and stream state. This does not establish every
 constructor/effect draw or the full game's random-stream phase.
@@ -766,7 +767,7 @@ entry/return/write envelope or bind a particular Level 100 receiver. The pinned
 Stuart source is architectural/name evidence, not proof that its full body is
 byte-equivalent to the retail PC implementation.
 
-The 2026-08-28 static closure reports are:
+The 2026-08-28 static closure reports, kept in the folder dated 2026-08-27, are:
 
 - `<maintainer evidence>/continuous-20260827/lane-pc-level100-explosion-candidate-radii.md`
   (18,899 bytes, SHA-256
@@ -784,8 +785,8 @@ Reproduction owner:
 5,605 bytes, SHA-256
 `64344240ba844ad0dbf57aefcdd8d30ef4b386db43ec6f9fc84afd438ff32615`.
 Its verifier reads the pristine body, raw field-map TSV, strict RTTI/vtable and
-inheritance tables, pinned source declarations, instruction exports, and both runtime
-replicas; it does not consume this narrative document.
+inheritance tables, pinned source declarations, instruction exports, and both replicated runtime
+records; it does not consume this narrative document.
 
 The factory-chain supplement is
 `<maintainer evidence>/cround-explosion-semantic-20260810-v1/`. Its 257-row pristine switch

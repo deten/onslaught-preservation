@@ -1,14 +1,14 @@
 # CCLIParams__GetParams
 
 Status: active — complete parser static audit; bounded original-code execution
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (source pin aligned with the README's commit; analytic name marked; earlier: research-campaign records and decompiler-style code removed)
 Summary: startup defaults, the 25 retail option comparisons, argument ordering and bounded side effects.
 Evidence: MEASURED — pristine instructions, four initializer controls and 47 isolated parser cases; no retail startup or gameplay acceptance.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, 2,506,752 bytes,
 SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 > Address: 0x00423bc0 | Source: `references/Onslaught/CLIParams.cpp` (`CCLIParams::GetParams(char *text)` parser shape)
-Source File: `references/Onslaught/CLIParams.cpp` at `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`; Binary: `BEA.exe.original.backup` (`74154bfa…7750`).
+Source File: `references/Onslaught/CLIParams.cpp` at `c3d8ac464259942b83fa8aa7f867c856e77b734d`; Binary: `BEA.exe.original.backup` (`74154bfa…7750`).
 
 ## Identity and evidence
 
@@ -21,7 +21,7 @@ SHA-256 `7e9869f8c52f40b3b9ac5d85e48d40389b1de09ad8c829b94be121f774b75ec6`.
 at `00512298` and calls at `0051229d`. The string tokenizer and caller identify
 the source's `GetParams(char *text)` overload, not `GetParams(argc,argv)`.
 
-Pinned source `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`,
+Pinned source `c3d8ac464259942b83fa8aa7f867c856e77b734d`,
 [`CLIParams.cpp`](https://github.com/dlprentice/Onslaught/blob/c3d8ac464259942b83fa8aa7f867c856e77b734d/CLIParams.cpp):18–87,
 corroborates the constructor/parser relationship. Its field set and option set
 differ from retail; source declarations are not a recovered retail class layout.
@@ -35,7 +35,7 @@ OS/printf interception; neither count describes retail acceptance runs.
 
 ## Startup defaults ownership
 
-`CLIParams__InitDefaults` at `004239f0` initializes this same command-line
+`CLIParams__InitDefaults` (an analytic name; onslaught-decomp has no function of this name) at `004239f0` initializes this same command-line
 object. The old Unit AI attribution was wrong. Startup table slot `006220f0`
 points to the already recovered wrapper `0x004239c0`; its call at `004239c5`
 supplies `ECX=00662db8`. The complete wrapper is 22 bytes, SHA-256

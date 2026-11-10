@@ -1,10 +1,12 @@
 # DXFrontEndVideo.cpp - Function Mappings
 
-Status: active static function map
-Last updated: 2026-10-22 (reconstructed code and research-campaign records removed)
+Status: active — static function map
+Last updated: 2026-11-06 (names follow the published function table; return values, fade-alpha field and base-class label corrected; earlier: reconstructed code and research-campaign records removed)
 Summary: front-end Bink video playback: the `CDXFrontEndVideo` object, its double-buffered textures, open,
 update and render, and the neighbouring `CDXGame` and `CBinkOpenThread` entries that used to be mistaken for
 its base class.
+Evidence: MEASURED — static decode of the named specimen's instructions for addresses, offsets, vtable slots and call sites; the base-class and inheritance labels are INFERRED; the base lifecycle, complete class layouts and runtime Bink, scheduling and Direct3D behaviour are UNKNOWN.
+Specimen: pristine `BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750` (the default named in the [README](../../README.md#how-to-read-a-finding); this page names no binary of its own).
 
 > DirectX front-end video playback using the Bink library. Debug source path string for
 > `DXFrontEndVideo.cpp`: `0x00650744`.
@@ -15,7 +17,7 @@ This file implements video playback for the front-end/menu system using the RAD 
 
 **Class Hierarchy:**
 ```
-CFrontEndVideo (base class)
+CFrontEndVideo (base class; not confirmed by RTTI, see below)
   |
   +-- CDXFrontEndVideo (DirectX implementation)
 ```
@@ -52,7 +54,7 @@ Slot 8 of the inherited vtable is `CGame__Shutdown` (`0x0046c990`), matching `CG
 
 ## How the FMV wrapper embeds it
 
-`CDXFMV__ctor_base` (`0x0053f0f0`) constructs an embedded `CDXFrontEndVideo` at `this+0x10` after installing
+`CDXFMV__ctor` (`0x0053f0f0`) constructs an embedded `CDXFrontEndVideo` at `this+0x10` after installing
 the base `CFMV` vtable and before installing the `CDXFMV` vtable; `CDXFMV__DestructorBody` tears that object
 down before `CMonitor__Shutdown(this)`. This links the `DXFMV.CPP` wrapper to this file's video object
 statically only.
@@ -62,11 +64,11 @@ statically only.
 Vtable `0x005e5084` slot 0 is `CDXFrontEndVideo__scalar_deleting_dtor`, a `RET 0x4` delete-flag wrapper that
 conditionally frees the object and returns it. The cluster covers construction, the default-size fallback,
 open, init and close, the width and height accessors, render and update. Its callers include
-`CFEPMultiplayerStart__ctor`, `CDXFMV__ctor_base`, `CFEPCommon__Init`/`StartVideo`/`StopVideo`/`Shutdown`,
+`CFEPMultiplayerStart__ctor`, `CDXFMV__ctor`, `CFEPCommon__Init`/`StartVideo`/`StopVideo`/`Shutdown`,
 `CFrontEnd__RenderVideoQuadScaledToWindow`, `CFrontEnd__Process` and the `CDXFMV` call sites.
 
-`CDXFrontEndVideo__Render` uses two byte-flag helpers: `CDXFrontEndVideo__ClearByteFlag` (`0x00441e20`)
-writes zero to the byte at ECX, and `CDXFrontEndVideo__SetByteFlagAndReturnOld` (`0x00441e30`) reads the old
+`CDXFrontEndVideo__Render` uses two byte-flag helpers: `CWarnOnce__ctor` (`0x00441e20`)
+writes zero to the byte at ECX, and `CWarnOnce__Warn` (`0x00441e30`) reads the old
 low byte at `[ECX]`, writes `1` and returns the old value in `AL`.
 
 Runtime Bink playback, asynchronous scheduling, Direct3D texture upload, the visible front-end video and the
@@ -74,13 +76,15 @@ complete class layouts remain open.
 
 ---
 
-## Functions (12 total)
+## Functions
 
-### CDXFrontEndVideo::CDXFrontEndVideo (Constructor)
+Function names follow onslaught-decomp's published function table (`config/functions.tsv` at 76e277d) where that table carries the cited address. Names the table does not carry are not checked against it here; they are cited from the decompilation notes, which are not yet published.
+
+### CDXFrontEndVideo::ctor (Constructor)
 | Property | Value |
 |----------|-------|
 | Address | 0x00541200 |
-| Name | `CDXFrontEndVideo__CDXFrontEndVideo` |
+| Name | `CDXFrontEndVideo__ctor` |
 | Interface | Receiver in ECX; no stack arguments; returns nothing |
 | Returns | void |
 
@@ -90,7 +94,7 @@ complete class layouts remain open.
 - Sets vtable to 0x005e5084
 - Clears Bink handle (this+0x08 = 0)
 - Clears texture pointers (this+0x0C, this+0x10 = 0)
-- Initializes flags (this+0x2C = 0)
+- Initializes the fade alpha (this+0x2C = 0)
 
 ---
 
@@ -106,11 +110,11 @@ complete class layouts remain open.
 
 ---
 
-### CDXFrontEndVideo::SetDefaultSize
+### CDXFrontEndVideo::Init
 | Property | Value |
 |----------|-------|
 | Address | 0x00541240 |
-| Name | `CDXFrontEndVideo__SetDefaultSize` |
+| Name | `CDXFrontEndVideo__Init` |
 | Interface | Receiver in ECX; no stack arguments; returns an int |
 | Returns | 1 (always) |
 
@@ -120,11 +124,11 @@ complete class layouts remain open.
 
 ---
 
-### CDXFrontEndVideo::Close
+### CDXFrontEndVideo::Shutdown
 | Property | Value |
 |----------|-------|
 | Address | 0x00541260 |
-| Name | `CDXFrontEndVideo__Close` |
+| Name | `CDXFrontEndVideo__Shutdown` |
 | Interface | Receiver in ECX; no stack arguments; returns nothing |
 | Returns | void |
 
@@ -272,13 +276,13 @@ otherwise the cached height.
 
 ---
 
-### CDXFrontEndVideo::Update
+### CDXFrontEndVideo::NextFrame
 | Property | Value |
 |----------|-------|
 | Address | 0x00541d30 |
-| Name | `CDXFrontEndVideo__Update` |
+| Name | `CDXFrontEndVideo__NextFrame` |
 | Interface | Member with the receiver in ECX; takes `wait_for_frame` (byte); returns an int |
-| Returns | 0 = playing, 1 = finished, -1 = waiting |
+| Returns | 0 when playing or when no video is loaded; 1 when finished; -1 when waiting |
 
 **Purpose:** Updates video playback state, checks for completion.
 
@@ -300,7 +304,7 @@ otherwise the cached height.
 
 ---
 
-### CDXGame::CDXGame (Owner Correction)
+### CDXGame::ctor (Owner Correction)
 | Property | Value |
 |----------|-------|
 | Address | 0x00541f10 |
@@ -312,7 +316,7 @@ otherwise the cached height.
 
 ---
 
-### CBinkOpenThread::CBinkOpenThread (Owner Correction)
+### CBinkOpenThread::ctor (Owner Correction)
 | Property | Value |
 |----------|-------|
 | Address | 0x00541120 |
@@ -322,7 +326,7 @@ otherwise the cached height.
 
 **Purpose:** Earlier notes called this the `CFrontEndVideo` destructor. The function calls the waiting-thread constructor at `0x00528bc0`, installs vtable `0x005e5078`, and RTTI for that vtable resolves to `CBinkOpenThread`. The adjacent `0x00541140` vtable-slot body is not yet recovered.
 
-`0x00528bc0` is `CWaitingThread__ctor_base`. The neighbouring helpers are `CBinkOpenThread__WorkerMain`, `CBinkOpenThread__Init`, `CBinkOpenThread__WaitForThread`, `CBinkOpenThread__StartAsync`, `CBinkOpenThread__RunSync`, `CBinkOpenThread__IsRunning`, `CBinkOpenThread__Lock`, and `CBinkOpenThread__Unlock`. Xrefs tie the cluster to `CDXFrontEndVideo__Open/Update/InitVideo/CloseVideo/Render`, Bink voice queue pumping, Goodies loading polling, mission object-code async loading, and message-box voice/text reveal. Runtime Bink, media and thread scheduling behaviour and the exact class layouts remain open.
+`0x00528bc0` is `CWaitingThread__ctor`. The neighbouring helpers are `CBinkOpenThread__WorkerMain`, `CBinkOpenThread__Init`, `CBinkOpenThread__WaitForThread`, `CBinkOpenThread__StartAsync`, `CBinkOpenThread__RunSync`, `CBinkOpenThread__IsRunning`, `CBinkOpenThread__Lock`, and `CBinkOpenThread__Unlock`. Xrefs tie the cluster to `CDXFrontEndVideo__Open/Update/InitVideo/CloseVideo/Render`, Bink voice queue pumping, Goodies loading polling, mission object-code async loading, and message-box voice/text reveal. Runtime Bink, media and thread scheduling behaviour and the exact class layouts remain open.
 
 ---
 
@@ -350,7 +354,7 @@ otherwise the cached height.
 | 4 | 0x10 | 0x00405930 | (inherited) |
 | 5 | 0x14 | 0x00619AD0 | (inherited) |
 | 6 | 0x18 | 0x0046FF10 | (inherited) |
-| 7 | 0x1C | 0x00541F30 | CDXGame::scalar_deleting_dtor (inheritance through this table is not yet revalidated) |
+| 7 | 0x1C | 0x00541F30 | CDXGame__scalar_deleting_dtor (inheritance through this table is not yet revalidated) |
 | 8 | 0x20 | 0x0046C990 | CGame__Shutdown (inherited `CDXGame`/`CGame` shutdown) |
 | 9 | 0x24 | 0x0046F7E0 | (inherited) |
 | 10 | 0x28 | 0x004014A0 | (inherited) |
@@ -415,7 +419,7 @@ completion test compares the two, so it does not decide.
 
 ## Related Classes
 
-- **CDXFMV** - Lower-level FMV wrapper (RTTI at 0x00650620)
+- **CDXFMV** - FMV wrapper that embeds this object (RTTI at 0x00650620)
 - **CFMV** - Base FMV class (RTTI at 0x00650638)
 - **CBinkOpenThread** - Async video loading thread (RTTI at 0x006506D0)
 - **CUMTexture** - Unmanaged texture class used for video frames (RTTI at 0x0062d8a8)
@@ -453,4 +457,4 @@ completion test compares the two, so it does not decide.
 
 - Called from CFrontEnd during menu FMV playback
 - Uses CTexture::FindTexture for fallback placeholder texture
-- Related to -skipfmv command line parameter
+- Related to the `-skipfmv` command line parameter, which the [frontend system notes](../source/frontend/fep-systems.md) document; see also the [front-end index](README.md).

@@ -1,7 +1,10 @@
 # PhysicsScript static contract
 
 Status: bounded static and copied-corpus evidence; not runtime proof
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (manager, statement and apply-anchor names aligned with the decompilation; Summary, Evidence and Specimen lines added; the generated-summary sentence reworded; earlier: research-campaign records and decompiler-style code removed)
+Summary: the PhysicsScript manager, statement families and apply anchors as the pristine specimen shows them, and what the copied-corpus parse bounds; no runtime behavior.
+Evidence: MEASURED — the manager, family and registry rows read from the pristine specimen, and an aggregate parse of a copied `default physics.dat` (archived research record, not published); not runtime proof.
+Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 PhysicsScript defines default records for unit, weapon, weapon-mode, round,
 spawner, explosion, component, feature, and hazard families. This page owns the
@@ -14,10 +17,10 @@ implementation-facing static map; function-level detail remains in
 | Address | Static role |
 | --- | --- |
 | `0x0042e880 CPhysicsScript__Create` | Allocates and initializes the `0x10`-byte manager and stores the singleton. |
-| `0x0042e8f0 CPhysicsScript__Destroy` | Deletes statement nodes, frees the manager, and clears the singleton. |
+| `0x0042e8f0 CPhysicsScript__Shutdown` | Deletes statement nodes, frees the manager, and clears the singleton. |
 | `0x0042e950 CPhysicsScript__Load` | Recreates the manager, reads header token `0x12`, creates known statements, invokes their load slot, and skips unknown payloads. |
-| `0x0042ea60 CPhysicsScript__Update` | Iterates statements and calls update slot `+0x4`; null-singleton caller behavior is not proven. |
-| `0x0042eb90 CPhysicsScript__CreateStatement` | Dispatches observed top-level type ids `1..9`; unknown ids return null. |
+| `0x0042ea60 CPhysicsScript__Process` | Iterates statements and calls update slot `+0x4`; null-singleton caller behavior is not proven. |
+| `0x0042eb90 CPhysicsScriptStatement__Create` | Dispatches observed top-level type ids `1..9`; unknown ids return null. |
 
 The singleton is stored at `0x0066e99c`.
 
@@ -58,17 +61,18 @@ statements. Relevant registry lists include:
 | `0x00855404` | Feature defaults |
 | `0x00855408` | Hazard defaults |
 
-Key apply anchors are `CSpawnerBasedOn__ApplyToSpawnerByName` at `0x00439e70`,
-`CSpawnerUnit__ApplyToSpawnerByName` at `0x0043a080`, and
-`CExplosionBasedOn__ApplyToExplosionByName` at `0x0043abd0`.
+Key apply anchors are `CSpawnerBasedOn__Apply` at `0x00439e70`,
+`CSpawnerUnit__Apply` at `0x0043a080`, and
+`CExplosionBasedOn__Apply` at `0x0043abd0`.
 
 ## Retained evidence
 
 - `physics-script-copied-corpus-parser-proof.md` (archived research record, not published)
   records a public-safe aggregate parse of a copied `default physics.dat`.
 
-Generated proof-plan crosswalks and rollups are not independent authorities;
-the function notes and this contract retain the supported facts directly.
+Generated summaries and crosswalks are not independent sources; the function notes
+(in the decompilation notes, not yet published) and this contract hold the supported facts
+directly.
 
 ## Claim boundary
 

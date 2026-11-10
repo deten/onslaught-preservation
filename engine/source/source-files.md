@@ -1,6 +1,6 @@
-Status: active quick reference
-Last updated: 2026-10-22 (links updated for the onslaught-preservation layout)
-Source: migrated from archived Onslaught skills during the skill clean-slate pass.
+Status: active — quick reference for how Stuart's source files are organized
+Last updated: 2026-11-06 (provenance line replaced; counts dated to the commit each was read at, with the c3d8ac4 count added; the not-provided heading and sub-counts corrected; the audit link made to the public Toolkit path; the Goodie wording corrected)
+Source: the file layout of Stuart Gillam's published Onslaught source (pin c3d8ac4, see engine/source/README.md); counts below are dated to the commit each was read at.
 Summary: Stuart source file organization lookup.
 # Source File Organization
 
@@ -19,7 +19,7 @@ Summary: Stuart source file organization lookup.
 
 | File | Purpose |
 |------|---------|
-| FEPGoodies.cpp | 232 goodie conditions |
+| FEPGoodies.cpp | 232 Goodie descriptor initializers |
 | FEPLoadGame.cpp | Console save loading |
 | FEPSaveGame.cpp | Saving, cheat codes |
 | PCFEPLoadGame.cpp | **EMPTY STUB** |
@@ -49,16 +49,16 @@ Summary: Stuart source file organization lookup.
 | PCMemoryCard.cpp/h | **STUB** |
 | XBoxMemoryCard.cpp/h | Full impl |
 
-## Not Provided (117 of 169)
+## Not provided (total unknown)
 
 **High Priority:**
 - Unit.cpp, Mech.cpp, Cannon.cpp, Missile.cpp
 
-**MissionScript (7 files):**
-- AsmInstruction.cpp (27 opcodes)
+**MissionScript (7 files in an archived note, unverified):**
+- AsmInstruction.cpp (27 opcodes in that note, unverified)
 - ScriptObjectCode.cpp
 
-**Rendering (19 DX*.cpp):**
+**Rendering (19 DX*.cpp in that note, unverified):**
 - DXLandscape.cpp, DXShadows.cpp
 
 **CITATION REPAIRED 2026-07-28 — and the figure it backed is now marked UNKNOWN.**
@@ -68,21 +68,24 @@ This line previously read, in full:
 
 `stuart-request-list.md` **does not exist anywhere in this repository**
 (`find . -iname 'stuart-request-list*'` outside `.git` returns nothing), so the
-"117 of 169" heading above and the missing-file list under it had no resolvable
+"117 of 169" figures and the missing-file list under the heading had no resolvable
 backing at all.
 
 - **UNKNOWN** — the total original file count (169) and the 117 not provided are
   inherited from an archived note that is not in this repository. Nothing here
   can confirm or refute them. What would settle it: the archived request list
   itself, or a statement from Stuart of the original project's file count.
-- **MEASURED** — the pinned drop's own inventory, read on 2026-07-28 from
+- **MEASURED** — the pinned drop's own inventory, read on 2026-07-28 at commit `5352a81` from
   `git -C references/Onslaught ls-tree -r HEAD --name-only`: **108 entries — 52
   `.cpp`, 54 headers (53 `.h` + 1 `.H`), 1 `.md`, 1 `LICENSE`.** That confirms
-  the "52 files provided" heading at the top of this document, and 52 + 117 = 169
-  is internally consistent — but consistency is not evidence.
+  the "52 files provided" heading at the top of this document for that commit, and 52 + 117 = 169
+  is internally consistent — but consistency is not evidence. At the current pin,
+  `c3d8ac4`, the same listing (read 2026-11-06) has **131 entries — 62 `.cpp`, 64 `.h`
+  + 1 `.H`, 3 `.md`, 1 `LICENSE`**; its 23 extra files are mesh sources and two Markdown
+  files added after `5352a81`.
 - The current inventory posture is owned by
-  `reference-submodule-audit-2026-07-12.md` (archived research record, not published),
-  which is the correct place to look and resolves from here.
+  [`reference-submodule-audit-2026-07-12.md`](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/reverse-engineering/source-code/reference-submodule-audit-2026-07-12.md),
+  which is the place to look.
 
 This matters more than a normal dead link: a missing-corpus inventory is what
 decides whether a reimplementation ports from source or recovers from bytes.

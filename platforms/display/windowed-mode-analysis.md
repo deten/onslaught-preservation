@@ -1,50 +1,31 @@
 # Windowed Mode Analysis
 
-> Investigation of `-forcewindowed` parsing and startup-flow behavior across Steam baselines
-> Generated: December 2025
-
 Status: **partially superseded 2026-07-28**, parser scope corrected 2026-09-26 — the `0x00662f3e` guard-byte claim
 and the hex-edit instruction built on it are **withdrawn as false**. The two-gate
-model, the startup-flow patch guidance, and the wrapper workarounds stand
+model, the startup-flow patch record (no maintained tool applies it), and the wrapper workarounds stand
 unchanged. See "Correction 2026-07-28" immediately below.
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Last updated: 2026-11-06 (tool citations labelled, the command-line route first, copied source replaced by citations, withdrawn steps removed)
 Verdict: `-forcewindowed` is real and reachable, but its parser gate
 `0x00662f3e` is **BSS — zero at load**; on the inspected startup route,
 the parser sets it for `-testeur` appearing **earlier on the same command line**. So `-forcewindowed` alone
 does nothing on a stock invocation, and the byte cannot be normalised with a hex
-editor because it has no file byte to edit. The startup-flow byte patch at file
-offset `0x12A644` remains the operational path.
-Evidence: MEASURED — September 26 initializer/parser reinspection, plus the dated PE section table, `tools/pe_read_va.py`,
-`tools/operand_scan.py` and `tools/disasm_va.py` read over the pristine specimen
-on 2026-07-28; corroborated by the runtime run recorded in
+editor because it has no file byte to edit. The measured route is the command-line order
+`-testeur -forcewindowed` (Option 4); the startup-flow byte patch at file offset `0x12A644` has no current maintained tool.
+Evidence: MEASURED — September 26 initializer/parser reinspection, plus the dated PE section table and reads over the pristine specimen on 2026-07-28 made with `tools/pe_read_va.py` (in Onslaught-Career-Editor at the commit the README gives for `tools/` paths) and with `tools/operand_scan.py` and `tools/disasm_va.py` (archived research records, not published); corroborated by the runtime run recorded in
 `retail-capture-provenance-2026-07-25.md` (archived research record, not published).
 Specimen: `BEA.exe.original.backup`, SHA-256
 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`,
 2,506,752 bytes (`<maintainer evidence>/safe-copy-bea-pristine/`, read-only). Image base
 `0x00400000`. `BEA.exe` was not launched by this pass.
 
+> Investigation of `-forcewindowed` parsing and startup-flow behavior across Steam baselines
+> Written: December 2025
+
 ## Correction 2026-07-28 — the guard-byte claim was false, and its hex edit was harmful
 
-**What this document previously said, quoted so the record survives:**
+**What this document previously said:** a hex-editor byte edit to the guard was proposed on the basis of a claim about the canonical copy; the edit is withdrawn and must not be applied.
 
-> | Guard Flag | Current canonical Steam hash (`74154bfa...`) has `0x00662f3e` = 0x01; some historical baselines were observed at 0x00 |
->
-> - In current canonical Steam hash (`74154bfa...`), this byte is already `0x01`.
->
-> **Validation note (2026-03)**: In current repo binaries, the guard is already `0x01` …
->
-> ### Option 3: Binary Patch (Guard-byte Normalization)
->
-> Normalize the guard byte so `-forcewindowed` is parsed:
->
-> 1. Open BEA.exe in a hex editor
-> 2. Go to file offset 0x262F3E
-> 3. If the byte is `0x00`, change it to `0x01`
-> 4. Save and run with `-forcewindowed`
->
-> 3. **Baseline normalization (optional):** ensure file offset `0x262F3E` is `0x01` so the parser gate does not block `-forcewindowed`.
-
-**All of that is wrong. Measured on the pristine specimen named in the header:**
+**The claim was wrong. Measured on the pristine specimen named in the header:**
 
 1. **`0x00662f3e` has no file byte at all.** VA `0x00662f3e` is RVA `0x262f3e`.
    `.data` has virtual extent RVA `0x222000`–`0x5d4614` but **raw** extent
@@ -61,8 +42,8 @@ Specimen: `BEA.exe.original.backup`, SHA-256
    recorded elsewhere: a `.data` VA whose naive file offset lands on unrelated
    content.
 
-3. **The mechanism is the opposite of what was described.** `tools/operand_scan.py`
-   finds exactly **two** absolute references to `0x00662f3e` in the image, and
+3. **The mechanism is the opposite of what was described.** The operand scan
+   (`tools/operand_scan.py`, archived research record, not published) finds exactly **two** absolute references to `0x00662f3e` in the image, and
    **both are reads** — `0x00424150` and `0x004714f0`, each `mov al, byte ptr
    [0x662f3e]`. That scan found no absolute write. The setting writer is object-relative:
 
@@ -103,8 +84,8 @@ those historical binaries hashed and its section table parsed; none is held here
 
 **What is unchanged:** the two-gate model, the `mForceWindowed` offset `0x38`,
 the `d3dapp.cpp` source context, the DxWnd and dgVoodoo2 workarounds, and the
-operational guidance to use the startup-flow patch at `0x12A644` (with
-`0x129696` as the resolution gate). None of those rest on the guard byte.
+record of the startup-flow patch at `0x12A644` (with
+`0x129696` as the resolution gate; no current tool applies it). None of those rest on the guard byte.
 
 ## Summary
 
@@ -144,19 +125,7 @@ In `CCLIParams__GetParams` at `0x00423bc0`:
 
 ### D3D Initialization (Startup Fullscreen Gate)
 
-From Stuart's source code (`d3dapp.cpp` line 162-170):
-
-```cpp
-#ifndef _DEBUG
-#ifndef OPTIMISED_DEBUG
-#ifdef DEV_VERSION
-    if ((!CLIPARAMS.mModelViewer) && (!CLIPARAMS.mCutsceneEditor))
-#endif
-    if (!CLIPARAMS.mForceWindowed)
-        ToggleFullscreen();  // <-- Should be skipped if mForceWindowed=TRUE
-#endif
-#endif
-```
+In `references/Onslaught/d3dapp.cpp:162-170`, the startup call to `ToggleFullscreen` is guarded by the `CLIPARAMS.mForceWindowed` check, and the guard is compiled only when `_DEBUG` and `OPTIMISED_DEBUG` are both undefined. In `DEV_VERSION` builds, the toggle also requires that the model-viewer and cutscene-editor flags are both clear.
 
 If `mForceWindowed` is not set (or later startup flow forces fullscreen), this path falls through to fullscreen mode.
 
@@ -193,25 +162,22 @@ DxWnd intercepts DirectX calls and forces windowed mode at the API level.
 
 dgVoodoo2 is a DirectX wrapper that provides windowed mode support.
 
-1. Download from http://dege.freeweb.hu/dgVoodoo2/dgVoodoo2/
+1. Download the current release from https://github.com/dege-diosg/dgVoodoo2/releases
 2. Extract to game directory
 3. Configure via dgVoodooCpl.exe
 4. Enable windowed mode in settings
 
 ### Option 3: ~~Binary Patch (Guard-byte Normalization)~~ — WITHDRAWN 2026-07-28
 
-**Do not do this.** The four steps that stood here are quoted in
-"Correction 2026-07-28" above and are not repeated as instructions, because
-file offset `0x262F3E` is inside `.rsrc`, not `.data`. Editing it changes a
+**Do not do this.** A byte edit to file offset `0x262F3E` was proposed here and is withdrawn; it must not be applied, because that offset is inside `.rsrc`, not `.data`. Editing it changes a
 **resource byte** and does nothing to the parser gate, which is BSS and has no
 file byte at all.
 
 The **2026-03 validation note** that stood here — "In current repo binaries, the
 guard is already `0x01`" — was reading that same `.rsrc` byte and is withdrawn.
 
-The half of that note which was correct still holds: primary operational
-guidance is the startup-flow patch set (`0x12A644`, optional `0x12BB97`) exposed
-by Binary Patches.
+The half of that note which was correct still holds: the startup-flow patch set
+(`0x12A644`, optional `0x12BB97`) is the set the retired AppCore editor applied to copied executables, and no current tool offers it. Option 4 is the route to use.
 
 ### Option 4: `-testeur -forcewindowed` on the command line (no patching)
 
@@ -225,7 +191,7 @@ Order matters: `-testeur` must come **first**.
 
 | Address | Purpose |
 |---------|---------|
-| 0x00423bc0 | `CLIParams__ParseCommandLine` - CLI parsing |
+| 0x00423bc0 | `CCLIParams__GetParams` - CLI parsing |
 | 0x00424150 | Guard flag check (`0x00662f3e`) |
 | 0x00424168 | Set `mForceWindowed = 1` |
 | 0x006244a0 | String `"-forcewindowed"` |
@@ -237,32 +203,17 @@ Order matters: `-testeur` must come **first**.
 
 ## Source Code Reference
 
-From `CLIParams.h`:
-```cpp
-class CCLIParams {
-public:
-    // ... other fields ...
-    BOOL mForceWindowed;  // offset 0x38 (index 0xe)
-    // ...
-};
-```
-
-From `d3dapp.cpp`:
-```cpp
-// The code that SHOULD check mForceWindowed before going fullscreen
-if (!CLIPARAMS.mForceWindowed)
-    ToggleFullscreen();
-```
+- `references/Onslaught/CLIParams.h:28` declares `mForceWindowed` as a `BOOL` member of `CCLIParams`. This document uses offset 0x38 for it (see the Summary table).
+- `references/Onslaught/d3dapp.cpp:167-168` makes the startup `ToggleFullscreen` call depend on `mForceWindowed`, as described under "D3D Initialization" above. Source parity is guidance; the retail branch is confirmed only by the BEA.exe evidence above.
 
 ## Conclusion
 
-The `-forcewindowed` launch outcome is controlled by both parser gating (`0x00662f3e`) and startup fullscreen flow. *(Corrected 2026-07-28. The sentence that followed here previously read: "In current repo binaries, the guard byte is already `0x01`, but startup-flow patches remain the reliable path for consistent windowed startup." The guard byte is **zero at load in every build** — it is BSS. Only the second clause survives.)* Startup-flow patches remain the reliable path for consistent windowed startup; the guard is opened at runtime by `-testeur`, not by the image.
+The `-forcewindowed` launch outcome is controlled by both parser gating (`0x00662f3e`) and startup fullscreen flow. *(Corrected 2026-07-28. The sentence that followed here previously read: "In current repo binaries, the guard byte is already `0x01`, but startup-flow patches remain the reliable path for consistent windowed startup." The guard byte is **zero at load in the pristine specimen** — it is BSS. Neither clause stands as written.)* The measured route to windowed startup is the command-line order `-testeur -forcewindowed`; the startup-flow patches are recorded but no maintained tool applies them, and the guard is opened at runtime by `-testeur`, not by the image.
 
 **To enable windowed mode in current app workflow:**
-1. **Primary stable path:** apply the stable startup-flow patch `0x12A644`, with resolution gate patch `0x129696` as desired.
-2. **Optional experimental follow-up:** use `0x12BB97` only if the stable set is already verified and startup still flips to fullscreen on that setup.
-3. ~~**Baseline normalization (optional):** ensure file offset `0x262F3E` is `0x01` so the parser gate does not block `-forcewindowed`.~~ **WITHDRAWN 2026-07-28** — quoted here struck through rather than deleted, because it was a live instruction that would corrupt `.rsrc`. Use `-testeur -forcewindowed` on the command line instead if an unpatched route is wanted; see Option 4.
-4. **Wrapper fallback:** use wrapper/translation help only when system-specific behavior still bypasses the verified byte-patch path.
+1. **Command-line route (measured, no file changed):** launch with `-testeur -forcewindowed`, in that order (Option 4).
+2. **Byte patches (no current tool):** the startup-flow patch `0x12A644`, with the resolution gate patch `0x129696` as desired, and the optional follow-up `0x12BB97` for setups where startup still flips to fullscreen, were applied to copied executables by the retired AppCore editor. No maintained tool applies them now, and a hand edit is not recommended. If one is made anyway, copy the executable outside the game folder, verify the pristine SHA-256 first, write only the bytes at the named offsets, re-hash the copy, and keep `BEA.exe.original.backup`.
+3. **Wrapper fallback:** use wrapper/translation help only when system-specific behavior still bypasses the command-line route.
 
 ---
 

@@ -1,7 +1,7 @@
 # Retail Specimen Baseline
 
 Status: active specimen record
-Last updated: 2026-11-02 (historical manifest generator availability clarified)
+Last updated: 2026-11-06 (governance notes, a retired capture-tool claim and a dated narrative removed; earlier: historical manifest generator availability clarified)
 Summary: which retail executable and corpus files probes trust, their hashes, and the state of the installed copy.
 Evidence: MEASURED — SHA-256 of the named files, measured on the dates given.
 Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
@@ -33,13 +33,13 @@ contributors can run here.
 
 ## Baseline Targets
 
-The pinned set currently includes:
+The pinned set in the 2026-03-14 pass includes:
 
 | Key | Purpose |
 |-----|---------|
 | `installed_live_bea_exe` | Installed executable actually used by local runtime sessions |
-| `clean_repo_bea_exe` | Clean repo mirror of the retail Steam executable |
-| `repo_defaultoptions_bea` | Repo mirror of the boot/global options snapshot |
+| `clean_repo_bea_exe` | Pristine retail Steam executable, `BEA.exe.original.backup` (SHA-256 `74154bfa…`) |
+| `repo_defaultoptions_bea` | Boot/global options snapshot (`defaultoptions.bea`) |
 | `gold_save_haha_cannon` | Gold save baseline used by app/manual regression work |
 | `base_res_pc_aya` | Core packed resource archive |
 | `level_852_res_pc_aya` | Representative hidden/multiplayer-family resource archive |
@@ -49,7 +49,7 @@ The pinned set currently includes:
 
 ## Current Baseline Conclusions
 
-- The clean retail authority is the repo mirror, not the installed executable.
+- The clean retail authority is the pristine specimen named in the Specimen line above, not the installed executable.
 - The installed executable is still important because it is the actual runtime specimen, but it may drift if local patches are applied.
 - `defaultoptions.bea` and the gold `.bes` baseline are pinned separately because they serve different roles:
   - `defaultoptions.bea` is the boot/global settings specimen,
@@ -58,12 +58,12 @@ The pinned set currently includes:
 
 ### 2026-03-14 Finding
 
-During this pass, the installed executable was temporarily on a patched local variant and did not match the clean repo mirror.
+During this pass, the installed executable was temporarily on a patched local variant and did not match the pristine specimen.
 
-After the user restored the installed copy, the live install and the clean repo retail baseline match again:
+After the installed copy was restored, the live install and the pristine specimen match again:
 
 - installed live `BEA.exe`: `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
-- clean repo `BEA.exe`: `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
+- pristine specimen: `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
 
 So the current workstation state is back to a clean retail runtime specimen.
 
@@ -76,20 +76,18 @@ patched `e7881829…` executable described below survives as
 `<maintainer evidence>/…/safe-copy-bea/BEA.exe`. The
 2026-07-27 section records the Windows-era install.
 
-### 2026-07-27 — the installed executable is patched ON PURPOSE
+### 2026-07-27 — the installed executable is patched at four sites
 
-**This is not drift and it is not a problem to be escalated. The maintainer
-patches his own retail install deliberately, because it is easier for him to test
-with, and keeps the pristine original beside it as
-`BEA.exe.original.backup` in the same Steam folder. Do not raise it again.**
+On the Windows-era install, the installed executable differed from the pristine
+specimen at four patch sites, listed in the table below. The pristine copy was
+kept beside it as `BEA.exe.original.backup` in the same Steam folder.
 
-What *is* a problem is that
-`retail-specimen-manifest-2026-03-14.json` still records
-`installed_live_exe_matches_clean_repo: true`. That is stale. The manifest is a
-dated snapshot, so it is left as history rather than rewritten, and the standing
-state is recorded here instead.
+The archived manifest `retail-specimen-manifest-2026-03-14.json` (archived research
+record, not published) still records `installed_live_exe_matches_clean_repo: true`,
+which is stale. The manifest is a dated snapshot, so it is kept as history rather
+than rewritten, and the current state is recorded here instead.
 
-Measured today:
+Measured on 2026-07-27:
 
 - installed live `BEA.exe`: `e78818292a1dbe31dc6987c71665857de3a8cf3e7619745689d74c7da829c918`
 - pristine specimen: `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`
@@ -114,8 +112,7 @@ The exposure is prospective, not retrospective: any future scan run against the
 Steam path reads a different binary from the pristine specimen the static analysis
 was done on.
 
-**Capture tooling is unaffected and was already doing the right thing.**
-`Capture-Retail.ps1` targets `<maintainer evidence>/safe-copy-bea-pristine`, which carries
+The copied capture target, `<maintainer evidence>/safe-copy-bea-pristine`, carries
 `force_windowed` **only** — 4 bytes at `0x12A644`, verified — and deliberately
 leaves the version overlay and the 4:3 gate pristine so nothing cosmetic leaks
 into a reference capture. The two are different builds and must not be confused:
@@ -125,45 +122,24 @@ copied capture target `e1436ef7…`, installed live `e7881829…`.
 hash, not just an address. "Read from the binary" is ambiguous on this
 workstation and has been since at least 2026-03-14.
 
-> ### 2026-07-28 — the trap this rule is meant to stop, and it has already been sprung
->
-> **`e1436ef7…` is not pristine. Do not call it pristine.** It is the *capture
-> target*: pristine plus `force_windowed` and nothing else. The pristine
-> specimen is `BEA.exe.original.backup`, `74154bfa…`. The directory
-> `<maintainer evidence>/safe-copy-bea-pristine/` is named after its purpose, not its
-> contents, and the file named `BEA.exe` inside it is the **patched** one — the
-> names are inverted, as
-> `retail-capture-provenance-2026-07-25.md` (archived research record, not published)
-> recorded and did not fix.
->
-> On 2026-07-28, **nine** tracked notes were found attaching the word "pristine"
-> to `e1436ef7…` in a `Specimen:` header or in the body sentence "linear decode
-> of the pristine file": the seven `2026-07-26` terrain and cockpit notes, plus
-> `cockpit-world-matrix-static-2026-07-26.md` (which also carried **no hash at
-> all**) and one body sentence in
-> `terrain-gain-frame-global-falsified-2026-07-26.md`. All nine were corrected in
-> place. **No conclusion changed** — the two builds differ at exactly four bytes,
-> `0x12a644`–`0x12a647` = VA `0x0052a644`–`0x0052a647`, and no address cited in
-> any of the nine falls in that range.
->
-> Three sentences make a `Specimen:` line safe, and all three are required:
->
-> 1. **Name the file, not the directory.** `BEA.exe.original.backup` and
->    `BEA.exe` live side by side.
-> 2. **Carry the hash**, and check which of `74154bfa…` / `e1436ef7…` /
->    `e7881829…` it is before writing an adjective.
-> 3. **Say which role it plays** — pristine, capture target, or the deliberately
->    patched Steam install — because "safe copy" does not distinguish them.
->
-> This is the rule for new documents: [`AGENTS.md`](../../AGENTS.md) makes
-> `Specimen:` mandatory on any finding quoting a retail address. A header check
-> can validate **shape, not truth** — it cannot tell `e1436ef7` from `74154bfa`.
-> That check is still a reader's job, which is why the three rules above are
-> written out here.
+Three sentences make a `Specimen:` line safe, and all three are required:
 
-Restoring the install is a mutation of an installed game directory and is
-therefore separately authorized; the pristine bytes are held in two places above,
-so it is reversible whenever the user wants it done.
+1. **Name the file, not the directory.** `BEA.exe.original.backup` and
+   `BEA.exe` live side by side.
+2. **Carry the hash**, and check which of `74154bfa…` / `e1436ef7…` /
+   `e7881829…` it is before writing an adjective.
+3. **Say which role it plays** — pristine, capture target, or the deliberately
+   patched Steam install — because "safe copy" does not distinguish them.
+
+`e1436ef7…` is the capture target, not the pristine specimen: it is pristine plus
+`force_windowed` and nothing else. The pristine specimen is
+`BEA.exe.original.backup`, `74154bfa…`.
+
+This is the rule for new documents: [`AGENTS.md`](../../AGENTS.md) makes
+`Specimen:` mandatory on any finding quoting a retail address. A header check
+can validate **shape, not truth** — it cannot tell `e1436ef7` from `74154bfa`.
+That check is still a reader's job, which is why the three rules above are
+written out here.
 
 ## Operational Rule
 

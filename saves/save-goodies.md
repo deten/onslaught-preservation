@@ -1,7 +1,7 @@
 # Save Goodies quick reference
 
-Status: active quick reference
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense)
+Status: active — quick reference for where Goodie states live in a save and the corrections an editor must keep
+Last updated: 2026-11-06 (companion migration into CE noted, current ownership wording; earlier: retired AppCore/WinUI tools in the past tense)
 Summary: where the Goodie states live in a `.bes` save and the corrections an editor must keep.
 
 The authoritative format and evidence boundaries are in [goodies-system.md](goodies-system.md). Unlock copy shown by the product is owned by `companion/OnslaughtToolkit.Godot/Careers/GoodieUnlockRequirementService.cs` in Onslaught-Career-Editor.
@@ -33,4 +33,4 @@ MissionScript Goodie indices are one-based: `script index = save index + 1`. Scr
 - Goodie `232` maps to cutscene `33` and lacks a matching `goodie_232_res_PC.aya` in the checked PC archive set.
 - Goodie `228` is at `0x22D6`. The old `0x22D4` aligned-view value is not `mCareerInProgress`; that flag is at file offset `0x248A`.
 
-The companion's [`CareerSave`](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/companion/OnslaughtToolkit.Godot/Careers/CareerSave.cs) (Onslaught-Career-Editor `51129bab`) and its tests now own the byte-preserving Goodie edit.
+The companion's [`CareerSave`](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/companion/OnslaughtToolkit.Godot/Careers/CareerSave.cs) (Onslaught-Career-Editor `51129bab`) and its tests currently own the byte-preserving Goodie edit. The companion's features are moving into Onslaught CE ([GOAL.md](https://github.com/dlprentice/Onslaught-Career-Editor/blob/0ebde72bbc85972461fa5903390c5607e4d17376/GOAL.md) line 79; [PROGRAM.md](https://github.com/dlprentice/Onslaught-Career-Editor/blob/0ebde72bbc85972461fa5903390c5607e4d17376/PROGRAM.md) line 85); the standalone companion stays until a verified replacement exists.

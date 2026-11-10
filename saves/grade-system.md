@@ -1,10 +1,10 @@
 # Grade System
 
 Status: active save contract
-Last updated: 2026-10-22 (private evidence paths generalised for the onslaught-preservation layout)
+Last updated: 2026-11-06 (source defined as Stuart Gillam's published source, code block removed; earlier: private evidence paths generalised for the onslaught-preservation layout)
 Summary: a mission's rank is the float at CCareerNode+0x3C; the converter maps it to S, A-D or E, and -1.0 marks an uncompleted node.
 Evidence: MEASURED — the retail converter and level-map switch; SOURCE — `Career.cpp:1178-1202`; no capture of the map.
-Specimen: pristine `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
+Specimen: pristine Steam retail `BEA.exe`, held as `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 ## Retail/Steam Build (True Dword View)
 
@@ -34,18 +34,7 @@ Practical patching note: the patchers in this repo write these **bit patterns** 
 
 ## Grade Letter Conversion (Source Reference)
 
-The internal source (`references/Onslaught/`) contains the grade conversion logic (`CCareer::GetGradeFromRanking`):
-
-```cpp
-if (f == 1.f) return 'S';
-else if (f <= 0.f) return 'E';
-else {
-    i = floor(f * 4.f);
-    return 'D' - i;  // 0->D, 1->C, 2->B, 3->A
-}
-```
-
-This implies:
+Stuart Gillam's published source (`references/Onslaught/`, pinned as the [README](../README.md) describes) contains the grade conversion logic, `CCareer::GetGradeFromRanking` at `Career.cpp:1178-1202`. This implies:
 - `f == 1.0` => `S`
 - `0.75 <= f < 1.0` => `A`
 - `0.50 <= f < 0.75` => `B`

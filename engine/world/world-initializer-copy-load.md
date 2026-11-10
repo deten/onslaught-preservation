@@ -1,7 +1,7 @@
 # World initializer copy and load boundaries
 
 Status: active — copy effects and seven loaders measured in isolated original code; Spawner loading remains static evidence
-Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
+Last updated: 2026-11-06 (README pin and Appendix B class names stated, vtable slots defined, native harness named with its date; earlier: research-campaign records and decompiler-style code removed)
 Summary: selective initializer copies, distinct Squad overloads, versioned field reads and source/retail limits for reconstruction.
 Evidence: MEASURED — complete pristine instruction bodies, pinned source comparison, original Copy execution and seven original loaders with an intercepted reader; runtime limits are stated below.
 
@@ -11,6 +11,7 @@ Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`
 Source: `references/Onslaught` at
 `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`; `InitThing.h` SHA-256
 `5a7132f3d0fe5f95a8696675c99ef19fa6ddcc941d9065c7efd3018beab82fef`.
+`InitThing.h` is byte-identical at the README pin `c3d8ac4` (same blob), so the line numbers below hold at either commit.
 Field names below come from that header and are matched to complete retail
 instruction bodies. They do not certify the entire source object layout.
 
@@ -44,14 +45,14 @@ The derived routines preserve those omissions and add these copies:
 | `CCutsceneInitThing::Copy`, `0x0048da80` | Both full arrays `[+0x3bc,+0x5bc)` |
 | Shared body `0x0048dbe0` | One DWORD `+0x3bc`, interpreted as sphere radius or unit stats pointer by the holder |
 
-Squad has two overloads. Its primary table `0x005dc1b0` contains base Copy
+Squad has two overloads. Its primary vtable `0x005dc1b0` (the table of virtual-function addresses; its entries are slots, numbered from 0) contains base Copy
 `0x0040e1b0`, Squad Load `0x0048d8d0`, then typed Copy `0x0048d7d0`.
 The `Copy(CInitThing*)` override at `InitThing.h:645–649` delegates only to
 the base. Selecting it does not copy the Squad-specific fields. The second
 overload at lines 651–663 occupies slot 2.
 
-`0x0048dbe0` is present in Sphere (`0x005dc15c`), Unit (`0x005dc1c0`) and
-BattleEngineInitThing (`0x005dcad4`) slot 0. Sphere and Unit are different
+`0x0048dbe0` is present in CSphereTriggerInitThing (`0x005dc15c`), CUnitInitThing (`0x005dc1c0`) and
+CBattleEngineInitThing (`0x005dcad4`) slot 0. CSphereTriggerInitThing and CUnitInitThing are different
 direct children of CInitThing. The shared code does not justify choosing one
 exclusive source owner. Its complete 209-byte body has SHA-256
 `c459fbac5f3d57e80271bc525ba1feb295b17932222595d1deebd0a209187e5a`.
@@ -106,7 +107,7 @@ of malformed inputs remain separate questions.
 
 ## Executed evidence and limits
 
-On September 26, the existing native ELF32 experiment technique executed all
+On 2026-09-26 the native ELF32 harness (a child process whose syscalls are limited as stated below) executed all
 eight unchanged Copy bodies at their original addresses. Each linked body was
 compared with pristine bytes before execution. Sixty-four cases cover disjoint
 objects and self-copy, with terminators at offsets 0, 3, 127 and 255 within

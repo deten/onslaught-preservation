@@ -3,7 +3,7 @@
 Status: active, bounded semantic recovery
 Last updated: 2026-10-22 (research-campaign records and decompiler-style code removed)
 Evidence: MEASURED — complete pristine retail bodies, table accesses, constants,
-virtual calls, and seventeen normalized-identical PC demo twins; SOURCE — pinned
+virtual calls, and normalized-identical PC demo twins; SOURCE — pinned
 `Controller.cpp` and `Controller.h`; UNKNOWN — physical-device timing, live input
 feel, and PS2/Xbox instruction parity.
 Verdict: the shared controller object, mapping engine, repeat/deadzone laws,
@@ -75,7 +75,7 @@ repeat, positive/negative analogue, positive/negative analogue-as-repeat, key
 once, and key held. The PC build extends the switch through `17`:
 
 - type `10` calls the nonconsuming release-event query. The
-  September 26 keyboard recheck (in the decompilation notes, not yet published)
+  2026-09-26 keyboard recheck (in the decompilation notes, not yet published)
   establishes its writer, clearing behavior and full-EAX/nonzero caller test;
 - types `11..14` form signed mouse axes from cursor displacement about the
   window centre, with positive/negative sign gating and two bank-gated forms;

@@ -1,14 +1,14 @@
 # Save, options and startup compatibility contract
 
 Status: active bounded contract; comprehensive compatibility recheck in progress
-Last updated: 2026-10-22 (retired AppCore/WinUI tools in the past tense; VALIDATION citations pinned to sections; neutral evidence wording)
+Last updated: 2026-11-06 (commit label and companion test names corrected; glossary terms defined at first use; years added to five dated sections; fixture volume order stated; earlier: retired AppCore/WinUI tools in the past tense; VALIDATION citations pinned to sections; neutral evidence wording)
 Summary: independently rechecked startup/serialization behavior and explicit remaining save/settings compatibility boundaries.
 Evidence: MEASURED — selected pristine instructions and the isolated execution below; inherited subsystem summaries remain subject to recheck.
 Specimen: `<maintainer evidence>/safe-copy-bea-pristine/BEA.exe.original.backup`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750`.
 
 ## September 30 reconstructed options-reader comparison
 
-The maintainer independently reran 50 bounded in-memory comparisons between the original `0x00420d70` reader
+On September 30, 2026, the maintainer independently reran 50 bounded in-memory comparisons between the original `0x00420d70` reader
 and the current private reconstruction. Both execute at the original address in separate emulator images;
 the 1,072-byte candidate is still shorter than the 1,155-byte retail body and **does not count as a byte match**.
 All 70 candidate relocations are bound by 20 retail data-immediate witnesses and seven direct-call witnesses.
@@ -28,7 +28,7 @@ The compared results agree on these tested boundaries:
   selects language-bank reload instead. Tests include high-bit/noncanonical values, device-gated display reset,
   unsigned preset/language words and normalized final detail bytes.
 - All cases return the input pointer plus `0x56`. Callback order, arguments, receivers, intermediate state,
-  final permitted writes and the device block agree; original input/canaries, preserved registers and x87 balance
+  final permitted writes and the device block agree; original input/canaries, preserved registers and x87 (floating-point unit) balance
   remain intact.
 
 The controls refuse an unbound relocation, an unknown callee and truncated executable bounds. Suppressing
@@ -36,7 +36,7 @@ the hardware-sound restart flag produces a detected callback difference. This is
 explicit boundary models, not proof of whole-function equivalence, malformed-buffer admission, filesystem
 publication, actual graphics/audio/language behavior or complete original-save compatibility.
 
-Private reproduction, from the decompilation's main branch, with a new output directory:
+Maintainer rerun, not reproducible from this repository (its inputs are maintainer evidence), with a new output directory:
 
 ```text
 <maintainer evidence>/venv/bin/python -B <maintainer evidence>/build/career-compatibility-review-20260930/probe.py --out <maintainer evidence>/CHOSEN_NEW_DIRECTORY
@@ -50,7 +50,7 @@ implementations is a stronger falsifier; no save or settings file was created or
 
 ## October 1 original integer-tweak conversion
 
-The maintainer freshly compiled the options reader and reproduced 217 native i386 cases
+On October 1, 2026, the maintainer freshly compiled the options reader and reproduced 217 native i386 cases
 through the complete original/candidate bodies, now executing the actual
 `CTweakSLONG::Set` at `0x00528ad0` instead of the earlier conversion model. The
 serialized integer goes through binary32 before the setter converts it to a signed
@@ -83,7 +83,7 @@ Maintainer evidence:
 
 ## September 27 options-callback entry to persistence
 
-Twenty-one original-code [options-callback cases](../platforms/display/display-settings.md#september-27-options-processing-recheck)
+On September 27, 2026, twenty-one original-code [options-callback cases](../platforms/display/display-settings.md#september-27-options-processing-recheck)
 now bound the route at `0x0051f600`. Local state normalization precedes the
 page-state test, including on inactive pages. Only full-DWORD argument zero
 reads the options context; a zero context busy word and a route word other
@@ -98,9 +98,9 @@ or a complete options-dialog route. Original saves were not opened or changed.
 
 ## September 27 slot-save failure boundary
 
-The [slot-writer recheck](cpcmemorycard-pc-save-backend-semantics.md#september-27-slot-write-result-recheck)
+On September 27, 2026, the [slot-writer recheck](cpcmemorycard-pc-save-backend-semantics.md#september-27-slot-write-result-recheck)
 adds five executions of the complete original PC adapter at `0x00514f80`,
-plus one clearly separated counterfactual control. With intercepted CRT calls,
+plus one clearly separated counterfactual control. With intercepted C runtime (CRT) calls,
 a complete item write followed by close result `-1` still returns success
 (`0`). A non-one write count returns failure (`1`) without a close call.
 The unchanged real fixture is only passed as read-only data; this is not a
@@ -120,7 +120,7 @@ remain open.
 
 ## September 19 independent recheck
 
-The private `<maintainer evidence>/test-runs/save-startup-20260919/` owner contains selected
+The September 19, 2026 recheck's private `<maintainer evidence>/test-runs/save-startup-20260919/` owner contains selected
 complete-body disassembly and `startup_control.py`. The accepted
 `startup-run-o3zcj6ov/startup` receipt is
 `9639d263d59a96532c7f182d1e0b209f20b4faa90bc9e4acc519c8dd938a45f7`.
@@ -175,8 +175,8 @@ intercepted rather than validated.
 `menu_to_startup.py` then feeds the successful case's captured payload unchanged
 to the existing original WinMain executable. Receipt
 `533c72da0958207b18b1eb5ea20ec378598226a3c0ca5065451d71906f2f3639`,
-stem `menu-boot-qssmorvv/chain`. Menu-live volumes remain `0.25/0.75`, whereas
-the next startup reads the fixture's `0.6/0.4` bits, applies its bindings and
+stem `menu-boot-qssmorvv/chain`. Menu-live volumes remain `0.25/0.75` (this document does not record which is sound), whereas
+the next startup reads the fixture's `0.6/0.4` bits (sound 0.6, music 0.4), applies its bindings and
 sensitivity, and resets campaign progress. The handoff assumes successful
 storage; it does not prove durable publication, real process restart or audio
 playback. The startup driver's later separately invoked serializers/writer are
@@ -335,7 +335,7 @@ bodies: music setter, sound setter, camera getter and PC UpdateSound. Twenty-fiv
 scenario/rounding combinations pass once at each of x87 PC53 and PC64, yielding
 50 cases. Accepted stem `audio-volume-run-vra1oais/volume`; receipt
 `80a944c49b0e54c3ee76cd128d7f314dcd440a935a14dbd1874a4775e85f29a0`.
-Manager/event state and 2D COM boundaries are authored; this opens no device.
+Manager/event state and 2D COM (Component Object Model) boundaries are authored; this opens no device.
 
 Music stores the x87-converted configured integer, logs, then preserves the
 original float bits in career. It leaves current/target fade values unchanged.
@@ -381,7 +381,7 @@ return-value experiment, not an actual device failure.
 Original music Init resets current/target volume to 127, derives configured
 volume 51 from the preserved fixture, and consumes a playlist supplied by the
 owned platform-Init hook. Restoration selects category 2 for Level 100 and
-category 4 for the tested Level 110 route; frontend selection uses category 0.
+category 4 for the tested World 110 route; frontend selection uses category 0.
 The original selection code falls back to the playlist head if the requested
 track is unavailable. Virtual playback, real playlist creation and audible
 continuity remain outside the experiment.
@@ -509,8 +509,8 @@ This contradicted the former metadata name `LoadSampleFromBuffer_StubFail` at
 `005172a0`. The protected correction (archived research record, not published)
 now saves `CPCSoundManager__LoadNewSample_StubFail` and
 `CPCSoundManager__LoadSampleFromBuffer`, respectively. The caller establishes a
-filename-route stub and a working cached-buffer loader. The partial source at
-`references/Onslaught` commit `5352a81cdb838b145a57f7febc5d9fc4b0129ebb`
+filename-route stub and a working cached-buffer loader. The partial source at the earlier fork commit
+[`5352a81cdb838b145a57f7febc5d9fc4b0129ebb`](https://github.com/dlprentice/Onslaught/tree/5352a81cdb838b145a57f7febc5d9fc4b0129ebb) (committed 2025-12-12; the `references/Onslaught` pin in the README is [`c3d8ac4`](https://github.com/dlprentice/Onslaught/tree/c3d8ac464259942b83fa8aa7f867c856e77b734d), a different commit)
 has the opposite PC implementation availability: `pcsoundmanager.h:58` stubs
 the buffer loader, while `pcsoundmanager.cpp:151` implements filename loading.
 `SoundManager.cpp:248` also lacks retail's fourth reuse argument. Those source
@@ -559,7 +559,7 @@ The deleting wrapper at `00516960` always destroys the sample. Low-byte flag
 bit zero controls the final object-free request: `1`/`257` request it and
 `0`/`2` do not. Derived destruction at `005168d0` first shuts down matching
 events, then frees/clears sample allocation `+0x78` and releases/clears sample
-buffer `+0x80`. Base destruction at `004dff30` changes the vtable, repeats the
+buffer `+0x80`. Base destruction at `004dff30` changes the vtable (the table of virtual-function pointers), repeats the
 event traversal and unlinks through canonical manager `00896988`. Head, middle,
 tail and singleton cases are exercised; the singleton leaves the head null.
 Sample next and size fields are not cleared. Normal SEH-chain restoration is
@@ -772,7 +772,7 @@ The outer caller clears its sample/event heads, copies the master-volume word
 from `00662aac`, sets two gain fields to one and calls UpdateVolume with the
 now-empty event list. It allocates and links **256 distinct 136-byte sound-event
 objects**, then constructs a 20-byte menu and registers it through the original
-native thiscall operation. A prior registry child remains linked and untouched.
+native thiscall (C++ member-call convention) operation. A prior registry child remains linked and untouched.
 Successful allocation is supplied; the original pool/menu/console paths do not
 provide a safe general allocation-failure contract.
 
@@ -915,7 +915,7 @@ one real fixture and named derivatives, not complete startup acceptance.
 The extended startup controls ([`VALIDATION.md`, "Original startup reset with Goodies — September 20"](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/VALIDATION.md#original-startup-reset-with-goodies--september-20))
 replace the former Goodie hook with the unchanged recomputation and its required
 helpers. Original descriptor initialization supplies the thresholds; zero-filled
-BSS is not an equivalent starting state. WinMain, Load and Blank execute in 17
+BSS (the uninitialized data section) is not an equivalent starting state. WinMain, Load and Blank execute in 17
 valid, missing, short, invalid-version and options-tail scenarios.
 
 After Blank, exactly Goodies `0, 1, 8, 14, 33, 36, 41, 42, 43` have state `1`
@@ -954,14 +954,14 @@ setter at `004cefe0` writes `(index + 1) * 3.0`; the construction bounds yield
 `3, 6, ..., 63`. The tail reader preserves the raw sensitivity dword. Therefore
 that editor's range was a narrower application policy, not the retail range.
 The `OptionsD3DDeviceIndex`/`D3DDeviceIndex` consumer names similarly misdescribe
-the packed display-mode key. No companion/rebuild code was changed in this RE pass.
+the packed display-mode key. This review changed no code.
 
 The language decoder preserves physical rows, but its string readers do not
 enforce declared pool bounds or termination. Four private in-memory probes
 reproduce silent empty/truncated results and text running into the audio-size
 field; receipt `language-lookup-consumer-probe.json` is in the same private
 owner. Strict rejection would be an offline validation policy, not an imitation
-of retail's unchecked pointers. The rebuild materializer's ID dictionary and
+of retail's unchecked pointers. The [rebuild materializer](https://github.com/dlprentice/Onslaught-Career-Editor/blob/51129bab45489e5e45ee1c047cbcd8072bf4cc50/rebuild/tools/materialize_retail_assets.py)'s ID dictionary and
 corpus exporter's merged matrix select the last duplicate, unlike retail's
 first match; original per-language export rows retain ordering. All six measured
 files have unique IDs and valid pools, so these are derivative-input limitations,
@@ -978,7 +978,7 @@ newly verified merely because they remain documented here.
 | Career data | The mapped body includes 100 nodes, 200 links, 300 Goodie slots with 233 displayable entries, five packed kill counters from `0x23F6`, and raw float ranks. | In-game presentation and unlock animation remain runtime behavior. |
 | Options | Flags begin at `0x249E`, control entries at `0x24BE`, and the options tail is `0x56` bytes. `OptionsTail_Write`/`Read` and the binding helpers own this structure. | Hardware/input behavior needs focused runtime evidence when claimed. |
 | Frontend persistence | `CFEPLoadGame__DoLoad`, `CFEPOptions__SaveDefaultOptions`, `CFEPOptions__WriteDefaultOptionsFile`, `CPauseMenu__ResumeGameAndPersistOptions`, and `Platform__AsyncSaveCareer` connect frontend actions to serialization. | Static xrefs do not establish filesystem timing. |
-| Product behavior | The retired AppCore `BesFilePatcher` validated size/version, refused in-place output, preserved unknown and reserved regions, supported scoped options copy, and blocked career writes to options-like files unless explicitly overridden. | The companion's `CareerSave` and `OptionsFile` tests now carry the save-layout and file-safety facts. |
+| Product behavior | The retired AppCore `BesFilePatcher` validated size/version, refused in-place output, preserved unknown and reserved regions, supported scoped options copy, and blocked career writes to options-like files unless explicitly overridden. | The companion's tests in [`companion/OnslaughtToolkit.Godot/Tests/`](https://github.com/dlprentice/Onslaught-Career-Editor/tree/51129bab45489e5e45ee1c047cbcd8072bf4cc50/companion/OnslaughtToolkit.Godot/Tests), `CareerSaveTests.cs`, `OptionsTests.cs` and `FileSafetyTests.cs`, now carry the save-layout and file-safety facts. |
 
 ## Canonical owners
 

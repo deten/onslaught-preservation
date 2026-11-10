@@ -1,9 +1,15 @@
 # MSL Mission Scripting Language
 
+Status: active — the `.msl` language reference: syntax conventions and corpus observations, not runtime proof
+Last updated: 2026-11-06 (corpus checks: race threshold, Fenrir slot blocks, submarine placement, debug and vars lines; unchecked text labelled)
+Summary: the `.msl` mission language's conventions, command families and examples, with corpus observations labelled as such.
+
 **Battle Engine Aquila** uses a custom `.msl` mission language for objectives,
-AI, events, messages, cutscenes, and level outcomes. The local reference corpus
-contains hundreds of loose scripts and is the canonical owner for per-level
-details; this document retains the reusable language conventions and examples.
+AI, events, messages, cutscenes, and level outcomes. The maintainer's local
+reference corpus, which holds hundreds of loose scripts, is not published and
+cannot be checked from this repository. Per-level details are in
+[level-inventory.md](../level-inventory.md) and the public tables; this document
+keeps the reusable language conventions and examples.
 
 The retail binary contains the MissionScript/IScript interpreter and command
 registry described by the
@@ -56,13 +62,13 @@ end_vars
 | `position` | 3D coordinate | `position pos1;` |
 
 **Notes:**
-- Variables can be declared in a `vars` / `end_vars` block (some scripts omit it)
+- Variables can be declared in a `vars` / `end_vars` block (most scripts have one; some omit it, and the level scripts of levels 010 and 020 declare theirs in an `attributes` block, see [level-inventory.md](../level-inventory.md))
 - Variables can have default values
 - `thing` is a reference type pointing to game objects
 
 ## Special Functions (Lifecycle Callbacks)
 
-These functions are called automatically by the game engine at specific points:
+The corpus defines these callbacks by name; when the engine calls them is not established (see the [static contract](missionscript-iscript-static-contract.md)). The comments below give the intended use, not a measured call time:
 
 ```msl
 init()
@@ -115,8 +121,8 @@ PostEvent("Event Name");  // Fire event immediately
 
 | Event | Trigger |
 |-------|---------|
-| `"game playing"` | Game has finished loading, player is active |
-| `"Reached [Zone Name]"` | Posted by scripts/trigger volumes; not guaranteed in every level |
+| `"game playing"` | Posted when the opening pan ends and the game enters its playing state (see [level 100 construction order](../level100-construction-order.md)) |
+| `"Reached [Zone Name]"` | Named in two level 100 scripts in the corpus; what posts it is not runtime-verified |
 
 ### Example Event Chain
 
@@ -302,7 +308,7 @@ PlayCharMessage(P_TATIANA, MESSAGE_CONSTANT, delay);
 // Play and wait for completion
 PlayCharMessageWait(P_TATIANA, MESSAGE_CONSTANT, delay);
 
-// Priority versions (can interrupt other messages)
+// Priority versions: PlayPCharMessage takes a script-supplied numeric argument; whether it sets priority or interrupts is not established (see the command registry)
 PlayPCharMessage(P_KRAMER, MESSAGE_CONSTANT, delay, priority);
 PlayPCharMessageWait(P_KRAMER, MESSAGE_CONSTANT, delay, priority);
 
@@ -354,6 +360,7 @@ ShutdownVariable(TEXT_CONSTANT);
 // VARIABLE_NUMBER_AND_THRESHOLD   - Number with target/threshold
 // VARIABLE_TIMER                   - Countdown timer
 // VARIABLE_PERCENTAGE              - Percentage
+// VARIABLE_PERCENTAGE_AND_THRESHOLD - Percentage with threshold (levels 621 and 622 use it)
 // VARIABLE_TIME                    - Elapsed time display
 ```
 
@@ -448,6 +455,8 @@ Print("message");      // Output string
 SetAllegiance(ENEMY_ALLIGENCE);
 SetAllegiance(FRIENDLY_ALLIGENCE);
 ```
+
+Bare calls such as `Dive()` and `GetHealth()` appear in entity scripts in the corpus (for example the submarine and Fenrir scripts), where they refer to the script's own entity; `thing.Dive()` names its receiver. This is a corpus pattern, not a runtime-verified rule.
 
 ### Camera Control
 
@@ -591,6 +600,8 @@ The `onsldef.msl` file contains all shared constants:
 #define SLOT_TUTORIAL_4          66
 ```
 
+Corpus observation, not runtime-verified: in the level 731 and 732 folders, only `Fenrir.msl` calls SetSlot. Level 731's script calls `SetSlot(n, ...)` for components 1-23 (slots 1-23), and level 732's calls `SetSlot(n + 29, ...)` (slots 30-52). The level 741 and 742 `Fenrir.msl` scripts read `GetSlot(n + 29)` for components 1-23, the slots level 732 sets. The labels above number the 732 block from 31, one more than `n + 29` gives for component 1.
+
 ## Text String Files (.stf)
 
 Text strings are defined in `.stf` files (String Table File) and referenced by constants:
@@ -652,7 +663,11 @@ event("Submarine Destroyed")
 }
 ```
 
+The shipped level 500 scripts set these flags with `SetSlot`, the session-only call described under [Score and Career](#score-and-career). The career keeps tech slots in the saved career ([career system](../../engine/source/gameplay/career-system.md)); whether a session-only flag reaches that saved copy is not checked here.
+
 ### Defense Mission (level311)
+
+The script is in the level 311 folder, but its text constants use the 312 text IDs (`_312_...`), as [level-inventory.md](../level-inventory.md) pairs 311 with 312.
 
 ```msl
 init()
@@ -676,6 +691,8 @@ event("ForsetiBuildingDies")
 
 ### Racing Mission (level901)
 
+Simplified: the lap and win logic are not copied from the shipped script. The goodie threshold follows the shipped `LapMonitor.msl` in the level 901 folder, which sets goodie 68 for a time under 2,900 ticks (under 2,750 with a different message); see [level-inventory.md](../level-inventory.md#race-5).
+
 ```msl
 init()
 {
@@ -697,9 +714,9 @@ event("Start Line")
 
 event("Race Complete")
 {
-    if(raceTime < 2750)
+    if(raceTime < 2900)
     {
-        // Award goodie for fast time
+        // Goodie 68 for a time under 2,900 ticks (shipped threshold)
         if(GetGoodieState(68) < GOODIE_NEW)
         {
             SetGoodieState(68, GOODIE_NEW);
@@ -761,7 +778,7 @@ event("check health")
 
 ### Debug Directives
 
-Every script contains commented-out debug directives:
+732 of the 733 `.msl` files in the corpus contain these commented-out directives (all but `onsldef.msl`, the definitions file; a corpus count, not a runtime fact):
 
 ```msl
 // debug show_asm ;    // Show compiled assembly
@@ -783,8 +800,8 @@ These suggest the MSL compiler outputs to a bytecode/ASM format.
 Scripts commonly monitor player health with percentage-based thresholds:
 
 ```msl
-playerHelpHealth = player.GetHealth() * 0.8;    // 80%
-playerAbortHealth = player.GetHealth() * 0.4;   // 40%
+playerHelpHealth = player.GetHealth() * 0.8;    // 80% of the health when this line runs
+playerAbortHealth = player.GetHealth() * 0.4;   // 40% of the health when this line runs
 
 while(...)
 {
@@ -793,7 +810,7 @@ while(...)
         do_once
         {
             PostEvent("Abort Mission");
-            AddScore(-50);  // Penalty for needing help
+            AddScore(-50);  // Penalty for aborting (see Negative Scores)
         }
     }
 }
@@ -801,27 +818,27 @@ while(...)
 
 ### Negative Scores as Penalties
 
-The scoring system uses negative values for penalties:
+The corpus passes negative values to AddScore. Level 100's script passes -10, -20 and -50 once each, and 50 appears in ten scripts (corpus observation, not runtime-verified). Level 100's Reached Target Zone 3 poll reads -20 as the help penalty and -50 as the abort penalty ([level 100 final drone wave](../level100-final-drone-wave.md)); the meaning of -10 and of the 50 calls is not established:
 
 ```msl
-AddScore(-10);   // Hit penalty
-AddScore(-20);   // Needed assistance
-AddScore(-50);   // Mission aborted/failed secondary
-AddScore(50);    // Bonus for good performance
+AddScore(-10);   // Level 100 Evade Failed handler; meaning not established
+AddScore(-20);   // Help penalty in level 100 (see the drone wave document)
+AddScore(-50);   // Abort penalty in level 100 (see the drone wave document)
+AddScore(50);    // Passed in ten scripts; meaning not established
 ```
 
 ### Submarine Behavior
 
-The submarine in level 512 demonstrates teleportation-based AI:
+The submarine script in level 512 (`Sub.msl`) has a Northwest event that dives, teleports and surfaces. The abridged copy below is a corpus observation, not runtime-verified:
 
 ```msl
 event("Northwest")
 {
     Dive();
     PostEvent("Dive");
-    Pause(45.0);                        // Wait while "traveling"
-    Teleport(NW);                       // Actually just teleport
-    TeleportOrientation(-127, 0, 0);    // Face new direction
+    Pause(45.0);
+    Teleport(NW);
+    TeleportOrientation(-127, 0, 0);
     Surface();
 }
 ```
@@ -840,7 +857,7 @@ init()
 
 ### Mission 500 Branching Logic
 
-Level 500 (Archipelago) is the major branching point in the campaign:
+Level 500 (Split second) is the major branching point in the campaign:
 
 ```msl
 // Player can either:
@@ -852,6 +869,8 @@ SetSlot(61, TRUE);  // After destroying rocket
 SetSlot(62, TRUE);  // After destroying submarine
 ```
 
+Flag 62 (submarine) opens world 511 and flag 61 (rocket) opens world 512 ([career links](../../saves/career-links.md), link indices 46 and 47). The submarine's teleport script is in level 512 (see Submarine Behavior), and the level 500 folder's `Submarine.msl` sets flag 62.
+
 ### Component-Based Destruction
 
 Complex vehicles like the Fenrir use indexed components:
@@ -862,7 +881,8 @@ Complex vehicles like the Fenrir use indexed components:
 // Components 12-17: Plane launchers
 // Components 18-23: Bomb bays
 // Components 24-27: Engines
-// Doors are non-contiguous in Fenrir scripts (notably 28, 29, and 32)
+// Components 28 and 29: back doors (BackDoor in level 741; BackDoorTop and BackDoorBot in level 742)
+// Component 32: front door (FrontDoor); components 30 and 31 are not referenced in the level 741 or 742 scripts
 
 for(n = 1; n <= 23; n = n + 1)
 {
@@ -873,11 +893,13 @@ for(n = 1; n <= 23; n = n + 1)
 }
 ```
 
+The loop covers components 1-23 only and has no comment, so these scripts never shut down the engines (24-27) or the doors (28, 29, 32); they do not say why.
+
 ### Cutscene Camera System
 
 The current registry places `CreatePosition`, `Goto3PointPanCamera`, and
-`Goto4PointPanCamera` at rows 66, 114, and 115. The retained VM schema supports
-the `CPositionDataType` vtable at `0x005e4da4`; runtime camera switching and
+`Goto4PointPanCamera` at rows 66, 114, and 115. The retained [VM schema](missionscript-vm-datatype-opcode-schema.v1.json) lists
+the `CPositionDataType` vtable; runtime camera switching and
 visible output remain separate proof.
 
 Death/victory cutscenes use a 3-point pan camera:
@@ -925,7 +947,7 @@ MissionScripts/
     Cutscene_Won.msl
     Cutscene_Lost.msl
     hack.msl               # Door unlock trigger
-  level901/                # Racing multiplayer
+  level901/                # Racing checkpoints (single player)
     LapMonitor.msl
     LapTimer.msl
     Checkpoint1.msl
