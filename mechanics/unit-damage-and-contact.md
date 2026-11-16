@@ -272,7 +272,7 @@ Two details matter to a reimplementation.
   split. The replays ran on the fixed-step clock described in
   [where the retail game depends on real time](../engine/runtime-time-dependence.md). The input tapes, the repeat runs
   and the traces are public, with a README and SHA-256 sums:
-  [battle-engine-aquila-rebuild, `evidence/unit-hit-third-normal/`](https://github.com/deten/battle-engine-aquila-rebuild/tree/da2f7d69a6703de81217695f940e46cd1434907e/evidence/unit-hit-third-normal).
+  [battle-engine-aquila-rebuild, `evidence/unit-hit-third-normal/`](https://github.com/deten/battle-engine-aquila-rebuild/tree/3d2b415ad96d203fbd38a9ec72ed1e577cc288c1/evidence/unit-hit-third-normal).
 
   INFERRED: the original's value is the same on every run because the same calls run before `CUnit::Hit`, not because
   anything sets it. A rebuild that wants the original's outcomes has to reproduce that leftover. A rebuild that sets
