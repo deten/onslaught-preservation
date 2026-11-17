@@ -1,7 +1,7 @@
 # Unit and Battle Engine damage and contact
 
 Status: active — subsystem description of how damage, repair, shields and invulnerability are applied and how unit contact is admitted; one full-game observation (the contact rule's unset third normal in recorded play)
-Last updated: 2026-11-16 (the unset third contact normal measured in recorded play of levels 720 and 741)
+Last updated: 2026-11-17 (the unset third contact normal measured in recorded play of levels 720 and 741; how level 720's value was traced, and the run with the original's values given to CE)
 Summary: the order of operations when something damages or repairs the player's Battle Engine and any other unit (shields, life, augmentation, death, shake, invulnerability, radio warnings), the rules for admitting a unit's contact with the thing it stands on, and the events a unit handles; with the cases that were run on the original function bodies and what remains open.
 Evidence: SOURCE — Stuart's pinned `BattleEngine.cpp` (the Battle Engine's `Damage`), which has no counterpart for `Unit.cpp`; MEASURED — the decompilation's source for these four functions is listed as byte-matched against the retail executable, and the complete original bodies of `CBattleEngine::Damage` and `CUnit::Damage` were run in an isolated harness with authored inputs (41 and 61 cases), and in replays of recorded play of levels 720 and 741, the third normal `CUnit::Hit` reads with two contacts, what the original finds there, whether repeated runs agree, and what a different value does to the standing decision; INFERRED — the consequences drawn from that order, each marked where it is drawn; UNKNOWN — everything the open questions list, including every question about live play.
 Specimen: pristine Steam `BEA.exe`, SHA-256 `74154bfae14ddc8ecb87a0766f5bc381c7b7f1ab334ed7a753040eda1e1e7750` (see the [retail specimen baseline](../platforms/pc/retail-specimen-baseline.md)).
@@ -250,29 +250,29 @@ Two details matter to a reimplementation.
   report but not the normal array. Whether real triangle geometry produces these sequences was not measured.
 - **It happens in real play, and it decides the outcome.** Replaying two recordings in the original with a trace on
   `CUnit::Hit` showed a report with two contacts, neither steep enough on its own, so the three-normal sum decided. The
-  [Onslaught CE](https://github.com/dlprentice/onslaught-ce) port, built with a different compiler and replaying the
-  same input, read different leftover bytes there, and the decision went the other way:
+  [Onslaught CE](https://github.com/dlprentice/onslaught-ce) port (version 0.1.13), built with a different compiler and
+  replaying the same input, read different leftover bytes there, and the decision went the other way:
   - **Level 741, 42.65 s, the player's Battle Engine.** Both contacts are about 51 degrees from level (`-Z` 0.63). The
     original's third slot held (0.89, -0.46, 0), and with it the sum passes the 0.69 test (`-Z` about 0.88). The
-    Battle Engine is declared standing, called from `CUnit::Hit` at `0x004fcd9f` and `0x004fcda9`. The port's slot
-    held values near zero, the sum stayed at 0.63, and the engine was not declared standing.
+    Battle Engine is declared standing, called from `CUnit::Hit` at `0x004fcd9f` and `0x004fcda9`. In CE 0.1.13 the
+    slot held values near zero, the sum stayed at 0.63, and the engine was not declared standing.
   - **Level 720, 0.05 s, a unit at the start of the level.** The original's third slot held (-0.78, -0.63, -0.04),
-    left there by `CUnit::GetEmitter` (an element of a particle emitter's matrix). The sum fails the test, so the unit
-    does not stand. The port's slot held (5, 0, -20), which passes the test (`-Z` about 0.95), so in the port the unit
-    stands.
+    left there by `CUnit::GetEmitter` copying a particle emitter's matrix: a write watch on that stack slot logged it
+    as the last write before the hit (MEASURED). The sum fails the test, so the unit does not stand. In CE 0.1.13 the
+    slot held (5, 0, -20), which passes the test (`-Z` about 0.95), so in CE the unit stands.
 
   Repeat runs: the third value was traced in one run of each level. In that run of level 741, the same two units (one of
   them the Battle Engine) touched with two contacts nine times between 30.35 s and 42.65 s, and the third value was
   the same each time; other two-contact reports in the run held other values. Two further full runs of each level, made days
   apart, matched each other at every 50-frame checkpoint (the player's position, the random state, life and the event
   count), on level 741 through the end of the level at 196 s. A flipped decision moves the unit, so both runs made the
-  same decision there (INFERRED). When the
-  port was given the original's three values for the level 720 contact, its first difference from the original moved
-  from frame 3 to frame 3,200, where a separate rounding difference took over. That shows this read caused the earlier
-  split. The replays ran on the fixed-step clock described in
-  [where the retail game depends on real time](../engine/runtime-time-dependence.md). The input tapes, the repeat runs
-  and the traces are public, with a README and SHA-256 sums:
-  [battle-engine-aquila-rebuild, `evidence/unit-hit-third-normal/`](https://github.com/deten/battle-engine-aquila-rebuild/tree/3d2b415ad96d203fbd38a9ec72ed1e577cc288c1/evidence/unit-hit-third-normal).
+  same decision there (INFERRED). When CE was given the original's third values for level 720 (written into the slot
+  at each two-contact hit, in order), its first difference from the original moved from frame 3 to frame 3,200, where a
+  separate rounding difference took over. That shows this read caused the earlier split. The replays ran on the
+  fixed-step clock described in [where the retail game depends on real time](../engine/runtime-time-dependence.md).
+  The input tapes, the repeat runs, the traces, the values given to CE and that run's probes are public, with a README
+  and SHA-256 sums:
+  [battle-engine-aquila-rebuild, `evidence/unit-hit-third-normal/`](https://github.com/deten/battle-engine-aquila-rebuild/tree/c2e507ecdd0ffdcae6886f9e0dd3d8c805f0e1b1/evidence/unit-hit-third-normal).
 
   INFERRED: the original's value is the same on every run because the same calls run before `CUnit::Hit`, not because
   anything sets it. A rebuild that wants the original's outcomes has to reproduce that leftover. A rebuild that sets
